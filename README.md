@@ -29,14 +29,6 @@ Requires macOS 14 or later and the [GitHub CLI](https://cli.github.com).
    gh auth login
    ```
 
-DevNotch isn't notarized by Apple yet, so macOS blocks it the first time you open it. To allow it, run:
-
-```sh
-xattr -dr com.apple.quarantine /Applications/DevNotch.app
-```
-
-Or try to open the app, then go to **System Settings › Privacy & Security** and click **Open Anyway**.
-
 ## Usage
 
 1. Open DevNotch and hover over the notch.
@@ -89,9 +81,9 @@ So it never has to store a token. DevNotch asks `gh` for a token on each refresh
 
 Run `gh auth login` with the other account, then add it from the accounts button in the panel.
 
-### Does it work on Macs without a notch?
+### Does it work with external displays or Macs without a notch?
 
-Yes. The panel sits at the top center of the main screen.
+Yes. On a screen without a notch, hover over the top center of the menu bar. DevNotch shows up on whichever screen your pointer is on, and alerts appear there too.
 
 ### How often does it refresh?
 
