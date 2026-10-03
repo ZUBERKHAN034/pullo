@@ -16,7 +16,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         source: demo == nil ? GitHubSource(accounts: accounts) : demoSource
     )
     private lazy var model = NotchViewModel(
-        store: store, accounts: accounts, settings: settings, tracker: tracker, geometry: .current()
+        store: store, accounts: accounts, settings: settings, tracker: tracker,
+        geometry: demo == nil ? .underPointer() : NotchGeometry(screen: NotchGeometry.notchedScreen)
     )
     private lazy var settingsWindow = SettingsWindowController { [unowned self] in
         SettingsForm(settings: settings, accounts: accounts, model: model)
@@ -29,9 +30,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let panel = NotchPanel(rootView: NotchRootView(model: model, store: store, accounts: accounts))
         self.panel = panel
-        layoutPanel()
+        panel.setFrame(model.geometry.panelFrame, display: true)
         panel.orderFrontRegardless()
 
+        model.$geometry
+            .removeDuplicates()
+            .sink { [weak panel] geometry in panel?.setFrame(geometry.panelFrame, display: true) }
+            .store(in: &cancellables)
         model.$state
             .sink { [weak self] state in self?.stateChanged(to: state) }
             .store(in: &cancellables)
@@ -45,6 +50,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         accounts.onAccountAdded = { [weak self] account in self?.model.accountConnected(account) }
 
         if let demo {
+            model.followsPointer = false
             // The tour drives everything itself; a stray real mouse move or shortcut shouldn't interfere.
             Task { await demo.play(model: model, store: store, source: demoSource) }
             return
@@ -62,7 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.layoutPanel() }
+            MainActor.assumeIsolated { self?.screensChanged() }
         }
         // The network takes a moment to come back after sleep; refresh once it has, not a minute later.
         NSWorkspace.shared.notificationCenter.addObserver(
@@ -115,9 +121,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func layoutPanel() {
-        model.geometry = .current()
-        panel?.setFrame(model.geometry.panelFrame, display: true)
+    /// A display was plugged in, removed or rearranged. The panel stays put unless its screen went away.
+    private func screensChanged() {
+        if let screen = NSScreen.screens.first(where: { $0.frame == model.geometry.screenFrame }) {
+            model.geometry = NotchGeometry(screen: screen)
+        } else {
+            model.close()
+            model.geometry = .underPointer()
+        }
     }
 
     private func installEventMonitors() {

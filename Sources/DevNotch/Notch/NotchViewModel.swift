@@ -28,6 +28,8 @@ final class NotchViewModel: ObservableObject {
     /// The panel needs key focus for typing (search); AppKit-side, so the delegate provides it.
     var onNeedsKeyFocus: (() -> Void)?
     var onOpenSettings: (() -> Void)?
+    /// Off in the demo, which stays on the notched screen whatever the real pointer does.
+    var followsPointer = true
 
     private var queue: [NotchAlert] = []
     private var peekTask: Task<Void, Never>?
@@ -68,6 +70,7 @@ final class NotchViewModel: ObservableObject {
     // MARK: - Pointer
 
     func mouseMoved(to point: NSPoint) {
+        moveToPointerScreen()
         let inside = layout.hitRect(for: state).contains(point)
 
         if waitingForPointerExit {
@@ -114,6 +117,13 @@ final class NotchViewModel: ObservableObject {
         hoverTask = nil
     }
 
+    /// There's one panel, and it goes to the screen you're on; only while closed, so it never jumps away mid-use.
+    func moveToPointerScreen() {
+        guard followsPointer, state == .closed else { return }
+        let target = NotchGeometry.underPointer()
+        if target != geometry { geometry = target }
+    }
+
     // MARK: - Transitions
 
     func open(viaKeyboard: Bool = false) {
@@ -128,6 +138,7 @@ final class NotchViewModel: ObservableObject {
     }
 
     func toggleFromKeyboard() {
+        moveToPointerScreen()
         if state == .open { close() } else { open(viaKeyboard: true) }
     }
 
@@ -196,6 +207,7 @@ final class NotchViewModel: ObservableObject {
         guard state == .closed, !queue.isEmpty else { return }
         let alert = queue.count > 1 ? NotchAlert.summary(of: queue) : queue[0]
         queue.removeAll()
+        moveToPointerScreen()
         withAnimation(Motion.peek) {
             peekAlert = alert
             state = .peek
