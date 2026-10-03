@@ -1,0 +1,50 @@
+import Foundation
+import ServiceManagement
+
+@MainActor
+final class AppSettings: ObservableObject {
+    @Published var mutedCategories: Set<AlertCategory> { didSet { save() } }
+    @Published var mutedAccounts: Set<String> { didSet { save() } }
+    @Published var haptics: Bool { didSet { save() } }
+    @Published private(set) var launchAtLogin: Bool
+    @Published private(set) var launchAtLoginError: String?
+
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        let stored = defaults.stringArray(forKey: "mutedCategories") ?? []
+        mutedCategories = Set(stored.compactMap(AlertCategory.init(rawValue:)))
+        mutedAccounts = Set(defaults.stringArray(forKey: "mutedAccounts") ?? [])
+        haptics = defaults.object(forKey: "haptics") as? Bool ?? true
+        launchAtLogin = SMAppService.mainApp.status == .enabled
+    }
+
+    func allows(_ event: PREvent) -> Bool {
+        !mutedCategories.contains(AlertCategory(event)) && !mutedAccounts.contains(event.pr.account)
+    }
+
+    func toggle(_ category: AlertCategory) {
+        if mutedCategories.contains(category) { mutedCategories.remove(category) } else { mutedCategories.insert(category) }
+    }
+
+    func toggleAccount(_ login: String) {
+        if mutedAccounts.contains(login) { mutedAccounts.remove(login) } else { mutedAccounts.insert(login) }
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            launchAtLoginError = nil
+        } catch {
+            launchAtLoginError = "Couldn't turn it on: \(error.localizedDescription). Install the app in /Applications."
+        }
+        launchAtLogin = SMAppService.mainApp.status == .enabled
+    }
+
+    private func save() {
+        defaults.set(mutedCategories.map(\.rawValue), forKey: "mutedCategories")
+        defaults.set(Array(mutedAccounts), forKey: "mutedAccounts")
+        defaults.set(haptics, forKey: "haptics")
+    }
+}
