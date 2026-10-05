@@ -203,6 +203,7 @@ final class NotchViewModel: ObservableObject {
         if settings.haptics {
             NSHapticFeedbackManager.defaultPerformer.perform(.levelChange, performanceTime: .now)
         }
+        settings.playSound()
         peekTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(alert.stack.isEmpty ? 4.5 : 6))
             guard let self, !Task.isCancelled, state == .peek else { return }

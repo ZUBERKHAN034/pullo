@@ -20,6 +20,17 @@ struct SettingsForm: View {
                     get: { settings.haptics },
                     set: { settings.haptics = $0 }
                 ))
+                Picker("Sound on new alerts", selection: Binding(
+                    get: { settings.sound ?? "" },
+                    set: { name in
+                        settings.sound = name.isEmpty ? nil : name
+                        settings.playSound()
+                    }
+                )) {
+                    Text("None").tag("")
+                    Divider()
+                    ForEach(AppSettings.systemSounds, id: \.self) { Text($0).tag($0) }
+                }
             }
 
             Section("Shortcuts") {

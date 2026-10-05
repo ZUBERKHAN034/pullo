@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import ServiceManagement
 
 @MainActor
@@ -6,6 +6,8 @@ final class AppSettings: ObservableObject {
     @Published var mutedCategories: Set<AlertCategory> { didSet { save() } }
     @Published var mutedAccounts: Set<String> { didSet { save() } }
     @Published var haptics: Bool { didSet { save() } }
+    /// The name of a system sound, or nil for silent alerts.
+    @Published var sound: String? { didSet { save() } }
     @Published private(set) var launchAtLogin: Bool
     @Published private(set) var launchAtLoginError: String?
 
@@ -17,6 +19,8 @@ final class AppSettings: ObservableObject {
         mutedCategories = Set(stored.compactMap(AlertCategory.init(rawValue:)))
         mutedAccounts = Set(defaults.stringArray(forKey: "mutedAccounts") ?? [])
         haptics = defaults.object(forKey: "haptics") as? Bool ?? true
+        let storedSound = defaults.object(forKey: "sound") as? String ?? "Glass"
+        sound = storedSound.isEmpty ? nil : storedSound
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
@@ -30,6 +34,17 @@ final class AppSettings: ObservableObject {
 
     func toggleAccount(_ login: String) {
         if mutedAccounts.contains(login) { mutedAccounts.remove(login) } else { mutedAccounts.insert(login) }
+    }
+
+    static let systemSounds: [String] = {
+        let files = (try? FileManager.default.contentsOfDirectory(atPath: "/System/Library/Sounds")) ?? []
+        return files.map { ($0 as NSString).deletingPathExtension }.sorted()
+    }()
+
+    func playSound() {
+        guard let sound, let player = NSSound(named: sound) else { return }
+        player.stop()
+        player.play()
     }
 
     func setLaunchAtLogin(_ enabled: Bool) {
@@ -46,5 +61,6 @@ final class AppSettings: ObservableObject {
         defaults.set(mutedCategories.map(\.rawValue), forKey: "mutedCategories")
         defaults.set(Array(mutedAccounts), forKey: "mutedAccounts")
         defaults.set(haptics, forKey: "haptics")
+        defaults.set(sound ?? "", forKey: "sound")
     }
 }

@@ -12,6 +12,7 @@ enum DemoData {
         let defaults = UserDefaults(suiteName: suite)!
         defaults.set(try? JSONEncoder().encode([work, personal]), forKey: "accounts")
         defaults.set(false, forKey: "haptics")
+        defaults.set("", forKey: "sound")
         return defaults
     }
 

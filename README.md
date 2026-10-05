@@ -35,7 +35,7 @@ Requires macOS 14 or later and the [GitHub CLI](https://cli.github.com).
 2. Pick which `gh` accounts to add.
 3. Hover over the notch to see your pull requests, or press <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>P</kbd> from any app.
 4. Click a pull request to open it in your browser. Opening it marks it as read.
-5. Click the gear to change alerts, trackpad feedback and "Open at login".
+5. Click the gear to change alerts, the alert sound, trackpad feedback and "Open at login".
 
 | Shortcut | Action |
 |---|---|
