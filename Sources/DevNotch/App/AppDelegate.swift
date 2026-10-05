@@ -17,7 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     private lazy var model = NotchViewModel(
         store: store, accounts: accounts, settings: settings, tracker: tracker,
-        geometry: demo == nil ? .underPointer() : NotchGeometry(screen: NotchGeometry.notchedScreen)
+        geometry: NotchGeometry(screen: NotchGeometry.notchedScreen)
     )
     private lazy var settingsWindow = SettingsWindowController { [unowned self] in
         SettingsForm(settings: settings, accounts: accounts, model: model)
@@ -50,7 +50,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         accounts.onAccountAdded = { [weak self] account in self?.model.accountConnected(account) }
 
         if let demo {
-            model.followsPointer = false
             // The tour drives everything itself; a stray real mouse move or shortcut shouldn't interfere.
             Task { await demo.play(model: model, store: store, source: demoSource) }
             return
@@ -121,14 +120,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// A display was plugged in, removed or rearranged. The panel stays put unless its screen went away.
+    /// A display was plugged in, removed or rearranged, or the lid opened or closed.
     private func screensChanged() {
-        if let screen = NSScreen.screens.first(where: { $0.frame == model.geometry.screenFrame }) {
-            model.geometry = NotchGeometry(screen: screen)
-        } else {
-            model.close()
-            model.geometry = .underPointer()
-        }
+        let target = NotchGeometry(screen: NotchGeometry.notchedScreen)
+        if target.screenFrame != model.geometry.screenFrame { model.close() }
+        model.geometry = target
     }
 
     private func installEventMonitors() {

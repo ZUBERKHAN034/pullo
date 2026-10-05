@@ -16,17 +16,10 @@ struct NotchGeometry: Equatable {
         )
     }
 
-    /// The screen with a notch, so the demo always records the same place.
+    /// The built-in screen, where the notch is. With the lid closed there's none, so it falls back to the main screen.
     @MainActor
     static var notchedScreen: NSScreen {
         NSScreen.screens.first { $0.safeAreaInsets.top > 0 } ?? NSScreen.main ?? NSScreen.screens[0]
-    }
-
-    @MainActor
-    static func underPointer() -> NotchGeometry {
-        let point = NSEvent.mouseLocation
-        let screen = NSScreen.screens.first { NSMouseInRect(point, $0.frame, false) } ?? NSScreen.main ?? NSScreen.screens[0]
-        return NotchGeometry(screen: screen)
     }
 }
 

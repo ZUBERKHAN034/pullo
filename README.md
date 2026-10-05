@@ -83,7 +83,7 @@ Run `gh auth login` with the other account, then add it from the accounts button
 
 ### Does it work with external displays or Macs without a notch?
 
-Yes. On a screen without a notch, hover over the top center of the menu bar. DevNotch shows up on whichever screen your pointer is on, and alerts appear there too.
+DevNotch stays on your Mac's built-in screen, under the notch, even with other displays plugged in. On a Mac without a notch, or with the lid closed, it moves to the main display: hover over the top center of the menu bar.
 
 ### How often does it refresh?
 
