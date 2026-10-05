@@ -35,6 +35,8 @@ final class NotchViewModel: ObservableObject {
     private var toastTask: Task<Void, Never>?
     /// Set after closing while the pointer is still over the notch, so it doesn't spring right back open.
     private var waitingForPointerExit = false
+    /// The pointer is over the peek, so it stays out until the pointer leaves.
+    private var holdingPeek = false
 
     init(store: PRStore, accounts: AccountStore, settings: AppSettings, tracker: ReadTracker, geometry: NotchGeometry) {
         self.store = store
@@ -76,7 +78,17 @@ final class NotchViewModel: ObservableObject {
         }
 
         switch state {
-        case .closed, .peek:
+        case .peek:
+            // Hovering holds the alert so it can be clicked; leaving lets it go after a moment.
+            if inside {
+                guard !holdingPeek else { return }
+                holdingPeek = true
+                peekTask?.cancel()
+            } else if holdingPeek {
+                holdingPeek = false
+                dismissPeek(after: .seconds(1.5))
+            }
+        case .closed:
             guard inside else { return cancelHover() }
             scheduleHover(after: .milliseconds(80)) { model in
                 if model.layout.hitRect(for: model.state).contains(NSEvent.mouseLocation) { model.open() }
@@ -118,6 +130,7 @@ final class NotchViewModel: ObservableObject {
 
     func open(viaKeyboard: Bool = false) {
         peekTask?.cancel()
+        holdingPeek = false
         queue.removeAll()
         keyboardMode = viaKeyboard
         if viaKeyboard, selectedPR == nil { selectedPRID = visiblePRs.first?.id }
@@ -134,6 +147,8 @@ final class NotchViewModel: ObservableObject {
     /// `pointerStaysOver` is for closes triggered from inside the panel, e.g. clicking a PR.
     func close(pointerStaysOver: Bool = false) {
         cancelHover()
+        peekTask?.cancel()
+        holdingPeek = false
         waitingForPointerExit = pointerStaysOver
         keyboardMode = false
         selectedPRID = nil
@@ -204,8 +219,13 @@ final class NotchViewModel: ObservableObject {
             NSHapticFeedbackManager.defaultPerformer.perform(.levelChange, performanceTime: .now)
         }
         settings.playSound()
+        dismissPeek(after: .seconds(alert.stack.isEmpty ? 4.5 : 6))
+    }
+
+    private func dismissPeek(after delay: Duration) {
+        peekTask?.cancel()
         peekTask = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(alert.stack.isEmpty ? 4.5 : 6))
+            try? await Task.sleep(for: delay)
             guard let self, !Task.isCancelled, state == .peek else { return }
             withAnimation(Motion.close) { self.state = .closed }
             try? await Task.sleep(for: .milliseconds(500))

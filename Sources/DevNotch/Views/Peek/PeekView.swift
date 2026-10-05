@@ -3,6 +3,7 @@ import SwiftUI
 struct PeekView: View {
     let alert: NotchAlert
     let onTap: () -> Void
+    @ViewState private var hovering = false
 
     var body: some View {
         HStack(spacing: 11) {
@@ -39,11 +40,18 @@ struct PeekView: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 0)
+            // Tapping opens the PR, or the panel when several alerts are stacked.
+            Image(systemName: alert.url == nil ? "chevron.down" : "arrow.up.right")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(.white.opacity(0.6))
+                .opacity(hovering ? 1 : 0)
+                .animation(Motion.hover, value: hovering)
         }
         .padding(.horizontal, 18)
         .frame(height: 54, alignment: .center)
         .padding(.bottom, 4)
         .contentShape(Rectangle())
+        .onHover { hovering = $0 }
         .onTapGesture(perform: onTap)
     }
 }
