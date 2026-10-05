@@ -91,8 +91,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func stateChanged(to state: NotchState) {
         guard let panel else { return }
-        // Clicks fall through to the menu bar unless the notch is showing something.
-        panel.ignoresMouseEvents = state == .closed
+        updateMouseCapture()
         // Clicking inside makes the panel key; hand typing back to the app you were in once it closes.
         if state == .closed, panel.isKeyWindow {
             DispatchQueue.main.async {
@@ -127,6 +126,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         model.geometry = target
     }
 
+    private func mouseMoved() {
+        model.mouseMoved(to: NSEvent.mouseLocation)
+        updateMouseCapture()
+    }
+
+    /// The panel is far bigger than the notch so it has room to grow; only the part that's showing should take clicks and scrolls.
+    private func updateMouseCapture() {
+        let state = model.state
+        let over = model.layout.hitRect(for: state).contains(NSEvent.mouseLocation)
+        let ignores = state == .closed || !over
+        if panel?.ignoresMouseEvents != ignores { panel?.ignoresMouseEvents = ignores }
+    }
+
     private func installEventMonitors() {
         let pointer: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged]
         if let global = NSEvent.addGlobalMonitorForEvents(matching: pointer.union(.leftMouseDown), handler: { [weak self] event in
@@ -134,14 +146,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if event.type == .leftMouseDown {
                     self?.model.mouseDown(at: NSEvent.mouseLocation)
                 } else {
-                    self?.model.mouseMoved(to: NSEvent.mouseLocation)
+                    self?.mouseMoved()
                 }
             }
         }) {
             monitors.append(global)
         }
         if let local = NSEvent.addLocalMonitorForEvents(matching: pointer, handler: { [weak self] event in
-            MainActor.assumeIsolated { self?.model.mouseMoved(to: NSEvent.mouseLocation) }
+            MainActor.assumeIsolated { self?.mouseMoved() }
             return event
         }) {
             monitors.append(local)
