@@ -19,7 +19,7 @@ struct PRRow: View {
                 leading
                     .frame(width: 18)
                 VStack(alignment: .leading, spacing: 2) {
-                    // Unread shows as a bolder title and the blue line saying what changed.
+                    // Unread shows as a bolder title, what changed on the line below, and a blue dot by the age.
                     Text(pr.title)
                         .font(.system(size: 12.5, weight: isUnread ? .semibold : .medium))
                         .foregroundStyle(.white.opacity(isUnread ? 1 : 0.88))
@@ -54,36 +54,36 @@ struct PRRow: View {
         .help("\(pr.repo) #\(pr.number) · \(pr.branch)")
     }
 
+    private var statuses: [PRStatus] { pr.statuses(mine: kind == .mine) }
+
+    /// The most urgent state; with failing CI it also opens the list of failed checks.
     @ViewBuilder
     private var leading: some View {
-        if let ci = pr.ci {
-            if ci == .failure {
-                Button {
-                    withAnimation(Motion.navigate) { showingChecks.toggle() }
-                } label: {
-                    CIStatusIcon(state: ci, size: 14)
-                        .frame(width: 18, height: 18)
-                        .background(Circle().fill(.red.opacity(showingChecks ? 0.25 : 0)))
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .help("Show failed checks")
-            } else {
-                CIStatusIcon(state: ci, size: 14)
+        let icon = StatusIcon(status: statuses.first ?? .noChecks)
+        if pr.ci == .failure {
+            Button {
+                withAnimation(Motion.navigate) { showingChecks.toggle() }
+            } label: {
+                icon
+                    .frame(width: 20, height: 20)
+                    .background(Circle().fill(.white.opacity(showingChecks ? 0.12 : 0)))
+                    .contentShape(Circle())
             }
+            .buttonStyle(.plain)
+            .help("Show failed checks")
         } else {
-            Circle().strokeBorder(.white.opacity(0.3), lineWidth: 1.5).frame(width: 14, height: 14)
-                .help("No checks")
+            icon.help(statuses.compactMap(\.label).first ?? (pr.ci == nil ? "No checks" : "Checks passed"))
         }
     }
 
+    /// Everything about the PR in one gray line: what changed if it's unread, then where it lives and its states.
     private var subtitle: some View {
         Group {
             if isUnread {
-                Text(unreadReasons.joined(separator: " · ")).foregroundColor(.unread)
-                    + Text(verbatim: "   \(pr.repoName) #\(pr.number)").foregroundColor(.secondaryText)
+                Text(unreadReasons.joined(separator: " · ")).foregroundColor(.white.opacity(0.82))
+                    + Text(verbatim: "  ·  " + details.joined(separator: " · ")).foregroundColor(.secondaryText)
             } else {
-                Text(subtitleText).foregroundColor(.secondaryText)
+                Text(details.joined(separator: " · ")).foregroundColor(.secondaryText)
             }
         }
         .font(.system(size: 11))
@@ -91,51 +91,36 @@ struct PRRow: View {
     }
 
     /// The branch stays out of the row; it's in the tooltip and one keystroke away with "c".
-    private var subtitleText: String {
-        let ref = "\(pr.repoName) #\(pr.number)"
-        switch kind {
-        case .mine:
-            return ref
-        case .review:
+    private var details: [String] {
+        var parts = ["\(pr.repoName) #\(pr.number)"]
+        if kind == .review {
+            parts.append("by \(pr.displayLogin(pr.author))")
             if case .team(let teams) = pr.reviewRequest, let team = teams.first {
-                return "\(ref) · by \(pr.displayLogin(pr.author)) · via \(teams.count > 1 ? "\(team) +\(teams.count - 1)" : team)"
+                parts.append("via \(teams.count > 1 ? "\(team) +\(teams.count - 1)" : team)")
             }
-            return "\(ref) · by \(pr.displayLogin(pr.author))"
         }
+        return parts + statuses.compactMap(\.label)
     }
 
     private var badges: some View {
-        HStack(spacing: 6) {
-            if hovering || selected {
-                HStack(spacing: 0) {
-                    if isUnread {
-                        IconButton(symbol: "checkmark.circle", help: "Mark as read (r)") { model.markRead(pr) }
-                    }
-                    IconButton(symbol: "doc.on.doc", help: "Copy branch (c)") { model.copyBranch(pr) }
-                }
-                .transition(.opacity.combined(with: .scale(scale: 0.8)))
+        HStack(spacing: 8) {
+            if (hovering || selected) && isUnread {
+                IconButton(symbol: "checkmark.circle", help: "Mark as read (r)") { model.markRead(pr) }
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
-            if let status { status }
-            // Your PRs are sorted by activity, review requests by how long they've waited; the age follows suit.
-            Text(ageDate.shortAge)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(ageTint)
-                .frame(minWidth: 30, alignment: .trailing)
-                .help(ageHelp)
+            HStack(spacing: 6) {
+                if isUnread {
+                    Circle().fill(Color.unread).frame(width: 6, height: 6)
+                        .transition(.scale.combined(with: .opacity))
+                }
+                // Your PRs are sorted by activity, review requests by how long they've waited; the age follows suit.
+                Text(ageDate.shortAge)
+                    .font(.system(size: 11, weight: .medium).monospacedDigit())
+                    .foregroundStyle(Color.secondaryText)
+                    .help(ageHelp)
+            }
+            .frame(minWidth: 34, alignment: .trailing)
         }
-    }
-
-    /// One tag at most, the one that matters most, so the row stays quiet.
-    private var status: Tag? {
-        if pr.hasConflict { return Tag(text: "Conflict", tint: .orange, symbol: "exclamationmark.triangle.fill") }
-        if kind == .mine, pr.review == .changesRequested {
-            return Tag(text: "Changes", tint: .red, symbol: "exclamationmark.bubble.fill")
-        }
-        if pr.isDraft { return Tag(text: "Draft", tint: .gray) }
-        if kind == .mine, pr.review == .approved {
-            return Tag(text: pr.isReadyToMerge ? "Ready" : "Approved", tint: .green, symbol: "checkmark.seal.fill")
-        }
-        return nil
     }
 
     private var ageDate: Date { kind == .mine ? pr.updatedAt : pr.createdAt }
@@ -143,13 +128,5 @@ struct PRRow: View {
     private var ageHelp: String {
         guard kind == .review else { return "Updated \(ageDate.shortAge) ago" }
         return pr.isDirectRequest ? "Waiting on your review for \(ageDate.shortAge)" : "Opened \(ageDate.shortAge) ago"
-    }
-
-    /// Only a direct review request that's waited over two days stands out; everything else stays quiet.
-    private var ageTint: Color {
-        guard kind == .review, pr.isDirectRequest, Date().timeIntervalSince(pr.createdAt) > 2 * 86400 else {
-            return .secondaryText
-        }
-        return .orange.opacity(0.9)
     }
 }
