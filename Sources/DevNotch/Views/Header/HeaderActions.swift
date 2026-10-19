@@ -6,7 +6,8 @@ struct HeaderActions: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            IconButton(symbol: "arrow.clockwise", help: refreshHelp, spinning: store.isLoading) {
+            // Two arrows around a circle turn on their own center; the single clockwise arrow wobbles as it spins.
+            IconButton(symbol: "arrow.triangle.2.circlepath", help: refreshHelp, spinning: store.isLoading) {
                 Task { await store.refresh() }
             }
             IconButton(symbol: "person.2", help: "Accounts", active: model.screen == .accounts) { model.show(.accounts) }
