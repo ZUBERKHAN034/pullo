@@ -127,12 +127,16 @@ struct PRRow: View {
             default:
                 EmptyView()
             }
-            Text(pr.createdAt.shortAge)
+            // Your PRs are sorted by activity, review requests by how long they've waited; the age follows suit.
+            Text(ageDate.shortAge)
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(ageTint)
                 .frame(minWidth: 30, alignment: .trailing)
+                .help(kind == .mine ? "Updated \(ageDate.shortAge) ago" : "Opened \(ageDate.shortAge) ago")
         }
     }
+
+    private var ageDate: Date { kind == .mine ? pr.updatedAt : pr.createdAt }
 
     /// Review requests get louder the longer someone has been waiting on you.
     private var ageTint: Color {
