@@ -98,9 +98,9 @@ struct PRRow: View {
             return ref
         case .review:
             if case .team(let teams) = pr.reviewRequest, let team = teams.first {
-                return "\(ref) · by \(pr.author) · via \(teams.count > 1 ? "\(team) +\(teams.count - 1)" : team)"
+                return "\(ref) · by \(pr.displayLogin(pr.author)) · via \(teams.count > 1 ? "\(team) +\(teams.count - 1)" : team)"
             }
-            return "\(ref) · by \(pr.author)"
+            return "\(ref) · by \(pr.displayLogin(pr.author))"
         }
     }
 
@@ -145,12 +145,11 @@ struct PRRow: View {
         return pr.isDirectRequest ? "Waiting on your review for \(ageDate.shortAge)" : "Opened \(ageDate.shortAge) ago"
     }
 
-    /// Review requests get louder the longer someone has been waiting on you.
+    /// Only a direct review request that's waited over two days stands out; everything else stays quiet.
     private var ageTint: Color {
-        guard kind == .review, pr.isDirectRequest else { return .secondaryText }
-        let hours = Date().timeIntervalSince(pr.createdAt) / 3600
-        if hours > 48 { return .red }
-        if hours > 24 { return .orange }
-        return .secondaryText
+        guard kind == .review, pr.isDirectRequest, Date().timeIntervalSince(pr.createdAt) > 2 * 86400 else {
+            return .secondaryText
+        }
+        return .orange.opacity(0.9)
     }
 }

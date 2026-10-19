@@ -28,16 +28,18 @@ extension PREvent {
         switch kind {
         case .ciPassed: "CI passed"
         case .ciFailed: "CI failed"
-        case .approved: actor.map { "\($0) approved" } ?? "PR approved"
-        case .changesRequested: actor.map { "\($0) requested changes" } ?? "Changes requested"
+        case .approved: name.map { "\($0) approved" } ?? "PR approved"
+        case .changesRequested: name.map { "\($0) requested changes" } ?? "Changes requested"
         case .reviewRequested:
             switch pr.reviewRequest {
-            case .direct: "\(pr.author) requested your review"
+            case .direct: "\(pr.displayLogin(pr.author)) requested your review"
             case .team(let teams): teams.first.map { "Review requested from \($0)" } ?? "Review requested from your team"
             }
-        case .newComment: actor.map { "\($0) commented" } ?? "New comments"
+        case .newComment: name.map { "\($0) commented" } ?? "New comments"
         }
     }
+
+    private var name: String? { actor.map(pr.displayLogin) }
 
     private var symbol: String {
         switch kind {

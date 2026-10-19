@@ -39,3 +39,17 @@ struct SearchTests {
         #expect(!pr.matches("   "))
     }
 }
+
+struct DisplayLoginTests {
+    @Test func dropsTheSharedCompanySuffix() {
+        let pr = PullRequest.make(account: "gabriel_acme")
+        #expect(pr.displayLogin("icaro-barbosa_acme") == "icaro-barbosa")
+        #expect(pr.displayLogin("Luan_ACME") == "Luan")
+    }
+
+    @Test func leavesOtherLoginsAlone() {
+        #expect(PullRequest.make(account: "gabriel_acme").displayLogin("octocat") == "octocat")
+        #expect(PullRequest.make(account: "gabriel_acme").displayLogin("_acme") == "_acme")
+        #expect(PullRequest.make(account: "jordan-cod").displayLogin("someone_acme") == "someone_acme")
+    }
+}

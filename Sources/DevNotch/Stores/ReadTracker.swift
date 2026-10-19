@@ -62,7 +62,7 @@ final class ReadTracker: ObservableObject {
         let newComments = Set(pr.othersCommentIDs).subtracting(base.commentIDs).count
         if newComments > 0 { reasons.append(newComments == 1 ? "1 new comment" : "\(newComments) new comments") }
 
-        let reviewers = pr.othersReviews.filter { !base.reviewIDs.contains($0.id) }.map(\.author)
+        let reviewers = pr.othersReviews.filter { !base.reviewIDs.contains($0.id) }.map { pr.displayLogin($0.author) }
         let uniqueReviewers = reviewers.reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } }
         if let first = uniqueReviewers.first {
             reasons.append(uniqueReviewers.count == 1 ? "\(first) reviewed" : "\(uniqueReviewers.count) people reviewed")
