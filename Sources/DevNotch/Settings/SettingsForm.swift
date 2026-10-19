@@ -5,6 +5,8 @@ struct SettingsForm: View {
     @ObservedObject var settings: AppSettings
     @ObservedObject var accounts: AccountStore
     let model: NotchViewModel
+    /// Nil in demo mode, where nothing should reach the network.
+    let updater: Updater?
 
     var body: some View {
         Form {
@@ -68,6 +70,10 @@ struct SettingsForm: View {
                 }
             }
 
+            if let updater {
+                UpdatesSection(updater: updater)
+            }
+
             Section {
                 HStack {
                     Button("Test alert") { model.previewAlert() }
@@ -79,5 +85,22 @@ struct SettingsForm: View {
         .formStyle(.grouped)
         .toggleStyle(.switch)
         .frame(width: 480, height: 600)
+    }
+}
+
+private struct UpdatesSection: View {
+    @ObservedObject var updater: Updater
+
+    var body: some View {
+        Section("Updates") {
+            Toggle("Check for updates automatically", isOn: Binding(
+                get: { updater.automaticallyChecks },
+                set: { updater.automaticallyChecks = $0 }
+            ))
+            LabeledContent("Version \(Updater.version)") {
+                Button("Check for Updates…") { updater.checkForUpdates() }
+                    .disabled(!updater.canCheckForUpdates)
+            }
+        }
     }
 }

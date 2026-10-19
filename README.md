@@ -16,6 +16,7 @@ Requires macOS 14 or later and the [GitHub CLI](https://cli.github.com).
 - Multiple GitHub accounts, each with its own list
 - Search by title, repo, number, branch or author
 - Global shortcut and keyboard navigation
+- Updates itself when a new version is out
 - Read-only: it doesn't approve, merge or store tokens
 
 ## Installation
@@ -92,3 +93,7 @@ Every minute, and right after your Mac wakes up. There's also a refresh button i
 ### What counts as an update?
 
 Comments, reviews, changes to CI or the review decision, and new commits on other people's pull requests. Your own activity and bot activity don't count. Read state is stored only on your Mac.
+
+## License
+
+[MIT](LICENSE)

@@ -1,0 +1,120 @@
+name: Release
+
+# Pushing a tag like v0.2.0 builds DevNotch, signs it with Developer ID, notarizes it, and publishes it
+# as a GitHub release along with the updated Sparkle feed, which is where installed copies look for updates.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Version from the tag
+        run: |
+          echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          # Sparkle compares CFBundleVersion, so it has to grow with every release; the run number always does.
+          echo "BUILD=$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+
+      - name: Import the Developer ID certificate
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_P12 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD=$(uuidgen)
+          echo "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          # Add it to the search list without dropping the login keychain, or codesign can't see the system roots.
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
+          rm "$RUNNER_TEMP/cert.p12"
+
+      - name: Archive
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild archive \
+            -project DevNotch.xcodeproj -scheme DevNotch -configuration Release \
+            -archivePath "$RUNNER_TEMP/DevNotch.xcarchive" \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/packages" \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Developer ID Application"
+
+      - name: Export with Developer ID
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          plutil -replace teamID -string "$TEAM_ID" ExportOptions.plist
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/DevNotch.xcarchive" \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath "$RUNNER_TEMP/export"
+
+      - name: Notarize
+        env:
+          API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          APP="$RUNNER_TEMP/export/DevNotch.app"
+          echo "$API_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/api_key.p8"
+          ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/notarize.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
+            --key "$RUNNER_TEMP/api_key.p8" --key-id "$API_KEY_ID" --issuer "$API_ISSUER_ID" --wait
+          xcrun stapler staple "$APP"
+          spctl --assess --type execute --verbose "$APP"
+          rm "$RUNNER_TEMP/api_key.p8"
+
+      # The feed's signature covers the exact bytes of this zip, so nothing may touch it after this step.
+      - name: Package
+        run: |
+          mkdir -p "$RUNNER_TEMP/feed"
+          ditto -c -k --keepParent "$RUNNER_TEMP/export/DevNotch.app" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip"
+          cp "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/DevNotch.zip"
+
+      - name: Release notes
+        run: |
+          PREVIOUS=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
+          git log --pretty='- %s' ${PREVIOUS:+"$PREVIOUS.."}"$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+          {
+            echo "<ul>"
+            git log --pretty='<li>%s</li>' ${PREVIOUS:+"$PREVIOUS.."}"$GITHUB_REF_NAME" | sed 's/&/\&amp;/g'
+            echo "</ul>"
+          } > "$RUNNER_TEMP/feed/DevNotch-$VERSION.html"
+
+      - name: Update the Sparkle feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          # Start from the published feed so earlier versions stay listed.
+          gh release download --pattern appcast.xml --dir "$RUNNER_TEMP/feed" || true
+          # The tools ship with the resolved package, so they always match the framework inside the app.
+          printf %s "$SPARKLE_PRIVATE_KEY" | "$RUNNER_TEMP/packages/artifacts/sparkle/Sparkle/bin/generate_appcast" --ed-key-file - \
+            --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/v$VERSION/" \
+            --embed-release-notes \
+            "$RUNNER_TEMP/feed"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" \
+            --title "DevNotch $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
+            "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/DevNotch.zip" "$RUNNER_TEMP/feed/appcast.xml"

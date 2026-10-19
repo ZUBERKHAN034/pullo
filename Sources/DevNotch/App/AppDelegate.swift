@@ -19,8 +19,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         store: store, accounts: accounts, settings: settings, tracker: tracker,
         geometry: NotchGeometry(screen: NotchGeometry.notchedScreen)
     )
+    // Sparkle checks on its own schedule from the moment it starts, so launch touches it instead of waiting for Settings.
+    private lazy var updater = demo == nil ? Updater() : nil
     private lazy var settingsWindow = SettingsWindowController { [unowned self] in
-        SettingsForm(settings: settings, accounts: accounts, model: model)
+        SettingsForm(settings: settings, accounts: accounts, model: model, updater: updater)
     }
     private var panel: NotchPanel?
     private var hotKey: HotKey?
@@ -56,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         store.start()
+        _ = updater
         if accounts.accounts.isEmpty { greetFirstLaunch() }
 
         hotKey = HotKey(keyCode: kVK_ANSI_P, modifiers: cmdKey | optionKey) { [weak self] in

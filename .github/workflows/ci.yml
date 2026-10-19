@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        run: swift test
+
+      # Contributors' forks have no signing identity, so CI only proves the app target builds.
+      - name: Build the app
+        run: |
+          xcodebuild build \
+            -project DevNotch.xcodeproj -scheme DevNotch -configuration Release \
+            CODE_SIGNING_ALLOWED=NO
