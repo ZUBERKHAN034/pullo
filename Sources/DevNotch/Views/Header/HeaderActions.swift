@@ -9,9 +9,6 @@ struct HeaderActions: View {
             IconButton(symbol: "arrow.clockwise", help: refreshHelp, spinning: store.isLoading) {
                 Task { await store.refresh() }
             }
-            IconButton(symbol: "magnifyingglass", help: "Search PRs (⌘F)", active: model.isSearching) {
-                model.isSearching ? model.stopSearch() : model.startSearch()
-            }
             IconButton(symbol: "person.2", help: "Accounts", active: model.screen == .accounts) { model.show(.accounts) }
             IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?() }
         }

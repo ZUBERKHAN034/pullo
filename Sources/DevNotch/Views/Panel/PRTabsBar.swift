@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// "My PRs" and "To review" with their counts, and "mark all read" when the tab has updates.
+/// "My PRs" and "To review" with their counts, the filter, and "mark all read" when the tab has updates.
 struct PRTabsBar: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore
@@ -13,6 +13,7 @@ struct PRTabsBar: View {
                 tabButton(tab)
             }
             Spacer()
+            SearchTrigger(action: model.startSearch)
             if unreadCount(in: model.tab) > 0 {
                 IconButton(symbol: "checkmark.circle", help: "Mark all as read", action: model.markAllRead)
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))

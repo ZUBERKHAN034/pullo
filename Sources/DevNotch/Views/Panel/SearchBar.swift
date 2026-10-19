@@ -43,9 +43,9 @@ struct SearchField: NSViewRepresentable {
         field.font = .systemFont(ofSize: 12.5, weight: .medium)
         field.textColor = .white
         field.placeholderAttributedString = NSAttributedString(
-            string: "Search by title, repo, #number, branch or author",
+            string: "Title, repo, #number, branch or author",
             attributes: [
-                .foregroundColor: NSColor.white.withAlphaComponent(0.35),
+                .foregroundColor: NSColor.white.withAlphaComponent(0.45),
                 .font: NSFont.systemFont(ofSize: 12.5, weight: .medium),
             ]
         )
