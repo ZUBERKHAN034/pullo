@@ -16,7 +16,8 @@ concurrency:
 jobs:
   release:
     runs-on: macos-26
-    timeout-minutes: 30
+    # The first notarization of a new account can take hours; later ones take minutes, and public repos pay nothing to wait.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
         with:
