@@ -25,8 +25,8 @@ jobs:
       - name: Version from the tag
         run: |
           echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-          # Sparkle compares CFBundleVersion, so it has to grow with every release; the run number always does.
-          echo "BUILD=$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+          # Sparkle compares CFBundleVersion, so it has to grow with every release; the commit count always does.
+          echo "BUILD=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
 
       - name: Import the Developer ID certificate
         env:
