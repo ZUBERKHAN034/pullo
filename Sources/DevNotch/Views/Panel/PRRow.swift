@@ -106,7 +106,7 @@ struct PRRow: View {
     private var badges: some View {
         HStack(spacing: 8) {
             if (hovering || selected) && isUnread {
-                IconButton(symbol: "checkmark.circle", help: "Mark as read · r") { model.markRead(pr) }
+                IconButton(symbol: "envelope.open", help: "Mark as read · r") { model.markRead(pr) }
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
             HStack(spacing: 6) {
