@@ -21,8 +21,8 @@ Requires macOS 14 or later and the [GitHub CLI](https://cli.github.com).
 
 ## Installation
 
-1. Download `DevNotch.zip` from the [latest release](https://github.com/jordan-cod/devnotch/releases/latest).
-2. Unzip it and move `DevNotch.app` to your Applications folder.
+1. Download [`DevNotch.dmg`](https://github.com/jordan-cod/devnotch/releases/latest/download/DevNotch.dmg) from the latest release.
+2. Open it and drag DevNotch to your Applications folder.
 3. If you don't have the GitHub CLI yet, install it and log in:
 
    ```sh

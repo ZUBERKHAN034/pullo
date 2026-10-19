@@ -13,6 +13,10 @@ concurrency:
   group: release
   cancel-in-progress: false
 
+env:
+  API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+  API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+
 jobs:
   release:
     runs-on: macos-26
@@ -67,11 +71,9 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath "$RUNNER_TEMP/export"
 
-      - name: Notarize
+      - name: Notarize the app
         env:
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           APP="$RUNNER_TEMP/export/DevNotch.app"
           echo "$API_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/api_key.p8"
@@ -80,14 +82,27 @@ jobs:
             --key "$RUNNER_TEMP/api_key.p8" --key-id "$API_KEY_ID" --issuer "$API_ISSUER_ID" --wait
           xcrun stapler staple "$APP"
           spctl --assess --type execute --verbose "$APP"
-          rm "$RUNNER_TEMP/api_key.p8"
 
-      # The feed's signature covers the exact bytes of this zip, so nothing may touch it after this step.
-      - name: Package
+      # Sparkle downloads this zip; the feed's signature covers its exact bytes, so nothing may touch it after this step.
+      - name: Package the update
         run: |
           mkdir -p "$RUNNER_TEMP/feed"
           ditto -c -k --keepParent "$RUNNER_TEMP/export/DevNotch.app" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip"
-          cp "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/DevNotch.zip"
+
+      # People download the disk image; it's signed and notarized on its own so Gatekeeper accepts it before it's opened.
+      - name: Disk image
+        run: |
+          python3 -m venv "$RUNNER_TEMP/dmgbuild"
+          "$RUNNER_TEMP/dmgbuild/bin/pip" install --quiet dmgbuild
+          DMG="$RUNNER_TEMP/DevNotch.dmg"
+          "$RUNNER_TEMP/dmgbuild/bin/dmgbuild" -s .github/dmg-settings.py \
+            -D app="$RUNNER_TEMP/export/DevNotch.app" "DevNotch" "$DMG"
+          codesign --sign "Developer ID Application" --timestamp "$DMG"
+          xcrun notarytool submit "$DMG" \
+            --key "$RUNNER_TEMP/api_key.p8" --key-id "$API_KEY_ID" --issuer "$API_ISSUER_ID" --wait
+          xcrun stapler staple "$DMG"
+          spctl --assess --type open --context context:primary-signature --verbose "$DMG"
+          rm "$RUNNER_TEMP/api_key.p8"
 
       - name: Release notes
         run: |
@@ -118,4 +133,4 @@ jobs:
         run: |
           gh release create "v$VERSION" \
             --title "DevNotch $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
-            "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/DevNotch.zip" "$RUNNER_TEMP/feed/appcast.xml"
+            "$RUNNER_TEMP/DevNotch.dmg" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/feed/appcast.xml"
