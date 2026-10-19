@@ -78,3 +78,16 @@ struct PREventTests {
         #expect(kinds([], [.make()]).isEmpty)
     }
 }
+
+struct StackedAlertTests {
+    @Test func whatNeedsYouComesFirst() {
+        let pr = PullRequest.make()
+        let alerts = [
+            PREvent(kind: .approved, pr: pr, actor: "octavio"),
+            PREvent(kind: .newComment, pr: pr, actor: "marina"),
+            PREvent(kind: .ciFailed, pr: pr, actor: nil),
+        ].map { $0.alert(showingAccount: false) }
+        let headlines = NotchAlert.summary(of: alerts).stack.map(\.headline)
+        #expect(headlines == ["CI failed", "marina commented", "octavio approved"])
+    }
+}

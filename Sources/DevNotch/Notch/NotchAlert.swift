@@ -12,17 +12,26 @@ struct NotchAlert: Identifiable, Equatable {
     var pr: PullRequest?
     /// Shown as a small chip when more than one account is connected.
     var account: String?
-    /// Alerts folded into this one when several arrive together.
+    /// Alerts folded into this one when several arrive together, most important first.
     var stack: [NotchAlert] = []
+    /// Higher comes first in a stack, so what needs you isn't buried under good news.
+    var priority = 0
+
+    /// Short "repo #n" for the PR, when there is one.
+    var reference: String? { pr.map { "\($0.repoName) #\($0.number)" } }
 
     static func summary(of alerts: [NotchAlert]) -> NotchAlert {
-        NotchAlert(
+        // Stable: equal priorities keep the order they arrived in.
+        let sorted = alerts.enumerated()
+            .sorted { $0.element.priority != $1.element.priority ? $0.element.priority > $1.element.priority : $0.offset < $1.offset }
+            .map(\.element)
+        return NotchAlert(
             symbol: "square.stack.3d.up.fill",
             tint: .white,
             headline: "\(alerts.count) updates",
             detail: alerts.map(\.headline).joined(separator: " · "),
             account: Set(alerts.map(\.account)).count == 1 ? alerts.first?.account : nil,
-            stack: alerts
+            stack: sorted
         )
     }
 }

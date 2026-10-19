@@ -10,8 +10,18 @@ extension PREvent {
             detail: "\(pr.repoName) #\(pr.number) · \(pr.title)",
             url: pr.url,
             pr: pr,
-            account: showingAccount ? pr.account : nil
+            account: showingAccount ? pr.account : nil,
+            priority: priority
         )
+    }
+
+    private var priority: Int {
+        switch kind {
+        case .ciFailed, .changesRequested: 3
+        case .reviewRequested: pr.isDirectRequest ? 2 : 0
+        case .newComment: 1
+        case .approved, .ciPassed: 0
+        }
     }
 
     private var headline: String {
