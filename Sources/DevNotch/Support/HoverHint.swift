@@ -30,16 +30,16 @@ private struct HoverHint: ViewModifier {
                     withAnimation(Motion.fade) { shown = true }
                 }
             }
+            // Always laid out and faded in: inside an `if`, SwiftUI drops the alignment guide and the hint lands on
+            // top of the view instead of beside it.
             .overlay(alignment: edge == .trailing ? .trailing : .leading) {
-                if shown {
-                    label
-                        .fixedSize()
-                        .alignmentGuide(edge == .trailing ? .trailing : .leading) { size in
-                            edge == .trailing ? size[.leading] - 8 : size[.trailing] + 8
-                        }
-                        .transition(.opacity)
-                        .allowsHitTesting(false)
-                }
+                label
+                    .fixedSize()
+                    .alignmentGuide(edge == .trailing ? .trailing : .leading) { size in
+                        edge == .trailing ? size[.leading] - 8 : size[.trailing] + 8
+                    }
+                    .opacity(shown ? 1 : 0)
+                    .allowsHitTesting(false)
             }
             // Above its siblings, which would otherwise draw over the hint.
             .zIndex(shown ? 1 : 0)
