@@ -113,7 +113,7 @@ struct PRNode: Decodable {
             ci: CIState(rollup: rollup?.state),
             review: ReviewDecision(raw: reviewDecision),
             hasConflict: mergeable == "CONFLICTING",
-            othersCommentIDs: othersActivity(comments, account: account).map(\.id),
+            othersComments: othersActivity(comments, account: account),
             othersReviews: othersActivity(reviews, account: account),
             headOID: headRefOid,
             commitCount: commitCount.totalCount,

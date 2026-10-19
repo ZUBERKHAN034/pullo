@@ -9,6 +9,7 @@ extension PREvent {
             headline: headline,
             detail: "\(pr.repoName) #\(pr.number) · \(pr.title)",
             url: pr.url,
+            pr: pr,
             account: showingAccount ? pr.account : nil
         )
     }
@@ -24,7 +25,7 @@ extension PREvent {
             case .direct: "\(pr.author) requested your review"
             case .team(let teams): teams.first.map { "Review requested from \($0)" } ?? "Review requested from your team"
             }
-        case .newComment: "New comment"
+        case .newComment: actor.map { "\($0) commented" } ?? "New comments"
         }
     }
 

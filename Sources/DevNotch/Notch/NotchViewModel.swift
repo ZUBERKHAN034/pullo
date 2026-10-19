@@ -203,7 +203,13 @@ final class NotchViewModel: ObservableObject {
     }
 
     func tapPeek(_ alert: NotchAlert) {
-        if let url = alert.url { openInBrowser(url) } else { open() }
+        if let pr = alert.pr {
+            open(pr)
+        } else if let url = alert.url {
+            openInBrowser(url)
+        } else {
+            open()
+        }
     }
 
     /// Several alerts waiting at once drop out together as one stacked peek.

@@ -24,16 +24,25 @@ extension PREvent {
                 if pr.ci == .success { events.append(PREvent(kind: .ciPassed, pr: pr, actor: nil)) }
                 if pr.ci == .failure { events.append(PREvent(kind: .ciFailed, pr: pr, actor: nil)) }
             }
-            if before.review != pr.review {
-                if pr.review == .approved {
-                    events.append(PREvent(kind: .approved, pr: pr, actor: pr.approvers.last))
-                }
-                if pr.review == .changesRequested {
-                    events.append(PREvent(kind: .changesRequested, pr: pr, actor: pr.changeRequesters.last))
-                }
+            // Each reviewer is news, so a second approval alerts too, and so do repos that don't require reviews,
+            // where the PR's review decision never changes.
+            let newApprovers = pr.approvers.filter { !before.approvers.contains($0) }
+            let newRequesters = pr.changeRequesters.filter { !before.changeRequesters.contains($0) }
+            if let approver = newApprovers.last {
+                events.append(PREvent(kind: .approved, pr: pr, actor: approver))
             }
-            if !Set(pr.othersCommentIDs).subtracting(before.othersCommentIDs).isEmpty {
-                events.append(PREvent(kind: .newComment, pr: pr, actor: nil))
+            if let requester = newRequesters.last {
+                events.append(PREvent(kind: .changesRequested, pr: pr, actor: requester))
+            }
+            // Plain comments and "comment" reviews; approvals and change requests already alerted above.
+            let newActivity = pr.othersComments.filter { !before.othersCommentIDs.contains($0.id) }
+                + pr.othersReviews.filter { review in
+                    !before.othersReviews.contains { $0.id == review.id }
+                        && !newApprovers.contains(review.author) && !newRequesters.contains(review.author)
+                }
+            let commenters = Set(newActivity.map(\.author))
+            if !newActivity.isEmpty {
+                events.append(PREvent(kind: .newComment, pr: pr, actor: commenters.count == 1 ? commenters.first : nil))
             }
         }
 

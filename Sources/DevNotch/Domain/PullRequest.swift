@@ -56,7 +56,7 @@ struct PullRequest: Identifiable, Equatable {
     let review: ReviewDecision?
     let hasConflict: Bool
     /// Recent comments and reviews by people other than you; bots don't count.
-    let othersCommentIDs: [String]
+    let othersComments: [Activity]
     let othersReviews: [Activity]
     let headOID: String
     let commitCount: Int
@@ -66,6 +66,8 @@ struct PullRequest: Identifiable, Equatable {
     let failedChecks: [FailedCheck]
 
     var isDirectRequest: Bool { reviewRequest == .direct }
+
+    var othersCommentIDs: [String] { othersComments.map(\.id) }
 
     var repoName: String { repo.split(separator: "/").last.map(String.init) ?? repo }
 

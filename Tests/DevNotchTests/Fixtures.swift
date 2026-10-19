@@ -17,6 +17,7 @@ extension PullRequest {
         headOID: String = "abc",
         commitCount: Int = 1,
         approvers: [String] = [],
+        changeRequesters: [String] = [],
         reviewRequest: ReviewRequest = .direct
     ) -> PullRequest {
         PullRequest(
@@ -34,12 +35,12 @@ extension PullRequest {
             ci: ci,
             review: review,
             hasConflict: false,
-            othersCommentIDs: comments,
+            othersComments: comments.map { Activity(id: $0, author: "octocat") },
             othersReviews: reviews,
             headOID: headOID,
             commitCount: commitCount,
             approvers: approvers,
-            changeRequesters: [],
+            changeRequesters: changeRequesters,
             reviewRequest: reviewRequest,
             failedChecks: []
         )

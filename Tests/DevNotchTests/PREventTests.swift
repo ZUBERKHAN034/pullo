@@ -28,8 +28,46 @@ struct PREventTests {
         #expect(events.first?.actor == "octavio")
     }
 
-    @Test func newCommentFromSomeoneElse() {
-        #expect(kinds([.make(comments: ["c1"])], [.make(comments: ["c1", "c2"])]) == [.newComment])
+    @Test func secondApprovalAlertsToo() {
+        let events = PREvent.diff(
+            old: Snapshot(mine: [.make(review: .approved, approvers: ["octavio"])], reviewRequests: []),
+            new: Snapshot(mine: [.make(review: .approved, approvers: ["octavio", "marina"])], reviewRequests: [])
+        )
+        #expect(events.map(\.kind) == [.approved])
+        #expect(events.first?.actor == "marina")
+    }
+
+    @Test func approvalAlertsWithoutRequiredReviews() {
+        // Repos that don't require reviews never set a review decision.
+        #expect(kinds([.make(review: nil)], [.make(review: nil, approvers: ["octavio"])]) == [.approved])
+    }
+
+    @Test func changesRequestedNamesWho() {
+        let events = PREvent.diff(
+            old: Snapshot(mine: [.make()], reviewRequests: []),
+            new: Snapshot(mine: [.make(review: .changesRequested, changeRequesters: ["marina"])], reviewRequests: [])
+        )
+        #expect(events.map(\.kind) == [.changesRequested])
+        #expect(events.first?.actor == "marina")
+    }
+
+    @Test func newCommentNamesWhoCommented() {
+        let events = PREvent.diff(
+            old: Snapshot(mine: [.make(comments: ["c1"])], reviewRequests: []),
+            new: Snapshot(mine: [.make(comments: ["c1", "c2"])], reviewRequests: [])
+        )
+        #expect(events.map(\.kind) == [.newComment])
+        #expect(events.first?.actor == "octocat")
+    }
+
+    @Test func commentReviewAlertsAsComment() {
+        let review = Activity(id: "r1", author: "marina")
+        #expect(kinds([.make()], [.make(reviews: [review])]) == [.newComment])
+    }
+
+    @Test func approvalIsNotAlsoAComment() {
+        let review = Activity(id: "r1", author: "octavio")
+        #expect(kinds([.make()], [.make(reviews: [review], approvers: ["octavio"])]) == [.approved])
     }
 
     @Test func newReviewRequest() {

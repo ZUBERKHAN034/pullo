@@ -8,6 +8,8 @@ struct NotchAlert: Identifiable, Equatable {
     let headline: String
     let detail: String
     var url: URL?
+    /// The PR it's about, so opening it from the alert marks it read like opening it from the list does.
+    var pr: PullRequest?
     /// Shown as a small chip when more than one account is connected.
     var account: String?
     /// Alerts folded into this one when several arrive together.

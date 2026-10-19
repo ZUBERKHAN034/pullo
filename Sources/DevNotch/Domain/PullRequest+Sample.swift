@@ -16,7 +16,7 @@ extension PullRequest {
         ci: .success,
         review: .approved,
         hasConflict: false,
-        othersCommentIDs: [],
+        othersComments: [],
         othersReviews: [],
         headOID: "",
         commitCount: 1,
