@@ -45,7 +45,6 @@ struct PRTabsBar: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .help("\(tab.title) · ⇥ to switch")
     }
 
     /// Turns blue when something in the tab changed, instead of a separate dot.
@@ -60,7 +59,6 @@ struct PRTabsBar: View {
             .padding(.horizontal, 5)
             .padding(.vertical, 1)
             .background(Capsule().fill(unread > 0 ? Color.unread.opacity(0.18) : .white.opacity(selected ? 0.16 : 0.08)))
-            .help(unread > 0 ? "\(unread) with updates" : "")
     }
 
     private func unreadCount(in tab: PRTab) -> Int {

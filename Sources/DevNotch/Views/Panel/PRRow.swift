@@ -51,7 +51,6 @@ struct PRRow: View {
         .animation(Motion.hover, value: selected)
         .animation(Motion.navigate, value: isUnread)
         .onTapGesture { model.open(pr) }
-        .help("\(pr.repo) #\(pr.number) · \(pr.branch)")
     }
 
     private var statuses: [PRStatus] { pr.statuses(mine: kind == .mine) }
@@ -70,9 +69,9 @@ struct PRRow: View {
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)
-            .help("Show failed checks")
+            .hint(statuses.first?.explanation ?? "")
         } else {
-            icon.help(statuses.compactMap(\.label).first ?? (pr.ci == nil ? "No checks" : "Checks passed"))
+            icon.hint(statuses.first?.explanation ?? "")
         }
     }
 
@@ -105,7 +104,7 @@ struct PRRow: View {
     private var badges: some View {
         HStack(spacing: 8) {
             if (hovering || selected) && isUnread {
-                IconButton(symbol: "checkmark.circle", help: "Mark as read (r)") { model.markRead(pr) }
+                IconButton(symbol: "checkmark.circle", help: "Mark as read · r") { model.markRead(pr) }
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
             HStack(spacing: 6) {
@@ -117,7 +116,7 @@ struct PRRow: View {
                 Text(ageDate.shortAge)
                     .font(.system(size: 11, weight: .medium).monospacedDigit())
                     .foregroundStyle(Color.secondaryText)
-                    .help(ageHelp)
+                    .hint(ageHelp, edge: .leading)
             }
             .frame(minWidth: 34, alignment: .trailing)
         }

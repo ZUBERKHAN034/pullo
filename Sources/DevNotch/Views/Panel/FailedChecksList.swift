@@ -32,7 +32,7 @@ struct FailedChecksList: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(check.url == nil ? "No link for this check" : "Open the check log")
+                .hint(check.url == nil ? "No link for this check" : "Open the check log")
             }
         }
     }

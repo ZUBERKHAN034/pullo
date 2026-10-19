@@ -16,6 +16,20 @@ enum PRStatus: Equatable {
         case .ciPassed, .noChecks: nil
         }
     }
+
+    /// What the icon means, in a sentence, for the hover hint.
+    var explanation: String {
+        switch self {
+        case .conflict: "Conflicts with the base branch"
+        case .ciFailed: "Checks failed · click to see which"
+        case .changesRequested: "A reviewer requested changes"
+        case .ciRunning: "Checks are running"
+        case .readyToMerge: "Approved and checks passed · ready to merge"
+        case .draft: "Draft, not ready for review"
+        case .ciPassed: "Checks passed"
+        case .noChecks: "No checks on this PR"
+        }
+    }
 }
 
 extension PullRequest {

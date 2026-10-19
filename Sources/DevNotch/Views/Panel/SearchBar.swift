@@ -22,7 +22,7 @@ struct SearchBar: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(.white.opacity(0.1)))
             }
             .buttonStyle(.plain)
-            .help("Close search")
+            .hint("Close search", edge: .leading)
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 6)
