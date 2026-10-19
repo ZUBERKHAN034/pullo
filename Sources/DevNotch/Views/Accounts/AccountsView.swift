@@ -22,7 +22,7 @@ struct AccountsView: View {
                 Spacer()
                 Text(accounts.accounts.count == 1 ? "1 connected" : "\(accounts.accounts.count) connected")
                     .font(.system(size: 10.5, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.3))
+                    .foregroundStyle(Color.tertiaryText)
             }
 
             ScrollView(.vertical, showsIndicators: false) {
@@ -61,7 +61,7 @@ struct AccountRow: View {
                     .foregroundStyle(.white.opacity(0.92))
                 Text(error ?? "via GitHub CLI")
                     .font(.system(size: 11))
-                    .foregroundStyle(error == nil ? .white.opacity(0.4) : .orange)
+                    .foregroundStyle(error == nil ? Color.secondaryText : .orange)
                     .lineLimit(1)
             }
             Spacer()
