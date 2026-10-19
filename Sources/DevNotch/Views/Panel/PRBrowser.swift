@@ -21,7 +21,8 @@ struct PRBrowser: View {
                 ErrorBanner(message: "Couldn't refresh @\(login)") { model.show(.accounts) }
             }
             content
-            if model.keyboardMode || model.selectedPRID != nil {
+            // Only when driving it from the keyboard; pointer users get tooltips instead.
+            if model.keyboardMode {
                 KeyboardHints(searching: model.isSearching)
             }
         }

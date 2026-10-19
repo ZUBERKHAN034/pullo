@@ -19,18 +19,11 @@ struct PRRow: View {
                 leading
                     .frame(width: 18)
                 VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        if isUnread {
-                            Circle()
-                                .fill(Color.unread)
-                                .frame(width: 6, height: 6)
-                                .transition(.scale.combined(with: .opacity))
-                        }
-                        Text(pr.title)
-                            .font(.system(size: 12.5, weight: isUnread ? .semibold : .medium))
-                            .foregroundStyle(.white.opacity(isUnread ? 1 : 0.88))
-                            .lineLimit(1)
-                    }
+                    // Unread shows as a bolder title and the blue line saying what changed.
+                    Text(pr.title)
+                        .font(.system(size: 12.5, weight: isUnread ? .semibold : .medium))
+                        .foregroundStyle(.white.opacity(isUnread ? 1 : 0.88))
+                        .lineLimit(1)
                     subtitle
                 }
                 Spacer(minLength: 8)
@@ -58,7 +51,7 @@ struct PRRow: View {
         .animation(Motion.hover, value: selected)
         .animation(Motion.navigate, value: isUnread)
         .onTapGesture { model.open(pr) }
-        .help(pr.url.absoluteString)
+        .help("\(pr.repo) #\(pr.number) · \(pr.branch)")
     }
 
     @ViewBuilder
@@ -68,7 +61,7 @@ struct PRRow: View {
                 Button {
                     withAnimation(Motion.navigate) { showingChecks.toggle() }
                 } label: {
-                    CIStatusIcon(state: ci, size: 12)
+                    CIStatusIcon(state: ci, size: 14)
                         .frame(width: 18, height: 18)
                         .background(Circle().fill(.red.opacity(showingChecks ? 0.25 : 0)))
                         .contentShape(Circle())
@@ -76,10 +69,11 @@ struct PRRow: View {
                 .buttonStyle(.plain)
                 .help("Show failed checks")
             } else {
-                CIStatusIcon(state: ci, size: 12)
+                CIStatusIcon(state: ci, size: 14)
             }
         } else {
-            Circle().strokeBorder(.white.opacity(0.25), lineWidth: 1.5).frame(width: 12, height: 12)
+            Circle().strokeBorder(.white.opacity(0.3), lineWidth: 1.5).frame(width: 14, height: 14)
+                .help("No checks")
         }
     }
 
@@ -87,19 +81,26 @@ struct PRRow: View {
         Group {
             if isUnread {
                 Text(unreadReasons.joined(separator: " · ")).foregroundColor(.unread)
-                    + Text(verbatim: "   \(pr.repoName) #\(pr.number)").foregroundColor(.white.opacity(0.35))
+                    + Text(verbatim: "   \(pr.repoName) #\(pr.number)").foregroundColor(.secondaryText)
             } else {
-                Text(subtitleText).foregroundColor(.white.opacity(0.42))
+                Text(subtitleText).foregroundColor(.secondaryText)
             }
         }
         .font(.system(size: 11))
         .lineLimit(1)
     }
 
+    /// The branch stays out of the row; it's in the tooltip and one keystroke away with "c".
     private var subtitleText: String {
+        let ref = "\(pr.repoName) #\(pr.number)"
         switch kind {
-        case .mine: "\(pr.repoName) #\(pr.number) · \(pr.branch)"
-        case .review: "\(pr.repoName) #\(pr.number) · by \(pr.author)"
+        case .mine:
+            return ref
+        case .review:
+            if case .team(let teams) = pr.reviewRequest, let team = teams.first {
+                return "\(ref) · by \(pr.author) · via \(teams.count > 1 ? "\(team) +\(teams.count - 1)" : team)"
+            }
+            return "\(ref) · by \(pr.author)"
         }
     }
 
@@ -114,36 +115,42 @@ struct PRRow: View {
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
-            if kind == .review, case .team(let teams) = pr.reviewRequest, let team = teams.first {
-                Tag(text: teams.count > 1 ? "\(team) +\(teams.count - 1)" : team, tint: .indigo, symbol: "person.3.fill")
-            }
-            if pr.isDraft { Tag(text: "Draft", tint: .gray) }
-            if pr.hasConflict { Tag(text: "Conflict", tint: .orange, symbol: "exclamationmark.triangle.fill") }
-            switch pr.review {
-            case .approved where kind == .mine:
-                Tag(text: pr.isReadyToMerge ? "Ready" : "Approved", tint: .green, symbol: "checkmark.seal.fill")
-            case .changesRequested where kind == .mine:
-                Tag(text: "Changes", tint: .red, symbol: "exclamationmark.bubble.fill")
-            default:
-                EmptyView()
-            }
+            if let status { status }
             // Your PRs are sorted by activity, review requests by how long they've waited; the age follows suit.
             Text(ageDate.shortAge)
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(ageTint)
                 .frame(minWidth: 30, alignment: .trailing)
-                .help(kind == .mine ? "Updated \(ageDate.shortAge) ago" : "Opened \(ageDate.shortAge) ago")
+                .help(ageHelp)
         }
+    }
+
+    /// One tag at most, the one that matters most, so the row stays quiet.
+    private var status: Tag? {
+        if pr.hasConflict { return Tag(text: "Conflict", tint: .orange, symbol: "exclamationmark.triangle.fill") }
+        if kind == .mine, pr.review == .changesRequested {
+            return Tag(text: "Changes", tint: .red, symbol: "exclamationmark.bubble.fill")
+        }
+        if pr.isDraft { return Tag(text: "Draft", tint: .gray) }
+        if kind == .mine, pr.review == .approved {
+            return Tag(text: pr.isReadyToMerge ? "Ready" : "Approved", tint: .green, symbol: "checkmark.seal.fill")
+        }
+        return nil
     }
 
     private var ageDate: Date { kind == .mine ? pr.updatedAt : pr.createdAt }
 
+    private var ageHelp: String {
+        guard kind == .review else { return "Updated \(ageDate.shortAge) ago" }
+        return pr.isDirectRequest ? "Waiting on your review for \(ageDate.shortAge)" : "Opened \(ageDate.shortAge) ago"
+    }
+
     /// Review requests get louder the longer someone has been waiting on you.
     private var ageTint: Color {
-        guard kind == .review, pr.isDirectRequest else { return .white.opacity(0.35) }
+        guard kind == .review, pr.isDirectRequest else { return .secondaryText }
         let hours = Date().timeIntervalSince(pr.createdAt) / 3600
         if hours > 48 { return .red }
         if hours > 24 { return .orange }
-        return .white.opacity(0.35)
+        return .secondaryText
     }
 }
