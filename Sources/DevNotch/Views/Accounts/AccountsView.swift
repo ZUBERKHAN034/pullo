@@ -49,6 +49,8 @@ struct AccountRow: View {
     let error: String?
     let onRemove: () -> Void
     @ViewState private var hovering = false
+    /// Removing takes a second click, so a stray one doesn't drop an account.
+    @ViewState private var confirming = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -63,8 +65,19 @@ struct AccountRow: View {
                     .lineLimit(1)
             }
             Spacer()
-            IconButton(symbol: "trash", help: "Remove account", action: onRemove)
-                .opacity(hovering ? 1 : 0.4)
+            if confirming {
+                Button("Remove", role: .destructive, action: onRemove)
+                    .buttonStyle(.plain)
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(.red.opacity(0.15)))
+                    .transition(.opacity)
+            } else {
+                IconButton(symbol: "trash", help: "Remove account") { confirming = true }
+                    .opacity(hovering ? 1 : 0.4)
+            }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
@@ -72,7 +85,11 @@ struct AccountRow: View {
             RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .fill(.white.opacity(hovering ? 0.06 : 0))
         )
-        .onHover { hovering = $0 }
+        .onHover { inside in
+            hovering = inside
+            if !inside { confirming = false }
+        }
         .animation(Motion.hover, value: hovering)
+        .animation(Motion.hover, value: confirming)
     }
 }

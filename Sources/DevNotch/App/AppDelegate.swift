@@ -50,6 +50,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.settingsWindow.show()
         }
         accounts.onAccountAdded = { [weak self] account in self?.model.accountConnected(account) }
+        accounts.onAccountRemoved = { [weak self] account in
+            self?.tracker.forget(account: account.login)
+            self?.settings.mutedAccounts.remove(account.login)
+        }
 
         if let demo {
             // The tour drives everything itself; a stray real mouse move or shortcut shouldn't interfere.

@@ -10,6 +10,7 @@ final class AccountStore: ObservableObject {
     @Published private(set) var importError: String?
 
     var onAccountAdded: ((Account) -> Void)?
+    var onAccountRemoved: ((Account) -> Void)?
 
     private let defaults: UserDefaults
     private let defaultsKey = "accounts"
@@ -46,6 +47,7 @@ final class AccountStore: ObservableObject {
         tokens[account.login] = nil
         accounts.removeAll { $0.id == account.id }
         persist()
+        onAccountRemoved?(account)
     }
 
     func reloadGHUsers() {

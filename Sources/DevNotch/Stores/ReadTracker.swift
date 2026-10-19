@@ -45,7 +45,8 @@ final class ReadTracker: ObservableObject {
         var updated = baselines.filter { !$0.key.hasPrefix("\(account)|") }
         for pr in prs {
             let key = Self.key(pr)
-            updated[key] = baselines[key] ?? ReadBaseline(pr, isNew: !firstSync)
+            // A PR you just opened yourself isn't news to you.
+            updated[key] = baselines[key] ?? ReadBaseline(pr, isNew: !firstSync && pr.author != account)
         }
         let newAccount = knownAccounts.insert(account).inserted
         guard updated != baselines || newAccount else { return }
@@ -55,7 +56,7 @@ final class ReadTracker: ObservableObject {
 
     func reasons(for pr: PullRequest) -> [String] {
         guard let base = baselines[Self.key(pr)] else { return [] }
-        if base.isNew { return [pr.author == pr.account ? "New PR" : "New review request"] }
+        if base.isNew { return ["New review request"] }
 
         var reasons: [String] = []
         let newComments = Set(pr.othersCommentIDs).subtracting(base.commentIDs).count
@@ -85,6 +86,13 @@ final class ReadTracker: ObservableObject {
 
     func isUnread(_ pr: PullRequest) -> Bool {
         !reasons(for: pr).isEmpty
+    }
+
+    /// Drops everything kept for a removed account, so adding it back starts fresh.
+    func forget(account: String) {
+        baselines = baselines.filter { !$0.key.hasPrefix("\(account)|") }
+        knownAccounts.remove(account)
+        save()
     }
 
     func markRead(_ prs: [PullRequest]) {
