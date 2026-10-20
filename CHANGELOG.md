@@ -5,6 +5,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ## [Unreleased]
 
 ### Added
+- Get beta versions: turn it on in Settings → Updates to try new features before everyone else.
+
+### Added
 - Each pull request shows how many lines it adds and removes. Hover over it to see how many files changed.
 
 ## [0.4.0] - 2026-10-20

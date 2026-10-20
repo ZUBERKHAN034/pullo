@@ -519,6 +519,22 @@
         }
       }
     },
+    "Betas bring new features earlier and may have bugs. Turning this off keeps the beta you have until a newer stable version is out.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las betas traen novedades antes y pueden tener errores. Si lo desactivas, conservas la beta actual hasta que salga una versión estable más nueva."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As betas trazem novidades antes e podem ter bugs. Ao desligar, você fica com a beta atual até sair uma versão estável mais nova."
+          }
+        }
+      }
+    },
     "CI failed": {
       "localizations": {
         "es": {
@@ -1100,6 +1116,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geral"
+          }
+        }
+      }
+    },
+    "Get beta versions": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recibir versiones beta"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receber versões beta"
           }
         }
       }
