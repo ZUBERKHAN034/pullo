@@ -8,7 +8,7 @@ final class AppSettings: ObservableObject {
     @Published var haptics: Bool { didSet { save() } }
     @Published var sound: String? { didSet { save() } }
     @Published private(set) var launchAtLogin: Bool
-    @Published private(set) var launchAtLoginError: String?
+    @Published private(set) var launchAtLoginFailure: String?
 
     private let defaults: UserDefaults
 
@@ -49,9 +49,9 @@ final class AppSettings: ObservableObject {
     func setLaunchAtLogin(_ enabled: Bool) {
         do {
             if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
-            launchAtLoginError = nil
+            launchAtLoginFailure = nil
         } catch {
-            launchAtLoginError = "Couldn't turn it on: \(error.localizedDescription). Install the app in /Applications."
+            launchAtLoginFailure = error.localizedDescription
         }
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }

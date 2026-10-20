@@ -29,7 +29,7 @@ struct PRList: View {
                                     pr: pr,
                                     kind: kind,
                                     selected: model.selectedPRID == pr.id,
-                                    unreadReasons: tracker.reasons(for: pr),
+                                    changes: tracker.changes(for: pr),
                                     model: model
                                 )
                             }

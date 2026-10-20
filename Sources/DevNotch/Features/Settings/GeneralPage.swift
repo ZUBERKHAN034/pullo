@@ -11,8 +11,8 @@ struct GeneralPage: View {
                     get: { settings.launchAtLogin },
                     set: { settings.setLaunchAtLogin($0) }
                 ))
-                if let error = settings.launchAtLoginError {
-                    Text(error).font(.caption).foregroundStyle(.orange)
+                if let reason = settings.launchAtLoginFailure {
+                    Text("Couldn't turn it on: \(reason). Install the app in /Applications.").font(.caption).foregroundStyle(.orange)
                 }
             }
             Section {

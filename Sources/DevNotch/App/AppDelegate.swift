@@ -5,13 +5,14 @@ import Combine
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let demo: DemoMode? = DemoMode.current
     private lazy var defaults = demo?.defaults ?? .standard
-    private lazy var accounts = AccountStore(defaults: defaults)
+    private let tokens = TokenProvider(cli: GHCLI())
+    private lazy var accounts = AccountStore(defaults: defaults, cli: GHCLI(), tokens: tokens)
     private lazy var settings = AppSettings(defaults: defaults)
     private lazy var tracker = ReadTracker(defaults: defaults)
     private lazy var store = PRStore(
         accounts: accounts,
         tracker: tracker,
-        source: demo?.source ?? GitHubSource(accounts: accounts)
+        source: demo?.source ?? GitHubSource(tokens: tokens)
     )
     private lazy var model = NotchViewModel(
         store: store, accounts: accounts, settings: settings, tracker: tracker,

@@ -6,16 +6,19 @@ final class AccountStore: ObservableObject {
     @Published private(set) var ghInstalled = true
     @Published private(set) var ghUsers: [String] = []
     @Published private(set) var importing: String?
-    @Published private(set) var importError: String?
+    @Published private(set) var importFailure: ImportFailure?
 
     var onAccountAdded: ((Account) -> Void)?
     var onAccountRemoved: ((Account) -> Void)?
 
     private let defaults: UserDefaults
-    private var tokens: [String: String] = [:]
+    private let cli: any GitHubCLI
+    private let tokens: TokenProvider
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults, cli: any GitHubCLI, tokens: TokenProvider) {
         self.defaults = defaults
+        self.cli = cli
+        self.tokens = tokens
         if let data = defaults.data(for: .accounts),
            let saved = try? JSONDecoder().decode([Account].self, from: data) {
             accounts = saved
@@ -27,28 +30,17 @@ final class AccountStore: ObservableObject {
         ghUsers.filter { user in !accounts.contains { $0.login.caseInsensitiveCompare(user) == .orderedSame } }
     }
 
-    func token(for account: Account) async throws -> String {
-        if let cached = tokens[account.login] { return cached }
-        let login = account.login
-        let token = try await Task.detached { try GHCLI.token(for: login) }.value
-        tokens[login] = token
-        return token
-    }
-
-    func invalidateToken(for login: String) {
-        tokens[login] = nil
-    }
-
     func remove(_ account: Account) {
-        tokens[account.login] = nil
+        Task { await tokens.forget(account.login) }
         accounts.removeAll { $0.id == account.id }
         persist()
         onAccountRemoved?(account)
     }
 
     func reloadGHUsers() {
+        let cli = cli
         Task { [weak self] in
-            let (installed, users) = await Task.detached { (GHCLI.isInstalled, GHCLI.users()) }.value
+            let (installed, users) = await Task.detached { (cli.isInstalled, cli.users()) }.value
             self?.ghInstalled = installed
             self?.ghUsers = users
         }
@@ -56,15 +48,16 @@ final class AccountStore: ObservableObject {
 
     func importFromGH(_ user: String) async {
         importing = user
-        importError = nil
+        importFailure = nil
         defer { importing = nil }
         do {
-            let token = try await Task.detached { try GHCLI.token(for: user) }.value
+            let cli = cli
+            let token = try await Task.detached { try cli.token(for: user) }.value
             let profile = try await GitHubClient(token: token).fetchUser()
-            tokens[profile.login] = token
+            await tokens.remember(token, for: profile.login)
             upsert(Account(login: profile.login, avatarURL: profile.avatarURL))
         } catch {
-            importError = "@\(user): \(error.localizedDescription)"
+            importFailure = ImportFailure(user: user, reason: error.localizedDescription)
         }
     }
 

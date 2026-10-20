@@ -48,8 +48,8 @@ struct AccountsPage: View {
                         }
                     }
                 }
-                if let message = accounts.importError {
-                    Text(message).font(.caption).foregroundStyle(.orange)
+                if let failure = accounts.importFailure {
+                    Text(failure.message).font(.caption).foregroundStyle(.orange)
                 }
                 LabeledContent("Logged in with gh just now?") {
                     Button("Check again") { accounts.reloadGHUsers() }

@@ -87,7 +87,6 @@ final class PRStore: ObservableObject {
                 tracker.sync(account: login, prs: snapshot.mine + snapshot.reviewRequests)
                 errors[login] = nil
             case .failure(let error):
-                if error as? GitHubError == .unauthorized { accounts.invalidateToken(for: login) }
                 errors[login] = error.localizedDescription
             }
         }

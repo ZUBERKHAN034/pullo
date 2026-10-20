@@ -1,19 +1,22 @@
 import Foundation
 
-enum GHCLI {
-    static var isInstalled: Bool { executable != nil }
+struct GHCLI: GitHubCLI {
+    var host = "github.com"
+    var timeout: Duration = .seconds(10)
+
+    var isInstalled: Bool { Self.executable != nil }
 
     private static var executable: String? {
         ["/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh"]
             .first(where: FileManager.default.isExecutableFile(atPath:))
     }
 
-    static func users(host: String = "github.com") -> [String] {
+    func users() -> [String] {
         let configDir = ProcessInfo.processInfo.environment["GH_CONFIG_DIR"] ?? NSHomeDirectory() + "/.config/gh"
         guard isInstalled, let hosts = try? String(contentsOfFile: configDir + "/hosts.yml", encoding: .utf8) else {
             return []
         }
-        return users(inHostsFile: hosts, host: host)
+        return Self.users(inHostsFile: hosts, host: host)
     }
 
     static func users(inHostsFile text: String, host: String) -> [String] {
@@ -46,8 +49,8 @@ enum GHCLI {
         return users
     }
 
-    static func token(for user: String, host: String = "github.com", timeout: Duration = .seconds(10)) throws -> String {
-        guard let executable else { throw GitHubError.noToken }
+    func token(for user: String) throws -> String {
+        guard let executable = Self.executable else { throw GitHubError.noToken }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = ["auth", "token", "--hostname", host, "--user", user]

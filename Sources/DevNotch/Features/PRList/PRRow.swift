@@ -4,13 +4,13 @@ struct PRRow: View {
     let pr: PullRequest
     let kind: PRTab
     let selected: Bool
-    let unreadReasons: [String]
+    let changes: [ReadChange]
     @ObservedObject var model: NotchViewModel
 
     @State private var hovering = false
     @State private var showingChecks = false
 
-    private var isUnread: Bool { !unreadReasons.isEmpty }
+    private var isUnread: Bool { !changes.isEmpty }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -76,7 +76,7 @@ struct PRRow: View {
     private var subtitle: some View {
         Group {
             if isUnread {
-                Text(unreadReasons.joined(separator: " · ")).foregroundColor(.textStrong)
+                Text(changes.map(\.label).joined(separator: " · ")).foregroundColor(.textStrong)
                     + Text(verbatim: "  ·  " + details.joined(separator: " · ")).foregroundColor(.textSecondary)
             } else {
                 Text(details.joined(separator: " · ")).foregroundColor(.textSecondary)

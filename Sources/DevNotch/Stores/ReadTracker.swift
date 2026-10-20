@@ -29,37 +29,35 @@ final class ReadTracker: ObservableObject {
         save()
     }
 
-    func reasons(for pr: PullRequest) -> [String] {
+    func changes(for pr: PullRequest) -> [ReadChange] {
         guard let base = baselines[Self.key(pr)] else { return [] }
-        if base.isNew { return ["New review request"] }
+        if base.isNew { return [.newReviewRequest] }
 
-        var reasons: [String] = []
+        var changes: [ReadChange] = []
         let newComments = Set(pr.othersCommentIDs).subtracting(base.commentIDs).count
-        if newComments > 0 { reasons.append(newComments == 1 ? "1 new comment" : "\(newComments) new comments") }
+        if newComments > 0 { changes.append(.comments(newComments)) }
 
         let reviewers = pr.othersReviews.filter { !base.reviewIDs.contains($0.id) }.map { pr.displayLogin($0.author) }
         let uniqueReviewers = reviewers.reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } }
-        if let first = uniqueReviewers.first {
-            reasons.append(uniqueReviewers.count == 1 ? "\(first) reviewed" : "\(uniqueReviewers.count) people reviewed")
-        }
+        if !uniqueReviewers.isEmpty { changes.append(.reviewed(by: uniqueReviewers)) }
 
         if pr.review != base.review {
-            if pr.review == .approved { reasons.append("Approved") }
-            if pr.review == .changesRequested { reasons.append("Changes requested") }
+            if pr.review == .approved { changes.append(.approved) }
+            if pr.review == .changesRequested { changes.append(.changesRequested) }
         }
         if pr.ci != base.ci {
-            if pr.ci == .failure { reasons.append("CI failed") }
-            if pr.ci == .success { reasons.append("CI passed") }
+            if pr.ci == .failure { changes.append(.ciFailed) }
+            if pr.ci == .success { changes.append(.ciPassed) }
         }
         if pr.author != pr.account, pr.headOID != base.headOID {
             let added = pr.commitCount - base.commitCount
-            reasons.append(added > 0 ? (added == 1 ? "1 new commit" : "\(added) new commits") : "force-push")
+            changes.append(added > 0 ? .commits(added) : .forcePush)
         }
-        return reasons
+        return changes
     }
 
     func isUnread(_ pr: PullRequest) -> Bool {
-        !reasons(for: pr).isEmpty
+        !changes(for: pr).isEmpty
     }
 
     func forget(account: String) {
