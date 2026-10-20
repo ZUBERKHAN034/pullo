@@ -20,13 +20,21 @@ final class PRListModel {
     private let accounts: AccountStore
     private let tracker: ReadTracker
     private let system: any SystemActions
+    private let clock: any Clock<Duration>
     @ObservationIgnored private var toastTask: Task<Void, Never>?
 
-    init(store: PRStore, accounts: AccountStore, tracker: ReadTracker, system: any SystemActions) {
+    init(
+        store: PRStore,
+        accounts: AccountStore,
+        tracker: ReadTracker,
+        system: any SystemActions,
+        clock: any Clock<Duration> = ContinuousClock()
+    ) {
         self.store = store
         self.accounts = accounts
         self.tracker = tracker
         self.system = system
+        self.clock = clock
     }
 
     var currentLogin: String? {
@@ -117,8 +125,9 @@ final class PRListModel {
     func showToast(_ message: String) {
         toastTask?.cancel()
         withAnimation(Motion.navigate) { toast = message }
+        let clock = clock
         toastTask = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(1.8))
+            try? await clock.sleep(for: .seconds(1.8))
             guard !Task.isCancelled else { return }
             withAnimation(Motion.fade) { self?.toast = nil }
         }
