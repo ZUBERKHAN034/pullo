@@ -50,9 +50,11 @@ struct PeekView: View {
         VStack(alignment: .leading, spacing: 1) {
             ForEach(Array(alert.stack.prefix(2).enumerated()), id: \.element.id) { index, item in
                 HStack(spacing: 6) {
+                    // What happened outranks where: the repo reference gives way first when space runs out.
                     Text(item.headline)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white)
+                        .layoutPriority(1)
                     if let reference = item.reference {
                         Text(reference)
                             .font(.system(size: 11))
