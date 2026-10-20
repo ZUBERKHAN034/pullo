@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import OSLog
 
 @MainActor
 @Observable
@@ -83,6 +84,7 @@ final class PRStore {
                 tracker.sync(account: login, prs: snapshot.mine + snapshot.reviewRequests)
                 errors[login] = nil
             case .failure(let error):
+                Logger.store.error("Refreshing @\(login, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
                 errors[login] = error.localizedDescription
             }
         }
@@ -102,7 +104,13 @@ final class PRStore {
         let stillThere = Set(new.mine.map(\.id))
         let gone = old.mine.filter { !stillThere.contains($0.id) }
         guard !gone.isEmpty, let account = accounts.accounts.first(where: { $0.login == login }) else { return [] }
-        let outcomes = await (try? source.outcomes(of: gone.map(\.id), for: account)) ?? []
+        let outcomes: [PROutcome]
+        do {
+            outcomes = try await source.outcomes(of: gone.map(\.id), for: account)
+        } catch {
+            Logger.store.error("Looking up merged or closed PRs failed: \(error.localizedDescription, privacy: .public)")
+            outcomes = []
+        }
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }
     }
 

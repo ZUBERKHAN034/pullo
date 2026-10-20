@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import OSLog
 
 @MainActor
 @Observable
@@ -21,9 +22,12 @@ final class AccountStore {
         self.defaults = defaults
         self.cli = cli
         self.tokens = tokens
-        if let data = defaults.data(for: .accounts),
-           let saved = try? JSONDecoder().decode([Account].self, from: data) {
-            accounts = saved
+        if let data = defaults.data(for: .accounts) {
+            do {
+                accounts = try JSONDecoder().decode([Account].self, from: data)
+            } catch {
+                Logger.store.error("Saved accounts are unreadable: \(error.localizedDescription, privacy: .public)")
+            }
         }
         reloadGHUsers()
     }
@@ -59,6 +63,7 @@ final class AccountStore {
             await tokens.remember(token, for: profile.login)
             upsert(Account(login: profile.login, avatarURL: profile.avatarURL))
         } catch {
+            Logger.github.error("Adding @\(user, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
             importFailure = ImportFailure(user: user, reason: error.localizedDescription)
         }
     }
@@ -74,8 +79,10 @@ final class AccountStore {
     }
 
     private func persist() {
-        if let data = try? JSONEncoder().encode(accounts) {
-            defaults.set(data, for: .accounts)
+        do {
+            try defaults.set(JSONEncoder().encode(accounts), for: .accounts)
+        } catch {
+            Logger.store.error("Saving accounts failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 }

@@ -1,7 +1,9 @@
 import Foundation
+import OSLog
 
 struct GitHubClient {
     let token: String
+    var session: URLSession = .shared
 
     private static let query = """
     query($mine: String!, $review: String!) {
@@ -44,6 +46,9 @@ struct GitHubClient {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(GQLResponse.self, from: data)
+        if let errors = decoded.errors, !errors.isEmpty {
+            Logger.github.error("GitHub reported errors: \(errors.map(\.message).joined(separator: " | "), privacy: .public)")
+        }
         guard let payload = decoded.data else {
             throw GitHubError.api(decoded.errors?.map(\.message).joined(separator: "\n") ?? "Empty response from GitHub.")
         }
@@ -90,8 +95,11 @@ struct GitHubClient {
     }
 
     private func send(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if !(200..<300).contains(status) {
+            Logger.github.error("\(request.url?.path() ?? "", privacy: .public) returned \(status)")
+        }
         if status == 401 { throw GitHubError.unauthorized }
         guard (200..<300).contains(status) else {
             struct Failure: Decodable { let message: String }

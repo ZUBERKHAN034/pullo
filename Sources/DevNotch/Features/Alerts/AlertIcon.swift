@@ -5,6 +5,11 @@ struct AlertIcon: View {
     var size: CGFloat = 30
 
     var body: some View {
+        icon.accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private var icon: some View {
         if let actor = alert.actor {
             Avatar(url: alert.actorAvatar, login: actor, size: size)
                 .overlay(alignment: .bottomTrailing) {

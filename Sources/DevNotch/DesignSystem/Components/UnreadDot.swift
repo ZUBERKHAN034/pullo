@@ -5,5 +5,6 @@ struct UnreadDot: View {
 
     var body: some View {
         Circle().fill(.unread).frame(width: size, height: size)
+            .accessibilityHidden(true)
     }
 }
