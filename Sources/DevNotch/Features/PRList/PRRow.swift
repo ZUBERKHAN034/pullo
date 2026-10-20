@@ -51,6 +51,13 @@ struct PRRow: View {
         .animation(Motion.hover, value: selected)
         .animation(Motion.navigate, value: isUnread)
         .onTapGesture { notch.open(pr) }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAction { notch.open(pr) }
+        .accessibilityActions {
+            if isUnread { Button("Mark as read") { list.markRead(pr) } }
+            Button("Copy branch") { list.copyBranch(pr) }
+        }
     }
 
     private var statuses: [PRStatus] { pr.statuses(mine: kind == .mine) }

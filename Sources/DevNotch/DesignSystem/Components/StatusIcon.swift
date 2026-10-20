@@ -18,6 +18,8 @@ struct StatusIcon: View {
             }
         }
         .frame(width: size, height: size)
+        .accessibilityElement()
+        .accessibilityLabel(status.explanation)
     }
 
     private func symbol(_ name: String, _ color: Color) -> some View {

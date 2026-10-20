@@ -42,6 +42,9 @@ struct PeekView: View {
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         .onTapGesture(perform: onTap)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { onTap() }
     }
 
     private var stackedLines: some View {

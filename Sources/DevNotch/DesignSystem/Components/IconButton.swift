@@ -20,6 +20,7 @@ struct IconButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(help)
         .onHover { hovering = $0 }
         .hint(help, edge: hintEdge)
     }
