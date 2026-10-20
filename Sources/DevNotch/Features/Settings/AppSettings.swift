@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import OSLog
 import ServiceManagement
 
 @MainActor
@@ -47,6 +48,7 @@ final class AppSettings {
             if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
             launchAtLoginFailure = nil
         } catch {
+            Logger.settings.error("Changing open at login failed: \(error.localizedDescription, privacy: .public)")
             launchAtLoginFailure = error.localizedDescription
         }
         launchAtLogin = SMAppService.mainApp.status == .enabled

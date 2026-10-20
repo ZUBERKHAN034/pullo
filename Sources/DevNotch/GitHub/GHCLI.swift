@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 struct GHCLI: GitHubCLI {
     var host = "github.com"
@@ -13,7 +14,12 @@ struct GHCLI: GitHubCLI {
 
     func users() -> [String] {
         let configDir = ProcessInfo.processInfo.environment["GH_CONFIG_DIR"] ?? NSHomeDirectory() + "/.config/gh"
-        guard isInstalled, let hosts = try? String(contentsOfFile: configDir + "/hosts.yml", encoding: .utf8) else {
+        guard isInstalled else { return [] }
+        let hosts: String
+        do {
+            hosts = try String(contentsOfFile: configDir + "/hosts.yml", encoding: .utf8)
+        } catch {
+            Logger.github.notice("Reading gh's hosts.yml failed: \(error.localizedDescription, privacy: .public)")
             return []
         }
         return Self.users(inHostsFile: hosts, host: host)

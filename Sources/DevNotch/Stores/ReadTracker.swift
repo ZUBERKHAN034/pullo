@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import OSLog
 
 @MainActor
 @Observable
@@ -11,9 +12,12 @@ final class ReadTracker {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        if let data = defaults.data(for: .readBaselines),
-           let saved = try? JSONDecoder().decode([String: ReadBaseline].self, from: data) {
-            baselines = saved
+        if let data = defaults.data(for: .readBaselines) {
+            do {
+                baselines = try JSONDecoder().decode([String: ReadBaseline].self, from: data)
+            } catch {
+                Logger.store.error("Saved read state is unreadable, starting over: \(error.localizedDescription, privacy: .public)")
+            }
         }
         knownAccounts = Set(defaults.stringArray(for: .readKnownAccounts) ?? [])
     }
@@ -77,7 +81,11 @@ final class ReadTracker {
     }
 
     private func save() {
-        if let data = try? JSONEncoder().encode(baselines) { defaults.set(data, for: .readBaselines) }
+        do {
+            try defaults.set(JSONEncoder().encode(baselines), for: .readBaselines)
+        } catch {
+            Logger.store.error("Saving read state failed: \(error.localizedDescription, privacy: .public)")
+        }
         defaults.set(Array(knownAccounts), for: .readKnownAccounts)
     }
 
