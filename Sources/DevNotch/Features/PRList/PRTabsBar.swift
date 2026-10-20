@@ -1,0 +1,65 @@
+import SwiftUI
+
+struct PRTabsBar: View {
+    @ObservedObject var model: NotchViewModel
+    @ObservedObject var store: PRStore
+    @ObservedObject var tracker: ReadTracker
+    @Namespace private var selection
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(PRTab.allCases, id: \.self) { tab in
+                tabButton(tab)
+            }
+            Spacer()
+            SearchTrigger(action: model.startSearch)
+            if unreadCount(in: model.tab) > 0 {
+                IconButton(symbol: "envelope.open", help: "Mark all as read", action: model.markAllRead)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            }
+        }
+        .animation(Motion.navigate, value: unreadCount(in: model.tab))
+    }
+
+    private func tabButton(_ tab: PRTab) -> some View {
+        let selected = model.tab == tab
+        return Button {
+            model.selectTab(tab)
+        } label: {
+            HStack(spacing: 6) {
+                Text(tab.title)
+                count(for: tab, selected: selected)
+            }
+            .font(.panel(.label, .semibold))
+            .foregroundStyle(selected ? Color.white : .textTertiary)
+            .padding(.horizontal, 11)
+            .padding(.vertical, 6)
+            .background {
+                if selected {
+                    Capsule()
+                        .fill(.surface)
+                        .matchedGeometryEffect(id: "tab", in: selection)
+                }
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func count(for tab: PRTab, selected: Bool) -> some View {
+        let total = model.prs(in: tab).count
+        let unread = unreadCount(in: tab)
+        let loaded = store.snapshots[model.currentLogin ?? ""] != nil
+        return Text(loaded ? "\(total)" : "–")
+            .font(.panel(.caption, .bold, design: .rounded))
+            .foregroundStyle(unread > 0 ? Color.unread : selected ? .textStrong : .textSecondary)
+            .contentTransition(.numericText())
+            .padding(.horizontal, 5)
+            .padding(.vertical, 1)
+            .background(Capsule().fill(unread > 0 ? Color.unread.opacity(0.18) : selected ? .surfaceStrong : .surfaceSubtle))
+    }
+
+    private func unreadCount(in tab: PRTab) -> Int {
+        model.prs(in: tab).filter(tracker.isUnread).count
+    }
+}

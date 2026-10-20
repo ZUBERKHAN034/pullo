@@ -1,25 +1,5 @@
 import Foundation
 
-struct ReadBaseline: Codable, Equatable {
-    var commentIDs: Set<String>
-    var reviewIDs: Set<String>
-    var headOID: String
-    var commitCount: Int
-    var ci: CIState?
-    var review: ReviewDecision?
-    var isNew = false
-
-    init(_ pr: PullRequest, isNew: Bool = false) {
-        commentIDs = Set(pr.othersCommentIDs)
-        reviewIDs = Set(pr.othersReviews.map(\.id))
-        headOID = pr.headOID
-        commitCount = pr.commitCount
-        ci = pr.ci
-        review = pr.review
-        self.isNew = isNew
-    }
-}
-
 @MainActor
 final class ReadTracker: ObservableObject {
     @Published private(set) var baselines: [String: ReadBaseline] = [:]

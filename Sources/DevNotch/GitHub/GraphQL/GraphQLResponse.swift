@@ -11,8 +11,3 @@ struct GQLResponse: Decodable {
     let data: Payload?
     let errors: [GQLError]?
 }
-
-struct Lenient<T: Decodable>: Decodable {
-    let value: T?
-    init(from decoder: Decoder) throws { value = try? T(from: decoder) }
-}
