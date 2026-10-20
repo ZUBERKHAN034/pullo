@@ -23,7 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         app.store.start()
-        if app.accounts.accounts.isEmpty { greetFirstLaunch() }
+        if app.accounts.accounts.isEmpty { greetFirstLaunch() } else { app.system.requestFocusAccess() }
         panel.startListening()
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification,

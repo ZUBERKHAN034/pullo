@@ -1,4 +1,5 @@
 import AppKit
+import Intents
 import SwiftUI
 
 @MainActor
@@ -8,6 +9,8 @@ protocol SystemActions {
     func tapTrackpad()
     func play(sound: String)
     func quit()
+    var isInFocus: Bool { get }
+    func requestFocusAccess()
 }
 
 struct LiveSystemActions: SystemActions {
@@ -32,6 +35,16 @@ struct LiveSystemActions: SystemActions {
 
     func quit() {
         NSApp.terminate(nil)
+    }
+
+    var isInFocus: Bool {
+        let center = INFocusStatusCenter.default
+        return center.authorizationStatus == .authorized && center.focusStatus.isFocused == true
+    }
+
+    func requestFocusAccess() {
+        guard INFocusStatusCenter.default.authorizationStatus == .notDetermined else { return }
+        INFocusStatusCenter.default.requestAuthorization { _ in }
     }
 }
 
