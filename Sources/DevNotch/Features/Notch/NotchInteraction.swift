@@ -27,6 +27,7 @@ final class NotchInteraction {
     @ObservationIgnored private var waitingForPointerExit = false
     @ObservationIgnored private var holdingPeek = false
     @ObservationIgnored private var pointer: NSPoint?
+    @ObservationIgnored private var buttonHeld = false
     @ObservationIgnored private var missedDuringFocus: [NotchAlert] = []
     @ObservationIgnored private var focusWatch: Task<Void, Never>?
 
@@ -50,8 +51,9 @@ final class NotchInteraction {
 
     // MARK: - Pointer
 
-    func mouseMoved(to point: NSPoint) {
+    func mouseMoved(to point: NSPoint, buttonHeld: Bool = false) {
         pointer = point
+        self.buttonHeld = buttonHeld
         let inside = layout.hitRect(for: state).contains(point)
 
         if waitingForPointerExit {
@@ -79,9 +81,9 @@ final class NotchInteraction {
                 if inside { list.keyboardMode = false }
                 return
             }
-            guard !inside else { return cancelHover() }
+            guard !inside, !buttonHeld else { return cancelHover() }
             scheduleHover(after: .milliseconds(200)) { notch in
-                if !notch.isPointerOver(.open) { notch.close() }
+                if !notch.isPointerOver(.open), !notch.buttonHeld { notch.close() }
             }
         }
     }

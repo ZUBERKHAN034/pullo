@@ -51,7 +51,7 @@ struct PRRow: View {
         .animation(Motion.hover, value: selected)
         .animation(Motion.navigate, value: isUnread)
         .onTapGesture { notch.open(pr) }
-        .draggable(pr.url) { PRDragPreview(pr: pr) }
+        .onDrag { pr.dragItem } preview: { PRDragPreview(pr: pr) }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction { notch.open(pr) }

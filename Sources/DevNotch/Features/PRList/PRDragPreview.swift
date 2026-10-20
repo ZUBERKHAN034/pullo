@@ -25,3 +25,12 @@ struct PRDragPreview: View {
         .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Color.hairline))
     }
 }
+
+extension PullRequest {
+    var dragItem: NSItemProvider {
+        let provider = NSItemProvider(object: url as NSURL)
+        provider.registerObject(url.absoluteString as NSString, visibility: .all)
+        provider.suggestedName = title
+        return provider
+    }
+}

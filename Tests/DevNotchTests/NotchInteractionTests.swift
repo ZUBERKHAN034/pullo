@@ -83,6 +83,18 @@ extension NotchBehavior {
             #expect(h.notch.state == .closed)
         }
 
+        @Test func staysOpenWhileDraggingAPROut() async {
+            let h = await NotchHarness()
+            h.notch.open()
+            h.notch.mouseMoved(to: h.inside(.open), buttonHeld: true)
+            h.notch.mouseMoved(to: h.outside, buttonHeld: true)
+            await h.clock.advance(by: .seconds(1))
+            #expect(h.notch.state == .open)
+            h.notch.mouseMoved(to: h.outside)
+            await h.clock.advance(by: .milliseconds(200))
+            #expect(h.notch.state == .closed)
+        }
+
         @Test func closingResetsSearchAndSelection() async {
             let h = await NotchHarness(mine: [.make(id: "PR_1")])
             h.notch.toggleFromKeyboard()
