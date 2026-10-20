@@ -7,6 +7,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Added
 - Each kind of alert can play its own sound, so you can tell a failed CI from an approval without looking. Set it in Settings → Alerts.
 - Alerts that arrive during a Focus are no longer lost. When the Focus ends, DevNotch shows them together in one alert.
+- Drag a pull request out of the panel to drop its link into Slack, an email or anywhere else.
 
 ## [0.5.0] - 2026-10-20
 
