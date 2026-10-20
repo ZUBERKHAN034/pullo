@@ -14,6 +14,18 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - The glass style moved from General to a new Appearance page in Settings.
 - DevNotch checks GitHub every 30 seconds while checks are running, and every minute otherwise.
 
+## [0.6.0-beta.2] - 2026-10-20
+
+### Added
+- While checks run on your pull requests, the closed notch widens to show how many are done, with a +1 when more than one is running. It turns green or red when they finish, right before the alert. Turn it off in Settings → Appearance.
+
+### Changed
+- The glass style moved from General to a new Appearance page in Settings.
+- DevNotch checks GitHub every 30 seconds while checks are running, and every minute otherwise.
+
+### Fixed
+- Dragging a pull request into another app works. The link goes out as both a URL and plain text, and the panel stays open until you drop it.
+
 ## [0.6.0-beta.1] - 2026-10-20
 
 ### Added
@@ -79,6 +91,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...HEAD
+[0.6.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.0-beta.1...v0.6.0-beta.2
 [0.6.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0-beta.1
 [0.5.0]: https://github.com/jordan-cod/devnotch/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/jordan-cod/devnotch/compare/v0.3.1...v0.4.0
