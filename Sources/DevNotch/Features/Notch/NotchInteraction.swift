@@ -156,8 +156,8 @@ final class NotchInteraction {
         enqueue(NotchAlert(
             symbol: "person.crop.circle.badge.checkmark",
             tint: .green,
-            headline: "Account connected",
-            detail: "@\(account.login) · loading your PRs"
+            headline: String(localized: "Account connected"),
+            detail: String(localized: "@\(account.login) · loading your PRs")
         ))
     }
 

@@ -9,10 +9,10 @@ enum GitHubError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .noToken: "gh didn't return a token for this account. Run `gh auth login`."
-        case .ghTimedOut: "gh took too long to answer. Check that `gh auth status` works in Terminal."
-        case .unauthorized: "GitHub rejected the gh token. Run `gh auth refresh`."
-        case .http(let status): "GitHub returned error \(status)."
+        case .noToken: String(localized: "gh didn't return a token for this account. Run `gh auth login`.")
+        case .ghTimedOut: String(localized: "gh took too long to answer. Check that `gh auth status` works in Terminal.")
+        case .unauthorized: String(localized: "GitHub rejected the gh token. Run `gh auth refresh`.")
+        case .http(let status): String(localized: "GitHub returned error \(status).")
         case .api(let message): message
         }
     }

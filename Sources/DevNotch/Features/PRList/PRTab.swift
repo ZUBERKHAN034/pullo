@@ -5,8 +5,8 @@ enum PRTab: CaseIterable {
 
     var title: String {
         switch self {
-        case .mine: "My PRs"
-        case .review: "To review"
+        case .mine: String(localized: "My PRs")
+        case .review: String(localized: "To review")
         }
     }
 }

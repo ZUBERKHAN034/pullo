@@ -8,12 +8,12 @@ enum SettingsPage: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .general: "General"
-        case .alerts: "Alerts"
-        case .accounts: "Accounts"
-        case .shortcuts: "Shortcuts"
-        case .updates: "Updates"
-        case .about: "About"
+        case .general: String(localized: "General")
+        case .alerts: String(localized: "Alerts")
+        case .accounts: String(localized: "Accounts")
+        case .shortcuts: String(localized: "Shortcuts")
+        case .updates: String(localized: "Updates")
+        case .about: String(localized: "About")
         }
     }
 

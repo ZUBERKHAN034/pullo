@@ -114,12 +114,12 @@ final class PRListModel {
 
     func markAllRead() {
         tracker.markRead(visiblePRs)
-        showToast("All marked as read")
+        showToast(String(localized: "All marked as read"))
     }
 
     func copyBranch(_ pr: PullRequest) {
         system.copy(pr.branch)
-        showToast("Copied branch: \(pr.branch)")
+        showToast(String(localized: "Copied branch: \(pr.branch)"))
     }
 
     func showToast(_ message: String) {

@@ -23,7 +23,7 @@ struct NotchAlert: Identifiable, Equatable {
         return NotchAlert(
             symbol: "square.stack.3d.up.fill",
             tint: .white,
-            headline: "\(alerts.count) updates",
+            headline: String(localized: "\(alerts.count) updates"),
             detail: alerts.map(\.headline).joined(separator: " · "),
             account: Set(alerts.map(\.account)).count == 1 ? alerts.first?.account : nil,
             stack: sorted

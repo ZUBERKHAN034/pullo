@@ -29,18 +29,19 @@ extension PREvent {
 
     private var headline: String {
         switch kind {
-        case .ciPassed: "CI passed"
-        case .ciFailed: "CI failed"
-        case .approved: name.map { "\($0) approved" } ?? "PR approved"
-        case .changesRequested: name.map { "\($0) requested changes" } ?? "Changes requested"
+        case .ciPassed: String(localized: "CI passed")
+        case .ciFailed: String(localized: "CI failed")
+        case .approved: name.map { String(localized: "\($0) approved") } ?? String(localized: "PR approved")
+        case .changesRequested: name.map { String(localized: "\($0) requested changes") } ?? String(localized: "Changes requested")
         case .reviewRequested:
             switch pr.reviewRequest {
-            case .direct: "\(pr.displayLogin(pr.author)) requested your review"
-            case .team(let teams): teams.first.map { "Review requested from \($0)" } ?? "Review requested from your team"
+            case .direct: String(localized: "\(pr.displayLogin(pr.author)) requested your review")
+            case .team(let teams): teams.first
+                .map { String(localized: "Review requested from \($0)") } ?? String(localized: "Review requested from your team")
             }
-        case .newComment: name.map { "\($0) commented" } ?? "New comments"
-        case .merged: name.map { "\($0) merged your PR" } ?? "PR merged"
-        case .closed: name.map { "\($0) closed your PR" } ?? "PR closed"
+        case .newComment: name.map { String(localized: "\($0) commented") } ?? String(localized: "New comments")
+        case .merged: name.map { String(localized: "\($0) merged your PR") } ?? String(localized: "PR merged")
+        case .closed: name.map { String(localized: "\($0) closed your PR") } ?? String(localized: "PR closed")
         }
     }
 

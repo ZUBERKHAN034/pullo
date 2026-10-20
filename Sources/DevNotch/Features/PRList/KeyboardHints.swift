@@ -5,13 +5,13 @@ struct KeyboardHints: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            hint("↑↓", "navigate")
-            hint("↩", "open")
+            hint("↑↓", String(localized: "navigate"))
+            hint("↩", String(localized: "open"))
             if searching {
-                hint("esc", "clear search")
+                hint("esc", String(localized: "clear search"))
             } else {
-                hint("⌘F", "search")
-                hint("esc", "close")
+                hint("⌘F", String(localized: "search"))
+                hint("esc", String(localized: "close"))
             }
         }
         .frame(maxWidth: .infinity)

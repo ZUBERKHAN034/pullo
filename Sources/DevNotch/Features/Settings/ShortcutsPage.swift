@@ -14,7 +14,7 @@ struct ShortcutsPage: View {
             Section("In the panel") {
                 row("Move through PRs", "↑ ↓")
                 row("Open the selected PR", "↩")
-                row("Switch between My PRs and To review", "⇥  or  ← →")
+                row("Switch between My PRs and To review", String(localized: "⇥  or  ← →"))
                 row("Filter PRs", "⌘F")
                 row("Copy the branch name", "C")
                 row("Mark as read", "R")
@@ -25,7 +25,7 @@ struct ShortcutsPage: View {
         }
     }
 
-    private func row(_ action: String, _ keys: String) -> some View {
+    private func row(_ action: LocalizedStringKey, _ keys: String) -> some View {
         LabeledContent(action) {
             Text(keys)
                 .font(.system(.body, design: .rounded).weight(.medium))

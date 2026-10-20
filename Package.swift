@@ -11,7 +11,8 @@ let package = Package(
         .executableTarget(
             name: "DevNotch",
             dependencies: [.product(name: "Sparkle", package: "Sparkle")],
-            path: "Sources/DevNotch"
+            path: "Sources/DevNotch",
+            exclude: ["Resources/Localizable.xcstrings"]
         ),
         .testTarget(name: "DevNotchTests", dependencies: ["DevNotch"], path: "Tests/DevNotchTests"),
     ]

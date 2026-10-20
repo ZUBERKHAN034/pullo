@@ -18,15 +18,15 @@ enum AlertCategory: String, CaseIterable, Codable {
 
     var title: String {
         switch self {
-        case .ciFailed: "CI failed"
-        case .ciPassed: "CI passed"
-        case .approved: "PR approved"
-        case .changesRequested: "Changes requested"
-        case .directReview: "Review requested from you"
-        case .teamReview: "Review requested from your team"
-        case .newComment: "New comment"
-        case .merged: "PR merged"
-        case .closed: "PR closed without merging"
+        case .ciFailed: String(localized: "CI failed")
+        case .ciPassed: String(localized: "CI passed")
+        case .approved: String(localized: "PR approved")
+        case .changesRequested: String(localized: "Changes requested")
+        case .directReview: String(localized: "Review requested from you")
+        case .teamReview: String(localized: "Review requested from your team")
+        case .newComment: String(localized: "New comment")
+        case .merged: String(localized: "PR merged")
+        case .closed: String(localized: "PR closed without merging")
         }
     }
 }
