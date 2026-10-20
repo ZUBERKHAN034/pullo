@@ -16,6 +16,7 @@ Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI
 - Multiple GitHub accounts, each with its own list
 - Search by title, repo, number, branch or author
 - Global shortcut and keyboard navigation
+- Solid or Liquid Glass look on macOS 26 and later
 - Updates itself when a new version is out
 - Read-only: it doesn't approve, merge or store tokens
 

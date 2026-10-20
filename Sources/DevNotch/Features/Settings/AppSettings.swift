@@ -10,6 +10,7 @@ final class AppSettings {
     var mutedAccounts: Set<String> { didSet { save() } }
     var haptics: Bool { didSet { save() } }
     var sound: String? { didSet { save() } }
+    var panelStyle: PanelStyle { didSet { save() } }
     private(set) var launchAtLogin: Bool
     private(set) var launchAtLoginFailure: String?
 
@@ -23,6 +24,7 @@ final class AppSettings {
         haptics = defaults.object(for: .haptics) as? Bool ?? true
         let storedSound = defaults.object(for: .sound) as? String ?? "Glass"
         sound = storedSound.isEmpty ? nil : storedSound
+        panelStyle = (defaults.object(for: .panelStyle) as? String).flatMap(PanelStyle.init(rawValue:)) ?? .solid
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
@@ -59,5 +61,6 @@ final class AppSettings {
         defaults.set(Array(mutedAccounts), for: .mutedAccounts)
         defaults.set(haptics, for: .haptics)
         defaults.set(sound ?? "", for: .sound)
+        defaults.set(panelStyle.rawValue, for: .panelStyle)
     }
 }

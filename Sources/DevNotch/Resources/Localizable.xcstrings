@@ -439,6 +439,22 @@
         }
       }
     },
+    "Appearance": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apariencia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aparência"
+          }
+        }
+      }
+    },
     "Approved": {
       "localizations": {
         "es": {
@@ -1100,6 +1116,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "O GitHub retornou o erro %lld."
+          }
+        }
+      }
+    },
+    "Glass": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vidrio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vidro"
+          }
+        }
+      }
+    },
+    "Glass follows your Liquid Glass setting, and turns solid when Reduce transparency is on.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El vidrio sigue tu ajuste de Liquid Glass y se vuelve sólido cuando “Reducir transparencia” está activado."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O vidro segue o seu ajuste de Liquid Glass e fica sólido quando “Reduzir transparência” está ativado."
+          }
+        }
+      }
+    },
+    "Glass with a dark top": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vidrio con la parte superior oscura"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vidro com topo escuro"
           }
         }
       }
@@ -1964,6 +2028,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atalhos"
+          }
+        }
+      }
+    },
+    "Solid": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sólido"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sólido"
           }
         }
       }

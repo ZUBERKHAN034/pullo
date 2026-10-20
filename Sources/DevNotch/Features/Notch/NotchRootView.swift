@@ -23,7 +23,7 @@ struct NotchRootView: View {
         }
         .frame(width: size.width, height: size.height, alignment: .top)
         .padding(.horizontal, radii.top)
-        .background(Color.black)
+        .background { NotchBackground(state: state, shape: shape, notchWidth: notch.geometry.notchSize.width, height: size.height) }
         .clipShape(shape)
         .compositingGroup()
         .shadow(color: .black.opacity(state == .closed ? 0 : 0.55), radius: state == .open ? 26 : 14, y: 8)
