@@ -9,6 +9,17 @@ struct PRNodeTests {
         return try decoder.decode(PRNode.self, from: Data(json.utf8))
     }
 
+    @Test func readsTheSizeOfThePullRequest() throws {
+        let sized = json.replacingOccurrences(of: "\"headRefName\": \"feat/canal-web\",",
+                                              with: "\"headRefName\": \"feat/canal-web\", \"additions\": 120, \"deletions\": 30, \"changedFiles\": 8,")
+        let pr = try decode(sized).pullRequest(account: "me")
+        #expect(pr.size == PRSize(additions: 120, deletions: 30, changedFiles: 8))
+    }
+
+    @Test func aResponseWithoutSizeLeavesItOut() throws {
+        #expect(try decode(json).pullRequest(account: "me").size == nil)
+    }
+
     private let json = """
     {
       "id": "PR_1", "number": 383, "title": "feat: canal web", "url": "https://github.com/a/b/pull/383",

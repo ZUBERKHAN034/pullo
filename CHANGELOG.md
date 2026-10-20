@@ -5,6 +5,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ## [Unreleased]
 
 ### Added
+- Each pull request shows how many lines it adds and removes. Hover over it to see how many files changed.
 - Each kind of alert can play its own sound, so you can tell a failed CI from an approval without looking. Set it in Settings → Alerts.
 
 ## [0.4.0] - 2026-10-20

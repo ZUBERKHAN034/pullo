@@ -112,6 +112,9 @@ struct PRRow: View {
                 IconButton(symbol: "envelope.open", help: String(localized: "Mark as read · r")) { list.markRead(pr) }
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
+            if let size = pr.size {
+                PRSizeLabel(size: size)
+            }
             HStack(spacing: 6) {
                 if isUnread {
                     UnreadDot()
