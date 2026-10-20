@@ -43,11 +43,26 @@ jobs:
       - name: Lint
         run: swiftlint lint --strict
 
+      - name: Same dependencies for SwiftPM and Xcode
+        run: |
+          diff <(jq -S .pins Package.resolved) \
+            <(jq -S .pins DevNotch.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved) \
+            || { echo "::error::Package.resolved and the Xcode project's Package.resolved pin different versions"; exit 1; }
+
   test:
     runs-on: macos-26
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .build/artifacts
+            .build/checkouts
+            .build/repositories
+            ${{ runner.temp }}/packages
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
 
       - name: Test
         run: swift test
@@ -57,4 +72,5 @@ jobs:
         run: |
           xcodebuild build \
             -project DevNotch.xcodeproj -scheme DevNotch -configuration Release \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/packages" \
             CODE_SIGNING_ALLOWED=NO
