@@ -6,14 +6,18 @@ struct HeaderActions: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            IconButton(symbol: "arrow.clockwise", help: "Refresh", spinning: store.isLoading) {
+            // Two arrows around a circle turn on their own center; the single clockwise arrow wobbles as it spins.
+            IconButton(symbol: "arrow.triangle.2.circlepath", help: refreshHelp, spinning: store.isLoading) {
                 Task { await store.refresh() }
             }
-            IconButton(symbol: "magnifyingglass", help: "Search PRs (⌘F)", active: model.isSearching) {
-                model.isSearching ? model.stopSearch() : model.startSearch()
-            }
-            IconButton(symbol: "person.2", help: "Accounts", active: model.screen == .accounts) { model.show(.accounts) }
-            IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?() }
+            IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?(nil) }
         }
+    }
+
+    /// When the list last updated lives here rather than taking room in the panel.
+    private var refreshHelp: String {
+        guard let updated = store.lastUpdated else { return "Refresh" }
+        let age = updated.shortAge
+        return age == "now" ? "Refresh · updated just now" : "Refresh · updated \(age) ago"
     }
 }

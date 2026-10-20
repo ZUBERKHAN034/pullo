@@ -12,13 +12,29 @@ struct ReadTrackerTests {
         #expect(tracker.reasons(for: pr).isEmpty)
     }
 
-    @Test func prsAppearingLaterAreNew() {
+    @Test func reviewRequestsAppearingLaterAreNew() {
+        tracker.sync(account: "me", prs: [])
+        let theirs = PullRequest.make(id: "PR_2", author: "octavio")
+        tracker.sync(account: "me", prs: [theirs])
+        #expect(tracker.reasons(for: theirs) == ["New review request"])
+    }
+
+    @Test func yourOwnNewPRIsNotUnread() {
         tracker.sync(account: "me", prs: [])
         let mine = PullRequest.make(id: "PR_1", author: "me")
+        tracker.sync(account: "me", prs: [mine])
+        #expect(tracker.reasons(for: mine).isEmpty)
+    }
+
+    @Test func forgettingAnAccountStartsItFresh() {
+        tracker.sync(account: "me", prs: [])
         let theirs = PullRequest.make(id: "PR_2", author: "octavio")
-        tracker.sync(account: "me", prs: [mine, theirs])
-        #expect(tracker.reasons(for: mine) == ["New PR"])
-        #expect(tracker.reasons(for: theirs) == ["New review request"])
+        tracker.sync(account: "me", prs: [theirs])
+        tracker.forget(account: "me")
+        #expect(tracker.baselines.isEmpty)
+        // Added back, it's a first sync again, so nothing lights up.
+        tracker.sync(account: "me", prs: [theirs])
+        #expect(tracker.reasons(for: theirs).isEmpty)
     }
 
     @Test func explainsWhatChanged() {

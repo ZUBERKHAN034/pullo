@@ -99,7 +99,7 @@ enum DemoData {
             repo: repo, branch: branch, author: author, isDraft: draft,
             createdAt: created, updatedAt: created,
             ci: ci, review: review, hasConflict: conflict,
-            othersCommentIDs: comments, othersReviews: reviews,
+            othersComments: comments.map { Activity(id: $0, author: "marina-dev") }, othersReviews: reviews,
             headOID: "head-\(id)", commitCount: 3,
             approvers: approvers, changeRequesters: review == .changesRequested ? ["marina-dev"] : [],
             reviewRequest: request, failedChecks: failedChecks

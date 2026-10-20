@@ -6,15 +6,17 @@ import SwiftUI
 struct Spin: ViewModifier {
     let active: Bool
     var period: Double = 0.9
+    /// Turns count from when it started, so it begins upright instead of at whatever angle the clock is on.
+    @ViewState private var start = Date()
 
     func body(content: Content) -> some View {
-        if active {
-            TimelineView(.animation) { context in
-                let turn = context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: period) / period
-                content.rotationEffect(.degrees(turn * 360))
-            }
-        } else {
-            content
+        // One view whether it spins or not, so starting and stopping doesn't swap it out mid-frame.
+        TimelineView(.animation(paused: !active)) { context in
+            let elapsed = active ? context.date.timeIntervalSince(start) : 0
+            content.rotationEffect(.degrees(elapsed.truncatingRemainder(dividingBy: period) / period * 360))
+        }
+        .onChange(of: active) { _, spinning in
+            if spinning { start = Date() }
         }
     }
 }

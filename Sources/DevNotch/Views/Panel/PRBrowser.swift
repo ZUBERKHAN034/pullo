@@ -18,10 +18,11 @@ struct PRBrowser: View {
                 }
             }
             if let login = model.currentLogin, store.snapshots[login] != nil, store.errors[login] != nil {
-                ErrorBanner(message: "Couldn't refresh @\(login)") { model.show(.accounts) }
+                ErrorBanner(message: "Couldn't refresh @\(login)") { model.onOpenSettings?(.accounts) }
             }
             content
-            if model.keyboardMode || model.selectedPRID != nil {
+            // Only when driving it from the keyboard; pointer users get tooltips instead.
+            if model.keyboardMode {
                 KeyboardHints(searching: model.isSearching)
             }
         }

@@ -2,7 +2,7 @@ import Foundation
 
 /// The groups of alerts that can be turned off in Settings.
 enum AlertCategory: String, CaseIterable, Codable {
-    case ciFailed, ciPassed, approved, changesRequested, directReview, teamReview, newComment
+    case ciFailed, ciPassed, approved, changesRequested, directReview, teamReview, newComment, merged, closed
 
     init(_ event: PREvent) {
         switch event.kind {
@@ -12,6 +12,8 @@ enum AlertCategory: String, CaseIterable, Codable {
         case .changesRequested: self = .changesRequested
         case .reviewRequested: self = event.pr.isDirectRequest ? .directReview : .teamReview
         case .newComment: self = .newComment
+        case .merged: self = .merged
+        case .closed: self = .closed
         }
     }
 
@@ -24,6 +26,8 @@ enum AlertCategory: String, CaseIterable, Codable {
         case .directReview: "Review requested from you"
         case .teamReview: "Review requested from your team"
         case .newComment: "New comment"
+        case .merged: "PR merged"
+        case .closed: "PR closed without merging"
         }
     }
 }

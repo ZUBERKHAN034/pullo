@@ -9,24 +9,43 @@ extension PREvent {
             headline: headline,
             detail: "\(pr.repoName) #\(pr.number) · \(pr.title)",
             url: pr.url,
-            account: showingAccount ? pr.account : nil
+            pr: pr,
+            actor: actor,
+            actorAvatar: actorAvatar ?? actor.flatMap { pr.avatars[$0] },
+            account: showingAccount ? pr.account : nil,
+            priority: priority
         )
+    }
+
+    private var priority: Int {
+        switch kind {
+        case .ciFailed, .changesRequested: 3
+        case .closed: 2
+        case .merged: 1
+        case .reviewRequested: pr.isDirectRequest ? 2 : 0
+        case .newComment: 1
+        case .approved, .ciPassed: 0
+        }
     }
 
     private var headline: String {
         switch kind {
         case .ciPassed: "CI passed"
         case .ciFailed: "CI failed"
-        case .approved: actor.map { "\($0) approved" } ?? "PR approved"
-        case .changesRequested: actor.map { "\($0) requested changes" } ?? "Changes requested"
+        case .approved: name.map { "\($0) approved" } ?? "PR approved"
+        case .changesRequested: name.map { "\($0) requested changes" } ?? "Changes requested"
         case .reviewRequested:
             switch pr.reviewRequest {
-            case .direct: "\(pr.author) requested your review"
+            case .direct: "\(pr.displayLogin(pr.author)) requested your review"
             case .team(let teams): teams.first.map { "Review requested from \($0)" } ?? "Review requested from your team"
             }
-        case .newComment: "New comment"
+        case .newComment: name.map { "\($0) commented" } ?? "New comments"
+        case .merged: name.map { "\($0) merged your PR" } ?? "PR merged"
+        case .closed: name.map { "\($0) closed your PR" } ?? "PR closed"
         }
     }
+
+    private var name: String? { actor.map(pr.displayLogin) }
 
     private var symbol: String {
         switch kind {
@@ -36,6 +55,8 @@ extension PREvent {
         case .changesRequested: "exclamationmark.bubble.fill"
         case .reviewRequested: pr.isDirectRequest ? "eyes" : "person.3.fill"
         case .newComment: "text.bubble.fill"
+        case .merged: "arrow.triangle.merge"
+        case .closed: "xmark"
         }
     }
 
@@ -46,6 +67,8 @@ extension PREvent {
         case .changesRequested: .orange
         case .reviewRequested: pr.isDirectRequest ? .purple : .indigo
         case .newComment: .blue
+        case .merged: .purple
+        case .closed: .red
         }
     }
 }

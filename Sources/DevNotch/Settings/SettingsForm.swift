@@ -1,106 +1,80 @@
 import AppKit
 import SwiftUI
 
+/// The pages of the settings window, listed in its sidebar.
+enum SettingsPage: String, CaseIterable, Identifiable {
+    case general, alerts, accounts, shortcuts, updates, about
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .general: "General"
+        case .alerts: "Alerts"
+        case .accounts: "Accounts"
+        case .shortcuts: "Shortcuts"
+        case .updates: "Updates"
+        case .about: "About"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .general: "gearshape"
+        case .alerts: "bell.badge"
+        case .accounts: "person.2"
+        case .shortcuts: "keyboard"
+        case .updates: "arrow.down.circle"
+        case .about: "info.circle"
+        }
+    }
+}
+
+/// Which page the settings window shows, so the panel can open it on a given one.
+@MainActor
+final class SettingsNavigation: ObservableObject {
+    @Published var page: SettingsPage? = .general
+}
+
+/// System Settings–style window: a sidebar of pages and the selected page on the right.
 struct SettingsForm: View {
     @ObservedObject var settings: AppSettings
     @ObservedObject var accounts: AccountStore
     let model: NotchViewModel
     /// Nil in demo mode, where nothing should reach the network.
     let updater: Updater?
+    @ObservedObject var navigation: SettingsNavigation
 
     var body: some View {
-        Form {
-            Section("General") {
-                Toggle("Open at login", isOn: Binding(
-                    get: { settings.launchAtLogin },
-                    set: { settings.setLaunchAtLogin($0) }
-                ))
-                if let error = settings.launchAtLoginError {
-                    Text(error).font(.caption).foregroundStyle(.orange)
-                }
-                Toggle("Tap the trackpad on new alerts", isOn: Binding(
-                    get: { settings.haptics },
-                    set: { settings.haptics = $0 }
-                ))
-                Picker("Sound on new alerts", selection: Binding(
-                    get: { settings.sound ?? "" },
-                    set: { name in
-                        settings.sound = name.isEmpty ? nil : name
-                        settings.playSound()
-                    }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(AppSettings.systemSounds, id: \.self) { Text($0).tag($0) }
-                }
+        NavigationSplitView {
+            List(pages, selection: $navigation.page) { page in
+                Label(page.title, systemImage: page.symbol)
             }
-
-            Section("Shortcuts") {
-                LabeledContent("Open the panel", value: "⌥⌘P")
-                LabeledContent("Search PRs", value: "⌘F with the panel open")
-            }
-
-            Section {
-                ForEach(AlertCategory.allCases, id: \.self) { category in
-                    Toggle(category.title, isOn: Binding(
-                        get: { !settings.mutedCategories.contains(category) },
-                        set: { enabled in
-                            if enabled == settings.mutedCategories.contains(category) { settings.toggle(category) }
-                        }
-                    ))
-                }
-            } header: {
-                Text("Alerts")
-            } footer: {
-                Text("Alerts drop down from the notch when something changes on a PR.")
-            }
-
-            if accounts.accounts.count > 1 {
-                Section("Alerts by account") {
-                    ForEach(accounts.accounts) { account in
-                        Toggle("@\(account.login)", isOn: Binding(
-                            get: { !settings.mutedAccounts.contains(account.login) },
-                            set: { enabled in
-                                if enabled == settings.mutedAccounts.contains(account.login) {
-                                    settings.toggleAccount(account.login)
-                                }
-                            }
-                        ))
-                    }
-                }
-            }
-
-            if let updater {
-                UpdatesSection(updater: updater)
-            }
-
-            Section {
-                HStack {
-                    Button("Test alert") { model.previewAlert() }
-                    Spacer()
-                    Button("Quit DevNotch", role: .destructive) { NSApp.terminate(nil) }
-                }
-            }
+            .navigationSplitViewColumnWidth(min: 170, ideal: 180, max: 200)
+            .toolbar(removing: .sidebarToggle)
+        } detail: {
+            detail
+                .formStyle(.grouped)
+                .toggleStyle(.switch)
+                .navigationTitle((navigation.page ?? .general).title)
         }
-        .formStyle(.grouped)
-        .toggleStyle(.switch)
-        .frame(width: 480, height: 600)
+        .frame(width: 700, height: 500)
     }
-}
 
-private struct UpdatesSection: View {
-    @ObservedObject var updater: Updater
+    /// Updates only exist outside demo mode.
+    private var pages: [SettingsPage] {
+        SettingsPage.allCases.filter { $0 != .updates || updater != nil }
+    }
 
-    var body: some View {
-        Section("Updates") {
-            Toggle("Check for updates automatically", isOn: Binding(
-                get: { updater.automaticallyChecks },
-                set: { updater.automaticallyChecks = $0 }
-            ))
-            LabeledContent("Version \(Updater.version)") {
-                Button("Check for Updates…") { updater.checkForUpdates() }
-                    .disabled(!updater.canCheckForUpdates)
-            }
+    @ViewBuilder
+    private var detail: some View {
+        switch navigation.page ?? .general {
+        case .general: GeneralPage(settings: settings)
+        case .alerts: AlertsPage(settings: settings, accounts: accounts, model: model)
+        case .accounts: AccountsPage(accounts: accounts)
+        case .shortcuts: ShortcutsPage()
+        case .updates: if let updater { UpdatesPage(updater: updater) }
+        case .about: AboutPage()
         }
     }
 }

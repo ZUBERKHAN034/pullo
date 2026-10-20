@@ -9,7 +9,7 @@ struct FailedChecksList: View {
             if pr.failedChecks.isEmpty {
                 Text("GitHub didn't say which checks failed.")
                     .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(Color.secondaryText)
             }
             ForEach(pr.failedChecks) { check in
                 Button {
@@ -26,13 +26,13 @@ struct FailedChecksList: View {
                         if check.url != nil {
                             Image(systemName: "arrow.up.right")
                                 .font(.system(size: 8, weight: .bold))
-                                .foregroundStyle(.white.opacity(0.35))
+                                .foregroundStyle(Color.tertiaryText)
                         }
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(check.url == nil ? "No link for this check" : "Open the check log")
+                .hint(check.url == nil ? "No link for this check" : "Open the check log")
             }
         }
     }

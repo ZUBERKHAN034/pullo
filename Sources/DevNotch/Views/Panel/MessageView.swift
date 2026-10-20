@@ -10,13 +10,13 @@ struct MessageView: View {
         VStack(spacing: 8) {
             Image(systemName: symbol)
                 .font(.system(size: 22, weight: .medium))
-                .foregroundStyle(.white.opacity(0.35))
+                .foregroundStyle(Color.tertiaryText)
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.85))
             Text(detail)
                 .font(.system(size: 11.5))
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(Color.secondaryText)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)
             if let retry {

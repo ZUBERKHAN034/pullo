@@ -22,7 +22,7 @@ struct SearchBar: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(.white.opacity(0.1)))
             }
             .buttonStyle(.plain)
-            .help("Close search")
+            .hint("Close search", edge: .leading)
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 6)
@@ -43,9 +43,9 @@ struct SearchField: NSViewRepresentable {
         field.font = .systemFont(ofSize: 12.5, weight: .medium)
         field.textColor = .white
         field.placeholderAttributedString = NSAttributedString(
-            string: "Search by title, repo, #number, branch or author",
+            string: "Title, repo, #number, branch or author",
             attributes: [
-                .foregroundColor: NSColor.white.withAlphaComponent(0.35),
+                .foregroundColor: NSColor.white.withAlphaComponent(0.45),
                 .font: NSFont.systemFont(ofSize: 12.5, weight: .medium),
             ]
         )

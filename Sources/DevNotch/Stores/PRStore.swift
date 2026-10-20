@@ -83,7 +83,10 @@ final class PRStore: ObservableObject {
                     mine: fetched.mine.sorted(by: Self.mineOrder),
                     reviewRequests: fetched.reviewRequests.sorted(by: Self.reviewOrder)
                 )
-                if let previous = snapshots[login] { events += PREvent.diff(old: previous, new: snapshot) }
+                if let previous = snapshots[login] {
+                    events += PREvent.diff(old: previous, new: snapshot)
+                    events += await departures(from: previous, to: snapshot, login: login)
+                }
                 snapshots[login] = snapshot
                 tracker.sync(account: login, prs: snapshot.mine + snapshot.reviewRequests)
                 errors[login] = nil
@@ -103,6 +106,16 @@ final class PRStore: ObservableObject {
         var seen = Set<String>()
         let unique = events.filter { seen.insert("\($0.pr.id)|\($0.kind)").inserted }
         if !unique.isEmpty { onEvents?(unique) }
+    }
+
+    /// Your PRs that left the open list: asks GitHub whether each was merged or closed, since one that just
+    /// slipped past the 40 most recent also disappears. Best effort; a failed lookup means no alert.
+    private func departures(from old: Snapshot, to new: Snapshot, login: String) async -> [PREvent] {
+        let stillThere = Set(new.mine.map(\.id))
+        let gone = old.mine.filter { !stillThere.contains($0.id) }
+        guard !gone.isEmpty, let account = accounts.accounts.first(where: { $0.login == login }) else { return [] }
+        let outcomes = (try? await source.outcomes(of: gone.map(\.id), for: account)) ?? []
+        return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }
     }
 
     /// Kept out of the task group's closure: the Swift 6.4 optimizer dropped every result when the call was inline.

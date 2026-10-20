@@ -54,7 +54,7 @@ struct AccountSwitcher: View {
                     .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
-                .help("@\(account.login) (⌘\((accounts.accounts.firstIndex(of: account) ?? 0) + 1))")
+                .hint("@\(account.login) · ⌘\((accounts.accounts.firstIndex(of: account) ?? 0) + 1)")
             }
         }
         .foregroundStyle(.white.opacity(0.85))
