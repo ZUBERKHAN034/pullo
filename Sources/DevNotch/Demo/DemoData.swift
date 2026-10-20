@@ -1,18 +1,16 @@
 import Foundation
 
-/// Made-up accounts and PRs for the demo, in three moments: before, after a round of news, and after CI goes green.
 enum DemoData {
     static let work = Account(login: "ana-acme", avatarURL: nil)
     static let personal = Account(login: "dev-ana", avatarURL: nil)
 
-    /// A throwaway defaults domain, so the demo never touches the real accounts or read state.
     static func freshDefaults() -> UserDefaults {
         let suite = "dev.jrdan.devnotch.demo"
         UserDefaults().removePersistentDomain(forName: suite)
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.set(try? JSONEncoder().encode([work, personal]), forKey: "accounts")
-        defaults.set(false, forKey: "haptics")
-        defaults.set("", forKey: "sound")
+        guard let defaults = UserDefaults(suiteName: suite) else { preconditionFailure("No defaults suite \(suite)") }
+        defaults.set(try? JSONEncoder().encode([work, personal]), for: .accounts)
+        defaults.set(false, for: .haptics)
+        defaults.set("", for: .sound)
         return defaults
     }
 
@@ -95,7 +93,7 @@ enum DemoData {
         let created = Date().addingTimeInterval(-hoursAgo * 3600)
         return PullRequest(
             id: id, account: account.login, number: number, title: title,
-            url: URL(string: "https://github.com/\(repo)/pull/\(number)")!,
+            url: .pullRequest(repo: repo, number: number),
             repo: repo, branch: branch, author: author, isDraft: draft,
             createdAt: created, updatedAt: created,
             ci: ci, review: review, hasConflict: conflict,
@@ -107,10 +105,8 @@ enum DemoData {
     }
 }
 
-/// Serves whichever demo moment the tour is on, in place of GitHub.
 actor DemoSource: PRSource {
     private var snapshots = DemoData.snapshots(at: .calm)
-    /// The first fetch takes a while, like a real cold start, so the loading state shows up in the demo.
     private var firstFetchDelay: Duration? = .seconds(8.5)
 
     func show(_ moment: DemoData.Moment) {

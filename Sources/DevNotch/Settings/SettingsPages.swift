@@ -84,7 +84,7 @@ struct AlertsPage: View {
 
 struct AccountsPage: View {
     @ObservedObject var accounts: AccountStore
-    @ViewState private var removing: Account?
+    @State private var removing: Account?
 
     var body: some View {
         Form {
@@ -154,7 +154,7 @@ struct ShortcutsPage: View {
     var body: some View {
         Form {
             Section {
-                row("Open or close the panel", "⌥⌘P")
+                row("Open or close the panel", Shortcut.togglePanel.symbols)
             } header: {
                 Text("Anywhere")
             } footer: {
@@ -221,8 +221,8 @@ struct AboutPage: View {
                 .padding(.vertical, 4)
             }
             Section {
-                Link("Source code on GitHub", destination: URL(string: "https://github.com/jordan-cod/devnotch")!)
-                Link("Report an issue", destination: URL(string: "https://github.com/jordan-cod/devnotch/issues/new")!)
+                Link("Source code on GitHub", destination: URL(static: "https://github.com/jordan-cod/devnotch"))
+                Link("Report an issue", destination: URL(static: "https://github.com/jordan-cod/devnotch/issues/new"))
                 LabeledContent("License", value: "MIT")
             }
         }

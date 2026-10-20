@@ -3,8 +3,6 @@ import Carbon.HIToolbox
 import Combine
 import SwiftUI
 
-/// The scripted walk through the app that becomes the README video.
-/// It drives the real view model, so what's recorded is the real UI, and it notes when things happen so sound can follow.
 @MainActor
 final class DemoTour {
     struct Cue: Encodable {
@@ -27,7 +25,6 @@ final class DemoTour {
         self.stage = stage
     }
 
-    /// Cue times count from `start`, in host time seconds; pass the first video frame's time to line them up.
     func run(startingAt start: Double = CACurrentMediaTime()) async {
         clockStart = start
         var previous = model.state
@@ -44,7 +41,6 @@ final class DemoTour {
         let screen = stage.captureRect
         let notch = CGPoint(x: screen.width / 2, y: model.geometry.notchSize.height / 2)
 
-        // The first load is slow on purpose (see DemoSource), so the panel opens while it's still loading.
         let firstLoad = Task { await store.refresh() }
         stage.model.titleCard = DemoCaption(title: "DevNotch", subtitle: "Your GitHub pull requests in the Mac notch.")
         await wait(2.8)
@@ -77,9 +73,11 @@ final class DemoTour {
         await moveCursor(to: CGPoint(x: notch.x + 12, y: notch.y), duration: 1.0)
         await wait(0.15)
         model.open()
-        stage.model.caption = DemoCaption(title: "Hover over the notch to see your PRs", subtitle: "Each one shows what changed since you last looked.")
+        stage.model.caption = DemoCaption(
+            title: "Hover over the notch to see your PRs",
+            subtitle: "Each one shows what changed since you last looked."
+        )
         await wait(0.9)
-        // Parked in the empty corner by the shortcut hints, so it covers nothing in the screenshots.
         await moveCursor(to: CGPoint(x: screen.width / 2 + 285, y: notch.y + 322), duration: 0.8)
         await wait(0.4)
         cue("shot:02-my-prs")
@@ -129,7 +127,7 @@ final class DemoTour {
         await wait(4.0)
 
         stage.model.caption = nil
-        stage.model.titleCard = DemoCaption(title: "DevNotch", subtitle: "Press ⌥⌘P to open it from any app.")
+        stage.model.titleCard = DemoCaption(title: "DevNotch", subtitle: "Press \(Shortcut.togglePanel.symbols) to open it from any app.")
         cue("end-card")
         await wait(3.6)
         cue("end")
@@ -149,7 +147,6 @@ final class DemoTour {
         await wait(duration)
     }
 
-    /// Sends the key through the same path a real key press takes.
     private func press(_ keyCode: Int, _ characters: String = "", command: Bool = false) {
         guard let event = NSEvent.keyEvent(
             with: .keyDown,

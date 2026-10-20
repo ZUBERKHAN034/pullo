@@ -6,7 +6,7 @@ extension PullRequest {
         account: "octocat",
         number: 42,
         title: "feat: show PRs in the notch",
-        url: URL(string: "https://github.com")!,
+        url: .github,
         repo: "jrdan/devnotch",
         branch: "feat/notch",
         author: "octocat",

@@ -1,10 +1,8 @@
 import Foundation
 
-/// The states a PR can be in, most urgent first. The row shows the first one as its icon and names the rest.
 enum PRStatus: Equatable {
     case conflict, ciFailed, changesRequested, ciRunning, readyToMerge, draft, ciPassed, noChecks
 
-    /// Passing or absent CI is the normal case, so it gets an icon but no word.
     var label: String? {
         switch self {
         case .conflict: "Conflict"
@@ -17,7 +15,6 @@ enum PRStatus: Equatable {
         }
     }
 
-    /// What the icon means, in a sentence, for the hover hint.
     var explanation: String {
         switch self {
         case .conflict: "Conflicts with the base branch"
@@ -33,7 +30,6 @@ enum PRStatus: Equatable {
 }
 
 extension PullRequest {
-    /// Review state and readiness only matter on your own PRs; on someone else's, it's their call.
     func statuses(mine: Bool) -> [PRStatus] {
         var statuses: [PRStatus] = []
         if hasConflict { statuses.append(.conflict) }

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The PR list screen: tabs or search on top, then the current account's PRs.
 struct PRBrowser: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore
@@ -21,7 +20,6 @@ struct PRBrowser: View {
                 ErrorBanner(message: "Couldn't refresh @\(login)") { model.onOpenSettings?(.accounts) }
             }
             content
-            // Only when driving it from the keyboard; pointer users get tooltips instead.
             if model.keyboardMode {
                 KeyboardHints(searching: model.isSearching)
             }
@@ -77,7 +75,6 @@ struct PRBrowser: View {
         }
     }
 
-    /// Review requests split into the ones sent to you and the ones sent to a team you're on.
     private var tabSections: [PRSection] {
         let prs = model.visiblePRs
         guard model.tab == .review else { return [PRSection(title: nil, kind: .mine, prs: prs)] }

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The notch silhouette: flares outward at the top so it melts into the bezel, rounds off at the bottom.
 struct NotchShape: Shape {
     var topRadius: CGFloat
     var bottomRadius: CGFloat

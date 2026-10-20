@@ -1,0 +1,18 @@
+# Layout belongs to SwiftFormat; SwiftLint only checks correctness.
+--swiftversion 6.0
+--indent 4
+--maxwidth 140
+--wraparguments preserve
+--wrapparameters before-first
+--wrapcollections preserve
+--closingparen balanced
+--commas always
+--self remove
+--importgrouping alpha
+--extensionacl on-declarations
+--stripunusedargs closure-only
+--header ignore
+--ranges no-space
+--patternlet inline
+# One-line `if x { y }` and small functions are the house style.
+--disable wrapPropertyBodies,docComments,blankLinesBetweenScopes,wrapSingleLineComments,wrapIfStatementBodies,wrapIfExpressionBodies,wrapFunctionBodies,wrapLoopBodies,wrapGuardStatementBodies,noForceUnwrapInTests,redundantReturn,wrapMultilineStatementBraces,preferKeyPath,blankLinesAtStartOfScope

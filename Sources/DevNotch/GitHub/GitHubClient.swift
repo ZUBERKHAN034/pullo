@@ -34,7 +34,7 @@ struct GitHubClient {
     """
 
     func fetchSnapshot(account: String) async throws -> Snapshot {
-        var request = request(for: "https://api.github.com/graphql")
+        var request = request(for: URL(static: "https://api.github.com/graphql"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: [
@@ -49,7 +49,6 @@ struct GitHubClient {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(GQLResponse.self, from: data)
-        // Partial data comes back alongside errors when an org blocks the token (SAML); show what we can.
         guard let payload = decoded.data else {
             throw GitHubError.api(decoded.errors?.map(\.message).joined(separator: "\n") ?? "Empty response from GitHub.")
         }
@@ -70,11 +69,11 @@ struct GitHubClient {
     """
 
     func fetchOutcomes(ids: [String]) async throws -> [PROutcome] {
-        var request = request(for: "https://api.github.com/graphql")
+        var request = request(for: URL(static: "https://api.github.com/graphql"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: ["query": Self.outcomesQuery, "variables": ["ids": ids]])
-        let decoded = try JSONDecoder().decode(OutcomeResponse.self, from: try await send(request))
+        let decoded = try await JSONDecoder().decode(OutcomeResponse.self, from: send(request))
         return decoded.data?.nodes.compactMap { $0.value?.outcome } ?? []
     }
 
@@ -83,13 +82,13 @@ struct GitHubClient {
             let login: String
             let avatar_url: URL?
         }
-        let data = try await send(request(for: "https://api.github.com/user"))
+        let data = try await send(request(for: URL(static: "https://api.github.com/user")))
         let payload = try JSONDecoder().decode(Payload.self, from: data)
         return GitHubUser(login: payload.login, avatarURL: payload.avatar_url)
     }
 
-    private func request(for url: String) -> URLRequest {
-        var request = URLRequest(url: URL(string: url)!)
+    private func request(for url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
         request.setValue("bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("DevNotch", forHTTPHeaderField: "User-Agent")
         return request
@@ -100,7 +99,6 @@ struct GitHubClient {
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         if status == 401 { throw GitHubError.unauthorized }
         guard (200..<300).contains(status) else {
-            // REST errors carry a readable reason (e.g. "Resource not accessible by integration").
             struct Failure: Decodable { let message: String }
             if let failure = try? JSONDecoder().decode(Failure.self, from: data) {
                 throw GitHubError.api(failure.message)

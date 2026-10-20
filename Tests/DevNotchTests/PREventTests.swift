@@ -1,9 +1,14 @@
+@testable import DevNotch
 import Foundation
 import Testing
-@testable import DevNotch
 
 struct PREventTests {
-    private func kinds(_ old: [PullRequest], _ new: [PullRequest], reviewOld: [PullRequest] = [], reviewNew: [PullRequest] = []) -> [PREvent.Kind] {
+    private func kinds(
+        _ old: [PullRequest],
+        _ new: [PullRequest],
+        reviewOld: [PullRequest] = [],
+        reviewNew: [PullRequest] = []
+    ) -> [PREvent.Kind] {
         PREvent.diff(
             old: Snapshot(mine: old, reviewRequests: reviewOld),
             new: Snapshot(mine: new, reviewRequests: reviewNew)
@@ -39,7 +44,6 @@ struct PREventTests {
     }
 
     @Test func approvalAlertsWithoutRequiredReviews() {
-        // Repos that don't require reviews never set a review decision.
         #expect(kinds([.make(review: nil)], [.make(review: nil, approvers: ["octavio"])]) == [.approved])
     }
 
@@ -114,7 +118,7 @@ struct PROutcomeTests {
 
 struct AlertAvatarTests {
     @Test func alertCarriesTheActorsAvatar() {
-        let url = URL(string: "https://avatars.githubusercontent.com/u/1")!
+        let url = URL(static: "https://avatars.githubusercontent.com/u/1")
         var pr = PullRequest.make()
         pr.avatars = ["octavio": url]
         let alert = PREvent(kind: .approved, pr: pr, actor: "octavio").alert(showingAccount: false)

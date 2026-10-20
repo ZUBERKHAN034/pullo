@@ -16,16 +16,16 @@ struct NotchGeometry: Equatable {
         )
     }
 
-    /// The built-in screen, where the notch is. With the lid closed there's none, so it falls back to the main screen.
     @MainActor
-    static var notchedScreen: NSScreen {
-        NSScreen.screens.first { $0.safeAreaInsets.top > 0 } ?? NSScreen.main ?? NSScreen.screens[0]
+    static var notchedScreen: NSScreen? {
+        NSScreen.screens.first { $0.safeAreaInsets.top > 0 } ?? NSScreen.main ?? NSScreen.screens.first
     }
+
+    static let placeholder = NotchGeometry(screenFrame: .zero, notchSize: CGSize(width: 180, height: 24), hasNotch: false)
 }
 
-// In an extension so the memberwise initializer stays available.
+@MainActor
 extension NotchGeometry {
-    @MainActor
     init(screen: NSScreen) {
         let frame = screen.frame
         if screen.safeAreaInsets.top > 0,
@@ -39,7 +39,6 @@ extension NotchGeometry {
             )
             return
         }
-        // External displays have no notch: anchor a virtual one to the top center of the menu bar.
         let menuBarHeight = max(frame.maxY - screen.visibleFrame.maxY, 24)
         self.init(screenFrame: frame, notchSize: CGSize(width: 180, height: menuBarHeight), hasNotch: false)
     }

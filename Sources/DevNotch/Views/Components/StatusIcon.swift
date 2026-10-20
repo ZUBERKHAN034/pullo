@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// One glyph for a PR's most urgent state, in the spirit of Linear's status icons: color only where it means
-/// something, outlines for the quiet states.
 struct StatusIcon: View {
     let status: PRStatus
     var size: CGFloat = 14
@@ -28,7 +26,6 @@ struct StatusIcon: View {
             .foregroundStyle(color)
     }
 
-    /// A ring with a quarter filled in, turning, while checks run.
     private var running: some View {
         let line = max(1.5, size / 8)
         return ZStack {

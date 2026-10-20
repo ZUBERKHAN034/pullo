@@ -1,10 +1,8 @@
 import Foundation
 
-/// Reads accounts the GitHub CLI already knows about. Tokens stay in gh's own storage; we ask for them on demand.
 enum GHCLI {
     static var isInstalled: Bool { executable != nil }
 
-    // GUI apps don't inherit the shell PATH, so look for gh where installers put it.
     private static var executable: String? {
         ["/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh"]
             .first(where: FileManager.default.isExecutableFile(atPath:))
@@ -18,7 +16,6 @@ enum GHCLI {
         return users(inHostsFile: hosts, host: host)
     }
 
-    /// gh writes hosts.yml in a fixed shape (host → users → one key per account), so a line scan is enough.
     static func users(inHostsFile text: String, host: String) -> [String] {
         var users: [String] = []
         var inHost = false
@@ -49,7 +46,7 @@ enum GHCLI {
         return users
     }
 
-    static func token(for user: String, host: String = "github.com") throws -> String {
+    static func token(for user: String, host: String = "github.com", timeout: Duration = .seconds(10)) throws -> String {
         guard let executable else { throw GitHubError.noToken }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
@@ -57,9 +54,14 @@ enum GHCLI {
         let output = Pipe()
         process.standardOutput = output
         process.standardError = Pipe()
+        let exited = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in exited.signal() }
         try process.run()
+        if exited.wait(timeout: .now() + .milliseconds(Int(timeout / .milliseconds(1)))) == .timedOut {
+            process.terminate()
+            throw GitHubError.ghTimedOut
+        }
         let data = output.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
 
         let token = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
         guard process.terminationStatus == 0, !token.isEmpty else { throw GitHubError.noToken }

@@ -1,5 +1,5 @@
-import Foundation
 @testable import DevNotch
+import Foundation
 
 extension PullRequest {
     static func make(
@@ -27,7 +27,7 @@ extension PullRequest {
             account: account,
             number: number,
             title: title,
-            url: URL(string: "https://github.com/\(repo)/pull/\(number)")!,
+            url: .pullRequest(repo: repo, number: number),
             repo: repo,
             branch: branch,
             author: author,
@@ -46,5 +46,21 @@ extension PullRequest {
             reviewRequest: reviewRequest,
             failedChecks: []
         )
+    }
+}
+
+final class ScratchDefaults {
+    private let suite = "DevNotchTests.\(UUID().uuidString)"
+    let defaults: UserDefaults
+
+    init() {
+        guard let defaults = UserDefaults(suiteName: suite) else { preconditionFailure("No defaults suite \(suite)") }
+        self.defaults = defaults
+    }
+
+    deinit {
+        defaults.removePersistentDomain(forName: suite)
+        let file = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Preferences/\(suite).plist")
+        try? FileManager.default.removeItem(at: file)
     }
 }

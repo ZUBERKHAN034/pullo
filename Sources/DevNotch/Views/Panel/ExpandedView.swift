@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Everything below the notch when the panel is open: onboarding or the PRs, with toasts over them.
 struct ExpandedView: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore

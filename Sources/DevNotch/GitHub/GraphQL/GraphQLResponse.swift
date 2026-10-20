@@ -12,7 +12,6 @@ struct GQLResponse: Decodable {
     let errors: [GQLError]?
 }
 
-/// Search results can carry nodes that are not pull requests; skip them instead of failing the whole response.
 struct Lenient<T: Decodable>: Decodable {
     let value: T?
     init(from decoder: Decoder) throws { value = try? T(from: decoder) }

@@ -1,5 +1,5 @@
-import Testing
 @testable import DevNotch
+import Testing
 
 struct SearchTests {
     let pr = PullRequest.make(number: 383, title: "feat: Canal Web", branch: "feat/canal-web", author: "octavio")

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Who did it, as their avatar with what they did as a small badge, like Linear's inbox. Alerts nobody caused,
-/// such as CI, show the symbol on its own.
 struct AlertIcon: View {
     let alert: NotchAlert
     var size: CGFloat = 30

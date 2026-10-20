@@ -7,12 +7,10 @@ struct DemoCaption: Equatable, Identifiable {
     let subtitle: String
 }
 
-/// What the stage shows around the notch while the tour plays.
 @MainActor
 final class DemoStageModel: ObservableObject {
     @Published var caption: DemoCaption?
     @Published var titleCard: DemoCaption?
-    /// In stage coordinates, top-left origin.
     @Published var cursor: CGPoint
     @Published var cursorVisible = false
 
@@ -21,11 +19,9 @@ final class DemoStageModel: ObservableObject {
     }
 }
 
-/// A clean backdrop behind the notch: a generated wallpaper and a made-up menu bar, so nothing from the real desktop shows.
 @MainActor
 final class DemoStage {
     let model: DemoStageModel
-    /// The recorded region, in display points with a top-left origin (what ScreenCaptureKit expects).
     let captureRect: CGRect
 
     private let backdrop: NSWindow
@@ -43,7 +39,6 @@ final class DemoStage {
             width: size.width,
             height: size.height
         )
-        // The backdrop sits over the real menu bar but under the notch panel; the pointer goes over everything.
         backdrop = Self.window(frame: frame, level: NSWindow.Level.mainMenu.rawValue + 2,
                                content: StageView(model: model, menuBarHeight: menuBarHeight))
         pointer = Self.window(frame: frame, level: NSWindow.Level.mainMenu.rawValue + 4,
@@ -55,7 +50,7 @@ final class DemoStage {
         pointer.orderFrontRegardless()
     }
 
-    private static func window<Content: View>(frame: NSRect, level: Int, content: Content) -> NSWindow {
+    private static func window(frame: NSRect, level: Int, content: some View) -> NSWindow {
         let window = NSWindow(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
         window.isOpaque = false
         window.backgroundColor = .clear
@@ -173,7 +168,6 @@ private struct TitleCard: View {
     }
 }
 
-/// A drawn arrow standing in for the real pointer, which ScreenCaptureKit leaves out.
 private struct PointerView: View {
     @ObservedObject var model: DemoStageModel
 

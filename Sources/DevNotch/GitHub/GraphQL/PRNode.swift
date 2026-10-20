@@ -32,7 +32,6 @@ struct PRNode: Decodable {
                 let login: String?
                 let name: String?
             }
-            /// Null when the token can't see the requested team.
             let requestedReviewer: Reviewer?
         }
         let nodes: [Node]
@@ -42,7 +41,6 @@ struct PRNode: Decodable {
             struct Commit: Decodable {
                 struct Rollup: Decodable {
                     struct Contexts: Decodable {
-                        /// A CheckRun (Actions and apps) or a StatusContext (legacy commit statuses).
                         struct Context: Decodable {
                             let name: String?
                             let conclusion: String?
@@ -129,13 +127,12 @@ struct PRNode: Decodable {
         )
     }
 
-    /// Everyone who shows up on the PR, so alerts can put a face to who did what.
     private var avatars: [String: URL] {
         var avatars: [String: URL] = [:]
         let people = [author.map { ($0.login, $0.avatarUrl) }]
             + (comments.nodes + reviews.nodes).map { node in node.author.map { ($0.login, $0.avatarUrl) } }
             + latestReviews.nodes.map { review in review.author.map { ($0.login, $0.avatarUrl) } }
-        for case let (login, url?)? in people { avatars[login] = url }
+        for case (let login, let url?)? in people { avatars[login] = url }
         return avatars
     }
 }

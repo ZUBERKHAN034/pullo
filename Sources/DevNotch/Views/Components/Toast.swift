@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A short confirmation that something happened, e.g. a branch name was copied.
 struct Toast: View {
     let message: String
 

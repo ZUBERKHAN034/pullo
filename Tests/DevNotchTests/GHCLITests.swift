@@ -1,5 +1,5 @@
-import Testing
 @testable import DevNotch
+import Testing
 
 struct GHCLITests {
     @Test func readsEveryAccountOfTheHost() {

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// "My PRs" and "To review" with their counts, the filter, and "mark all read" when the tab has updates.
 struct PRTabsBar: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore
@@ -47,7 +46,6 @@ struct PRTabsBar: View {
         .buttonStyle(.plain)
     }
 
-    /// Turns blue when something in the tab changed, instead of a separate dot.
     private func count(for tab: PRTab, selected: Bool) -> some View {
         let total = model.prs(in: tab).count
         let unread = unreadCount(in: tab)

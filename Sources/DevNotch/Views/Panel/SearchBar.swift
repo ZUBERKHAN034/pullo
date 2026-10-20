@@ -31,7 +31,6 @@ struct SearchBar: View {
     }
 }
 
-/// AppKit text field so it can take keyboard focus inside the non-activating panel as soon as it appears.
 struct SearchField: NSViewRepresentable {
     let text: Binding<String>
 

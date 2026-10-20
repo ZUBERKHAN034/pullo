@@ -1,6 +1,5 @@
 import Foundation
 
-/// A PR looked up by ID after it left the open list.
 struct OutcomeNode: Decodable {
     struct Person: Decodable {
         let login: String

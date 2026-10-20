@@ -1,5 +1,4 @@
 import AppKit
-import Carbon.HIToolbox
 import Combine
 
 @MainActor
@@ -17,9 +16,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     private lazy var model = NotchViewModel(
         store: store, accounts: accounts, settings: settings, tracker: tracker,
-        geometry: NotchGeometry(screen: NotchGeometry.notchedScreen)
+        geometry: NotchGeometry.notchedScreen.map { NotchGeometry(screen: $0) } ?? .placeholder
     )
-    // Sparkle checks on its own schedule from the moment it starts, so launch touches it instead of waiting for Settings.
     private lazy var updater = demo == nil ? Updater() : nil
     private lazy var settingsWindow = SettingsWindowController { [unowned self] navigation in
         SettingsForm(settings: settings, accounts: accounts, model: model, updater: updater, navigation: navigation)
@@ -56,7 +54,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if let demo {
-            // The tour drives everything itself; a stray real mouse move or shortcut shouldn't interfere.
             Task { await demo.play(model: model, store: store, source: demoSource) }
             return
         }
@@ -65,7 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = updater
         if accounts.accounts.isEmpty { greetFirstLaunch() }
 
-        hotKey = HotKey(keyCode: kVK_ANSI_P, modifiers: cmdKey | optionKey) { [weak self] in
+        hotKey = HotKey(.togglePanel) { [weak self] in
             MainActor.assumeIsolated { self?.toggleFromKeyboard() }
         }
 
@@ -76,7 +73,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.screensChanged() }
         }
-        // The network takes a moment to come back after sleep; refresh once it has, not a minute later.
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification,
             object: nil,
@@ -99,7 +95,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func stateChanged(to state: NotchState) {
         guard let panel else { return }
         updateMouseCapture()
-        // Clicking inside makes the panel key; hand typing back to the app you were in once it closes.
         if state == .closed, panel.isKeyWindow {
             DispatchQueue.main.async {
                 panel.orderOut(nil)
@@ -113,7 +108,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if model.state == .open { panel?.makeKeyAndOrderFront(nil) }
     }
 
-    /// With no account the closed notch shows nothing, so point at it once.
     private func greetFirstLaunch() {
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(1))
@@ -126,9 +120,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// A display was plugged in, removed or rearranged, or the lid opened or closed.
     private func screensChanged() {
-        let target = NotchGeometry(screen: NotchGeometry.notchedScreen)
+        guard let screen = NotchGeometry.notchedScreen else { return }
+        let target = NotchGeometry(screen: screen)
         if target.screenFrame != model.geometry.screenFrame { model.close() }
         model.geometry = target
     }
@@ -138,7 +132,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         updateMouseCapture()
     }
 
-    /// The panel is far bigger than the notch so it has room to grow; only the part that's showing should take clicks and scrolls.
     private func updateMouseCapture() {
         let state = model.state
         let over = model.layout.hitRect(for: state).contains(NSEvent.mouseLocation)

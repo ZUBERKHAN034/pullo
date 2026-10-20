@@ -1,8 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Explains a control on hover. Stands in for `.help`: the panel never activates the app, and macOS only
-    /// shows system tooltips for the active one, so they never appeared.
     func hint(_ text: String, edge: HorizontalEdge = .trailing) -> some View {
         modifier(HoverHint(text: text, edge: edge))
     }
@@ -10,10 +8,9 @@ extension View {
 
 private struct HoverHint: ViewModifier {
     let text: String
-    /// Which side of the view the hint opens on; pick the side with room.
     let edge: HorizontalEdge
-    @ViewState private var shown = false
-    @ViewState private var pending: Task<Void, Never>?
+    @State private var shown = false
+    @State private var pending: Task<Void, Never>?
 
     func body(content: Content) -> some View {
         content
@@ -23,15 +20,12 @@ private struct HoverHint: ViewModifier {
                     withAnimation(Motion.fade) { shown = false }
                     return
                 }
-                // A short wait, so sweeping the pointer across the panel doesn't flash hints everywhere.
                 pending = Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(400))
                     guard !Task.isCancelled else { return }
                     withAnimation(Motion.fade) { shown = true }
                 }
             }
-            // Always laid out and faded in: inside an `if`, SwiftUI drops the alignment guide and the hint lands on
-            // top of the view instead of beside it.
             .overlay(alignment: edge == .trailing ? .trailing : .leading) {
                 label
                     .fixedSize()
@@ -41,7 +35,6 @@ private struct HoverHint: ViewModifier {
                     .opacity(shown ? 1 : 0)
                     .allowsHitTesting(false)
             }
-            // Above its siblings, which would otherwise draw over the hint.
             .zIndex(shown ? 1 : 0)
     }
 

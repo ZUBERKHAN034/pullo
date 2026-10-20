@@ -1,9 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Borderless panel that sits above the menu bar; it never steals focus from the app you're using.
 final class NotchPanel: NSPanel {
-    init<Content: View>(rootView: Content) {
+    init(rootView: some View) {
         super.init(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel],

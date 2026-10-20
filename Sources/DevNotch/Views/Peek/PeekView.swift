@@ -3,7 +3,7 @@ import SwiftUI
 struct PeekView: View {
     let alert: NotchAlert
     let onTap: () -> Void
-    @ViewState private var hovering = false
+    @State private var hovering = false
 
     var body: some View {
         HStack(spacing: 11) {
@@ -30,7 +30,6 @@ struct PeekView: View {
                 stackedLines
             }
             Spacer(minLength: 0)
-            // Tapping opens the PR, or the panel when several alerts are stacked.
             Image(systemName: alert.url == nil ? "chevron.down" : "arrow.up.right")
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(.white.opacity(0.6))
@@ -45,12 +44,10 @@ struct PeekView: View {
         .onTapGesture(perform: onTap)
     }
 
-    /// The two most important events, one per line, rather than one sentence cut off midway.
     private var stackedLines: some View {
         VStack(alignment: .leading, spacing: 1) {
             ForEach(Array(alert.stack.prefix(2).enumerated()), id: \.element.id) { index, item in
                 HStack(spacing: 6) {
-                    // What happened outranks where: the repo reference gives way first when space runs out.
                     Text(item.headline)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white)

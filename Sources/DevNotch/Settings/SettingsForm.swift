@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// The pages of the settings window, listed in its sidebar.
 enum SettingsPage: String, CaseIterable, Identifiable {
     case general, alerts, accounts, shortcuts, updates, about
 
@@ -30,18 +29,15 @@ enum SettingsPage: String, CaseIterable, Identifiable {
     }
 }
 
-/// Which page the settings window shows, so the panel can open it on a given one.
 @MainActor
 final class SettingsNavigation: ObservableObject {
     @Published var page: SettingsPage? = .general
 }
 
-/// System Settings–style window: a sidebar of pages and the selected page on the right.
 struct SettingsForm: View {
     @ObservedObject var settings: AppSettings
     @ObservedObject var accounts: AccountStore
     let model: NotchViewModel
-    /// Nil in demo mode, where nothing should reach the network.
     let updater: Updater?
     @ObservedObject var navigation: SettingsNavigation
 
@@ -61,7 +57,6 @@ struct SettingsForm: View {
         .frame(width: 700, height: 500)
     }
 
-    /// Updates only exist outside demo mode.
     private var pages: [SettingsPage] {
         SettingsPage.allCases.filter { $0 != .updates || updater != nil }
     }

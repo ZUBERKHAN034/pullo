@@ -1,16 +1,13 @@
-import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class PRStore: ObservableObject {
-    /// Each account's PRs, kept apart and already sorted.
     @Published private(set) var snapshots: [String: Snapshot] = [:]
     @Published private(set) var lastUpdated: Date?
-    /// Last error per account login; an account that failed keeps showing its previous PRs.
     @Published private(set) var errors: [String: String] = [:]
     @Published private(set) var isLoading = false
 
-    /// Called once per refresh with everything that changed, so alerts can be grouped.
     var onEvents: (([PREvent]) -> Void)?
 
     private let accounts: AccountStore
@@ -50,7 +47,6 @@ final class PRStore: ObservableObject {
     }
 
     func refresh() async {
-        // A refresh requested mid-flight (e.g. an account was just added) runs right after, not never.
         guard !isLoading else {
             refreshQueued = true
             return
@@ -65,7 +61,7 @@ final class PRStore: ObservableObject {
 
     private func refreshAllAccounts() async {
         let current = accounts.accounts
-        let source = self.source
+        let source = source
         let results = await withTaskGroup(of: (String, Result<Snapshot, Error>).self) { group in
             for account in current {
                 group.addTask { await Self.fetch(account, from: source) }
@@ -102,26 +98,22 @@ final class PRStore: ObservableObject {
 
         lastUpdated = snapshots.isEmpty ? nil : Date()
 
-        // Two accounts can see the same PR; alert once.
         var seen = Set<String>()
         let unique = events.filter { seen.insert("\($0.pr.id)|\($0.kind)").inserted }
         if !unique.isEmpty { onEvents?(unique) }
     }
 
-    /// Your PRs that left the open list: asks GitHub whether each was merged or closed, since one that just
-    /// slipped past the 40 most recent also disappears. Best effort; a failed lookup means no alert.
     private func departures(from old: Snapshot, to new: Snapshot, login: String) async -> [PREvent] {
         let stillThere = Set(new.mine.map(\.id))
         let gone = old.mine.filter { !stillThere.contains($0.id) }
         guard !gone.isEmpty, let account = accounts.accounts.first(where: { $0.login == login }) else { return [] }
-        let outcomes = (try? await source.outcomes(of: gone.map(\.id), for: account)) ?? []
+        let outcomes = await (try? source.outcomes(of: gone.map(\.id), for: account)) ?? []
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }
     }
 
-    /// Kept out of the task group's closure: the Swift 6.4 optimizer dropped every result when the call was inline.
     private nonisolated static func fetch(_ account: Account, from source: PRSource) async -> (String, Result<Snapshot, Error>) {
         do {
-            return (account.login, .success(try await source.snapshot(for: account)))
+            return try await (account.login, .success(source.snapshot(for: account)))
         } catch {
             return (account.login, .failure(error))
         }
