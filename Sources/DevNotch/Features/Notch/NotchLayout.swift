@@ -2,12 +2,13 @@ import AppKit
 
 struct NotchLayout {
     let geometry: NotchGeometry
+    var closedWings: CGFloat = 0
 
     func size(for state: NotchState) -> CGSize {
         let notch = geometry.notchSize
         switch state {
         case .closed:
-            return notch
+            return CGSize(width: notch.width + closedWings * 2, height: notch.height)
         case .peek:
             return CGSize(width: max(notch.width + 200, 400), height: notch.height + 54)
         case .open:

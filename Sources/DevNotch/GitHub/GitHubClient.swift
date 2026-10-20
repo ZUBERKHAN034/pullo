@@ -23,7 +23,7 @@ struct GitHubClient {
       reviewRequests(first: 20) { nodes { requestedReviewer { __typename ... on User { login } ... on Team { name } } } }
       commits(last: 1) { nodes { commit { statusCheckRollup {
         state
-        contexts(first: 30) { nodes {
+        contexts(first: 30) { totalCount nodes {
           ... on CheckRun { name conclusion detailsUrl }
           ... on StatusContext { context state targetUrl }
         } }

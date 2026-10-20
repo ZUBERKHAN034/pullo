@@ -16,7 +16,7 @@ final class PRListModel {
 
     @ObservationIgnored var onNeedsKeyFocus: (() -> Void)?
 
-    private let store: PRStore
+    let store: PRStore
     private let accounts: AccountStore
     private let tracker: ReadTracker
     private let system: any SystemActions

@@ -17,7 +17,6 @@ final class PRStore {
     private let source: PRSource
     @ObservationIgnored private var pollTask: Task<Void, Never>?
     @ObservationIgnored private var refreshQueued = false
-    private let interval: Duration = .seconds(60)
 
     init(accounts: AccountStore, tracker: ReadTracker, source: PRSource) {
         self.accounts = accounts
@@ -33,12 +32,22 @@ final class PRStore {
         login.flatMap { snapshots[$0]?.reviewRequests } ?? []
     }
 
+    var pollInterval: Duration {
+        snapshots.values.contains { $0.mine.contains { $0.ci == .pending } } ? .seconds(30) : .seconds(60)
+    }
+
+    func runningCI(for logins: [String]) -> [PullRequest] {
+        logins.flatMap(mine(for:))
+            .filter { $0.ci == .pending && $0.checks != nil }
+            .sorted { $0.updatedAt > $1.updatedAt }
+    }
+
     func start() {
         pollTask?.cancel()
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
                 await self?.refresh()
-                try? await Task.sleep(for: self?.interval ?? .seconds(60))
+                try? await Task.sleep(for: self?.pollInterval ?? .seconds(60))
             }
         }
     }

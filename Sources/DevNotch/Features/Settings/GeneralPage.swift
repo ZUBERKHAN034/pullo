@@ -18,6 +18,12 @@ struct GeneralPage: View {
                 }
             }
             Section {
+                Toggle("Show CI progress on the notch", isOn: $settings.showsLiveCI)
+                    .toggleStyle(.switch)
+            } footer: {
+                Text("While checks run on your pull requests, the notch widens to show how many are done.")
+            }
+            Section {
                 Toggle("Open at login", isOn: Binding(
                     get: { settings.launchAtLogin },
                     set: { settings.setLaunchAtLogin($0) }

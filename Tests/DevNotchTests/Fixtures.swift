@@ -20,7 +20,9 @@ extension PullRequest {
         commitCount: Int = 1,
         approvers: [String] = [],
         changeRequesters: [String] = [],
-        reviewRequest: ReviewRequest = .direct
+        reviewRequest: ReviewRequest = .direct,
+        updatedAt: Date = Date(timeIntervalSince1970: 0),
+        checks: CheckProgress? = nil
     ) -> PullRequest {
         PullRequest(
             id: id,
@@ -33,7 +35,7 @@ extension PullRequest {
             author: author,
             isDraft: draft,
             createdAt: Date(timeIntervalSince1970: 0),
-            updatedAt: Date(timeIntervalSince1970: 0),
+            updatedAt: updatedAt,
             ci: ci,
             review: review,
             hasConflict: conflict,
@@ -44,7 +46,8 @@ extension PullRequest {
             approvers: approvers,
             changeRequesters: changeRequesters,
             reviewRequest: reviewRequest,
-            failedChecks: []
+            failedChecks: [],
+            checks: checks
         )
     }
 }

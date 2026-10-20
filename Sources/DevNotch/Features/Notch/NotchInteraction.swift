@@ -29,6 +29,8 @@ final class NotchInteraction {
     @ObservationIgnored private var pointer: NSPoint?
     @ObservationIgnored private var missedDuringFocus: [NotchAlert] = []
     @ObservationIgnored private var focusWatch: Task<Void, Never>?
+    @ObservationIgnored private var finishedCITask: Task<Void, Never>?
+    private var finishedCI: LiveCI?
 
     init(
         list: PRListModel,
@@ -46,7 +48,15 @@ final class NotchInteraction {
         self.clock = clock
     }
 
-    var layout: NotchLayout { NotchLayout(geometry: geometry) }
+    var layout: NotchLayout { NotchLayout(geometry: geometry, closedWings: liveCI?.wingWidth ?? 0) }
+
+    var liveCI: LiveCI? {
+        guard geometry.hasNotch, settings.showsLiveCI else { return nil }
+        if let finishedCI { return finishedCI }
+        let logins = accounts.accounts.map(\.login).filter { !settings.mutedAccounts.contains($0) }
+        let running = list.store.runningCI(for: logins)
+        return running.first.map { LiveCI(pr: $0, othersRunning: running.count - 1) }
+    }
 
     // MARK: - Pointer
 
@@ -151,7 +161,29 @@ final class NotchInteraction {
     }
 
     func enqueue(events: [PREvent]) {
-        enqueue(events.filter(settings.allows).map { $0.alert(showingAccount: showsAccounts) })
+        let shown = events.filter(settings.allows)
+        let alerts = shown.map { $0.alert(showingAccount: showsAccounts) }
+        guard let finished = shown.first(where: { $0.kind == .ciFailed }) ?? shown.first(where: { $0.kind == .ciPassed }),
+              showsFinishedCI(on: finished.pr)
+        else { return enqueue(alerts) }
+        showFinishedCI(finished.pr, then: alerts)
+    }
+
+    private func showsFinishedCI(on pr: PullRequest) -> Bool {
+        state == .closed && finishedCITask == nil && geometry.hasNotch && settings.showsLiveCI
+            && !settings.mutedAccounts.contains(pr.account)
+    }
+
+    private func showFinishedCI(_ pr: PullRequest, then alerts: [NotchAlert]) {
+        finishedCI = LiveCI(pr: pr, othersRunning: 0, finished: pr.ci)
+        let clock = clock
+        finishedCITask = Task { [weak self] in
+            try? await clock.sleep(for: .seconds(2))
+            guard let self else { return }
+            finishedCI = nil
+            finishedCITask = nil
+            enqueue(alerts)
+        }
     }
 
     func accountConnected(_ account: Account) {
