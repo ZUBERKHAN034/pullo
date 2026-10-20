@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct GHImportOptions: View {
-    @ObservedObject var accounts: AccountStore
+    @Environment(AccountStore.self) private var accounts
 
     var body: some View {
         VStack(spacing: 8) {

@@ -1,15 +1,15 @@
 import SwiftUI
 
 struct HeaderActions: View {
-    @ObservedObject var model: NotchViewModel
-    @ObservedObject var store: PRStore
+    @Environment(NotchInteraction.self) private var notch
+    @Environment(PRStore.self) private var store
 
     var body: some View {
         HStack(spacing: 2) {
             IconButton(symbol: "arrow.triangle.2.circlepath", help: refreshHelp, spinning: store.isLoading) {
                 Task { await store.refresh() }
             }
-            IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?(nil) }
+            IconButton(symbol: "gearshape", help: "Settings") { notch.onOpenSettings?(nil) }
         }
     }
 

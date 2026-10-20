@@ -2,7 +2,8 @@ import AppKit
 import SwiftUI
 
 struct GeneralPage: View {
-    @ObservedObject var settings: AppSettings
+    @Environment(\.system) private var system
+    @Environment(AppSettings.self) private var settings
 
     var body: some View {
         Form {
@@ -17,7 +18,7 @@ struct GeneralPage: View {
             }
             Section {
                 LabeledContent("Quit DevNotch") {
-                    Button("Quit", role: .destructive) { NSApp.terminate(nil) }
+                    Button("Quit", role: .destructive) { system.quit() }
                 }
             } footer: {
                 Text("DevNotch lives in the notch and has no Dock icon, so this is the way to quit it.")

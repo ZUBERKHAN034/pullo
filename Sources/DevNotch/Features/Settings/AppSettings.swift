@@ -1,14 +1,16 @@
 import AppKit
+import Observation
 import ServiceManagement
 
 @MainActor
-final class AppSettings: ObservableObject {
-    @Published var mutedCategories: Set<AlertCategory> { didSet { save() } }
-    @Published var mutedAccounts: Set<String> { didSet { save() } }
-    @Published var haptics: Bool { didSet { save() } }
-    @Published var sound: String? { didSet { save() } }
-    @Published private(set) var launchAtLogin: Bool
-    @Published private(set) var launchAtLoginFailure: String?
+@Observable
+final class AppSettings {
+    var mutedCategories: Set<AlertCategory> { didSet { save() } }
+    var mutedAccounts: Set<String> { didSet { save() } }
+    var haptics: Bool { didSet { save() } }
+    var sound: String? { didSet { save() } }
+    private(set) var launchAtLogin: Bool
+    private(set) var launchAtLoginFailure: String?
 
     private let defaults: UserDefaults
 
@@ -39,12 +41,6 @@ final class AppSettings: ObservableObject {
         let files = (try? FileManager.default.contentsOfDirectory(atPath: "/System/Library/Sounds")) ?? []
         return files.map { ($0 as NSString).deletingPathExtension }.sorted()
     }()
-
-    func playSound() {
-        guard let sound, let player = NSSound(named: sound) else { return }
-        player.stop()
-        player.play()
-    }
 
     func setLaunchAtLogin(_ enabled: Bool) {
         do {

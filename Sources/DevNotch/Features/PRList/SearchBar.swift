@@ -2,17 +2,17 @@ import AppKit
 import SwiftUI
 
 struct SearchBar: View {
-    @ObservedObject var model: NotchViewModel
+    @Environment(PRListModel.self) private var list
 
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .font(.panel(.label, .semibold))
                 .foregroundStyle(.textTertiary)
-            SearchField(text: Binding(get: { model.searchQuery }, set: { model.searchQuery = $0 }))
+            SearchField(text: Binding(get: { list.searchQuery }, set: { list.searchQuery = $0 }))
                 .frame(height: 18)
             Button {
-                model.stopSearch()
+                list.stopSearch()
             } label: {
                 KeyCap(key: "esc")
             }

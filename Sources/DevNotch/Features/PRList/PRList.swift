@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct PRList: View {
+    @Environment(PRListModel.self) private var list
     let sections: [PRSection]
-    @ObservedObject var model: NotchViewModel
-    @ObservedObject var tracker: ReadTracker
+    @Environment(ReadTracker.self) private var tracker
     @State private var appeared = false
 
     var body: some View {
@@ -28,9 +28,8 @@ struct PRList: View {
                                 PRRow(
                                     pr: pr,
                                     kind: kind,
-                                    selected: model.selectedPRID == pr.id,
-                                    changes: tracker.changes(for: pr),
-                                    model: model
+                                    selected: list.selectedPRID == pr.id,
+                                    changes: tracker.changes(for: pr)
                                 )
                             }
                         }
@@ -44,7 +43,7 @@ struct PRList: View {
                     }
                 }
             }
-            .onChange(of: model.selectedPRID) { _, id in
+            .onChange(of: list.selectedPRID) { _, id in
                 guard let id else { return }
                 withAnimation(Motion.navigate) { proxy.scrollTo(id, anchor: .center) }
             }

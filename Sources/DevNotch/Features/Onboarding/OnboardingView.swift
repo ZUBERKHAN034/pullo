@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    @ObservedObject var accounts: AccountStore
+    @Environment(AccountStore.self) private var accounts
 
     var body: some View {
         VStack(spacing: 14) {
@@ -23,7 +23,7 @@ struct OnboardingView: View {
                     .font(.panel(.body))
                     .foregroundStyle(.textTertiary)
             }
-            GHImportOptions(accounts: accounts)
+            GHImportOptions()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

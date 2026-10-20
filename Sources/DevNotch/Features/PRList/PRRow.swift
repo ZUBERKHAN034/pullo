@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct PRRow: View {
+    @Environment(PRListModel.self) private var list
+    @Environment(NotchInteraction.self) private var notch
     let pr: PullRequest
     let kind: PRTab
     let selected: Bool
     let changes: [ReadChange]
-    @ObservedObject var model: NotchViewModel
 
     @State private var hovering = false
     @State private var showingChecks = false
@@ -29,7 +30,7 @@ struct PRRow: View {
                 badges
             }
             if showingChecks {
-                FailedChecksList(pr: pr, model: model)
+                FailedChecksList(pr: pr)
                     .padding(.leading, 28)
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
@@ -49,7 +50,7 @@ struct PRRow: View {
         .animation(Motion.hover, value: hovering)
         .animation(Motion.hover, value: selected)
         .animation(Motion.navigate, value: isUnread)
-        .onTapGesture { model.open(pr) }
+        .onTapGesture { notch.open(pr) }
     }
 
     private var statuses: [PRStatus] { pr.statuses(mine: kind == .mine) }
@@ -100,7 +101,7 @@ struct PRRow: View {
     private var badges: some View {
         HStack(spacing: 8) {
             if hovering || selected, isUnread {
-                IconButton(symbol: "envelope.open", help: "Mark as read · r") { model.markRead(pr) }
+                IconButton(symbol: "envelope.open", help: "Mark as read · r") { list.markRead(pr) }
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
             HStack(spacing: 6) {

@@ -2,9 +2,10 @@ import AppKit
 import SwiftUI
 
 struct AlertsPage: View {
-    @ObservedObject var settings: AppSettings
-    @ObservedObject var accounts: AccountStore
-    let model: NotchViewModel
+    @Environment(NotchInteraction.self) private var notch
+    @Environment(AppSettings.self) private var settings
+    @Environment(AccountStore.self) private var accounts
+    @Environment(\.system) private var system
 
     var body: some View {
         Form {
@@ -13,7 +14,7 @@ struct AlertsPage: View {
                     get: { settings.sound ?? "" },
                     set: { name in
                         settings.sound = name.isEmpty ? nil : name
-                        settings.playSound()
+                        if let sound = settings.sound { system.play(sound: sound) }
                     }
                 )) {
                     Text("None").tag("")
@@ -22,7 +23,7 @@ struct AlertsPage: View {
                 }
                 Toggle("Tap the trackpad", isOn: Binding(get: { settings.haptics }, set: { settings.haptics = $0 }))
                 LabeledContent("Preview") {
-                    Button("Send a test alert") { model.previewAlert() }
+                    Button("Send a test alert") { notch.previewAlert() }
                 }
             } footer: {
                 Text("Alerts drop down from the notch when something changes on a PR.")

@@ -1,31 +1,27 @@
-import Combine
 import Foundation
+import Observation
 
 @MainActor
-final class PRStore: ObservableObject {
-    @Published private(set) var snapshots: [String: Snapshot] = [:]
-    @Published private(set) var lastUpdated: Date?
-    @Published private(set) var errors: [String: String] = [:]
-    @Published private(set) var isLoading = false
+@Observable
+final class PRStore {
+    private(set) var snapshots: [String: Snapshot] = [:]
+    private(set) var lastUpdated: Date?
+    private(set) var errors: [String: String] = [:]
+    private(set) var isLoading = false
 
-    var onEvents: (([PREvent]) -> Void)?
+    @ObservationIgnored var onEvents: (([PREvent]) -> Void)?
 
     private let accounts: AccountStore
     private let tracker: ReadTracker
     private let source: PRSource
-    private var pollTask: Task<Void, Never>?
-    private var refreshQueued = false
-    private var cancellables = Set<AnyCancellable>()
+    @ObservationIgnored private var pollTask: Task<Void, Never>?
+    @ObservationIgnored private var refreshQueued = false
     private let interval: Duration = .seconds(60)
 
     init(accounts: AccountStore, tracker: ReadTracker, source: PRSource) {
         self.accounts = accounts
         self.tracker = tracker
         self.source = source
-        accounts.$accounts
-            .dropFirst()
-            .sink { [weak self] _ in Task { await self?.refresh() } }
-            .store(in: &cancellables)
     }
 
     func mine(for login: String?) -> [PullRequest] {

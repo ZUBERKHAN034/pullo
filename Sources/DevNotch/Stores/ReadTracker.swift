@@ -1,8 +1,10 @@
 import Foundation
+import Observation
 
 @MainActor
-final class ReadTracker: ObservableObject {
-    @Published private(set) var baselines: [String: ReadBaseline] = [:]
+@Observable
+final class ReadTracker {
+    private(set) var baselines: [String: ReadBaseline] = [:]
 
     private var knownAccounts: Set<String> = []
     private let defaults: UserDefaults

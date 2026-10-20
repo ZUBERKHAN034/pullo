@@ -1,0 +1,97 @@
+import AppKit
+
+@MainActor
+final class NotchPanelController {
+    private let app: AppDependencies
+    private let panel: NotchPanel
+    private var notch: NotchInteraction { app.notch }
+    private var hotKey: HotKey?
+    private var monitors: [Any] = []
+
+    init(app: AppDependencies) {
+        self.app = app
+        panel = NotchPanel(rootView: app.inject(into: NotchRootView()))
+        panel.setFrame(app.notch.geometry.panelFrame, display: true)
+        panel.orderFrontRegardless()
+
+        notch.onStateChange = { [weak self] state in self?.stateChanged(to: state) }
+        app.list.onNeedsKeyFocus = { [weak panel] in panel?.makeKeyAndOrderFront(nil) }
+    }
+
+    func startListening() {
+        hotKey = HotKey(.togglePanel) { [weak self] in
+            MainActor.assumeIsolated { self?.toggleFromKeyboard() }
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.screensChanged() }
+        }
+        installEventMonitors()
+    }
+
+    private func stateChanged(to state: NotchState) {
+        updateMouseCapture()
+        if state == .closed, panel.isKeyWindow {
+            DispatchQueue.main.async { [panel] in
+                panel.orderOut(nil)
+                panel.orderFrontRegardless()
+            }
+        }
+    }
+
+    private func toggleFromKeyboard() {
+        notch.toggleFromKeyboard()
+        if notch.state == .open { panel.makeKeyAndOrderFront(nil) }
+    }
+
+    private func screensChanged() {
+        guard let screen = NotchGeometry.notchedScreen else { return }
+        let target = NotchGeometry(screen: screen)
+        guard target != notch.geometry else { return }
+        if target.screenFrame != notch.geometry.screenFrame { notch.close() }
+        notch.geometry = target
+        panel.setFrame(target.panelFrame, display: true)
+    }
+
+    private func mouseMoved() {
+        notch.mouseMoved(to: NSEvent.mouseLocation)
+        updateMouseCapture()
+    }
+
+    private func updateMouseCapture() {
+        let state = notch.state
+        let over = notch.layout.hitRect(for: state).contains(NSEvent.mouseLocation)
+        let ignores = state == .closed || !over
+        if panel.ignoresMouseEvents != ignores { panel.ignoresMouseEvents = ignores }
+    }
+
+    private func installEventMonitors() {
+        let pointer: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged]
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: pointer.union(.leftMouseDown), handler: { [weak self] event in
+            MainActor.assumeIsolated {
+                if event.type == .leftMouseDown {
+                    self?.notch.mouseDown(at: NSEvent.mouseLocation)
+                } else {
+                    self?.mouseMoved()
+                }
+            }
+        }) {
+            monitors.append(global)
+        }
+        if let local = NSEvent.addLocalMonitorForEvents(matching: pointer, handler: { [weak self] event in
+            MainActor.assumeIsolated { self?.mouseMoved() }
+            return event
+        }) {
+            monitors.append(local)
+        }
+        if let keys = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { [weak self] event in
+            let handled = MainActor.assumeIsolated { self?.notch.handleKey(event) == true }
+            return handled ? nil : event
+        }) {
+            monitors.append(keys)
+        }
+    }
+}

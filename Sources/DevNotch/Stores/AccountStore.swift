@@ -1,15 +1,17 @@
 import Foundation
+import Observation
 
 @MainActor
-final class AccountStore: ObservableObject {
-    @Published private(set) var accounts: [Account] = []
-    @Published private(set) var ghInstalled = true
-    @Published private(set) var ghUsers: [String] = []
-    @Published private(set) var importing: String?
-    @Published private(set) var importFailure: ImportFailure?
+@Observable
+final class AccountStore {
+    private(set) var accounts: [Account] = []
+    private(set) var ghInstalled = true
+    private(set) var ghUsers: [String] = []
+    private(set) var importing: String?
+    private(set) var importFailure: ImportFailure?
 
-    var onAccountAdded: ((Account) -> Void)?
-    var onAccountRemoved: ((Account) -> Void)?
+    @ObservationIgnored var onAccountAdded: ((Account) -> Void)?
+    @ObservationIgnored var onAccountRemoved: ((Account) -> Void)?
 
     private let defaults: UserDefaults
     private let cli: any GitHubCLI

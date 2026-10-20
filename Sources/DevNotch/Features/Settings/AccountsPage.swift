@@ -2,7 +2,8 @@ import AppKit
 import SwiftUI
 
 struct AccountsPage: View {
-    @ObservedObject var accounts: AccountStore
+    @Environment(NotchInteraction.self) private var notch
+    @Environment(AccountStore.self) private var accounts
     @State private var removing: Account?
 
     var body: some View {
