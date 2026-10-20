@@ -1,7 +1,9 @@
 import AppKit
+import Observation
 import SwiftUI
 
 @MainActor
-final class SettingsNavigation: ObservableObject {
-    @Published var page: SettingsPage? = .general
+@Observable
+final class SettingsNavigation {
+    var page: SettingsPage? = .general
 }

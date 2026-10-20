@@ -64,3 +64,24 @@ final class ScratchDefaults {
         try? FileManager.default.removeItem(at: file)
     }
 }
+
+struct FakeCLI: GitHubCLI {
+    var installed = true
+    var logins: [String] = []
+    var tokens: [String: String] = [:]
+
+    var isInstalled: Bool { installed }
+    func users() -> [String] { logins }
+
+    func token(for user: String) throws -> String {
+        guard let token = tokens[user] else { throw GitHubError.noToken }
+        return token
+    }
+}
+
+extension AccountStore {
+    convenience init(defaults: UserDefaults) {
+        let cli = FakeCLI()
+        self.init(defaults: defaults, cli: cli, tokens: TokenProvider(cli: cli))
+    }
+}

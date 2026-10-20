@@ -17,7 +17,7 @@ import AppKit
         }
 
         @MainActor
-        func play(model: NotchViewModel, store: PRStore) async {
+        func play(model: NotchInteraction, store: PRStore) async {
             guard let screen = NotchGeometry.notchedScreen else { return }
             let stage = DemoStage(screen: screen, menuBarHeight: model.geometry.notchSize.height)
             stage.show()
@@ -52,6 +52,6 @@ import AppKit
         static var current: DemoMode? { nil }
         var source: any PRSource { switch self {} }
         var defaults: UserDefaults { switch self {} }
-        func play(model: NotchViewModel, store: PRStore) async { switch self {} }
+        func play(model: NotchInteraction, store: PRStore) async { switch self {} }
     }
 #endif

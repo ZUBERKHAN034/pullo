@@ -5,9 +5,9 @@ import SwiftUI
 final class SettingsWindowController {
     private var window: NSWindow?
     private let navigation = SettingsNavigation()
-    private let content: (SettingsNavigation) -> SettingsForm
+    private let content: (SettingsNavigation) -> AnyView
 
-    init(content: @escaping (SettingsNavigation) -> SettingsForm) {
+    init(content: @escaping (SettingsNavigation) -> AnyView) {
         self.content = content
     }
 

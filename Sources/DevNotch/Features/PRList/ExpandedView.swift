@@ -1,28 +1,27 @@
 import SwiftUI
 
 struct ExpandedView: View {
-    @ObservedObject var model: NotchViewModel
-    @ObservedObject var store: PRStore
-    @ObservedObject var accounts: AccountStore
-    @ObservedObject var tracker: ReadTracker
+    @Environment(PRListModel.self) private var list
+    @Environment(NotchInteraction.self) private var notch
+    @Environment(AccountStore.self) private var accounts
 
     var body: some View {
-        let size = model.layout.size(for: .open)
+        let size = notch.layout.size(for: .open)
         ZStack(alignment: .top) {
             if accounts.accounts.isEmpty {
-                OnboardingView(accounts: accounts)
+                OnboardingView()
                     .transition(.reveal(delay: 0.05))
             } else {
-                PRBrowser(model: model, store: store, tracker: tracker)
+                PRBrowser()
                     .transition(.reveal(delay: 0.05))
             }
         }
         .padding(.horizontal, 14)
         .padding(.top, 8)
         .padding(.bottom, 14)
-        .frame(width: size.width, height: size.height - model.geometry.notchSize.height, alignment: .top)
+        .frame(width: size.width, height: size.height - notch.geometry.notchSize.height, alignment: .top)
         .overlay(alignment: .bottom) {
-            if let message = model.toast {
+            if let message = list.toast {
                 Toast(message: message)
                     .padding(.bottom, 14)
                     .transition(.move(edge: .bottom).combined(with: .opacity))

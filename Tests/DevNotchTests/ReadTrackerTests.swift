@@ -14,21 +14,21 @@ struct ReadTrackerTests {
     @Test func firstSyncStartsEverythingAsRead() {
         let pr = PullRequest.make()
         tracker.sync(account: "me", prs: [pr])
-        #expect(tracker.reasons(for: pr).isEmpty)
+        #expect(tracker.labels(for: pr).isEmpty)
     }
 
     @Test func reviewRequestsAppearingLaterAreNew() {
         tracker.sync(account: "me", prs: [])
         let theirs = PullRequest.make(id: "PR_2", author: "octavio")
         tracker.sync(account: "me", prs: [theirs])
-        #expect(tracker.reasons(for: theirs) == ["New review request"])
+        #expect(tracker.labels(for: theirs) == ["New review request"])
     }
 
     @Test func yourOwnNewPRIsNotUnread() {
         tracker.sync(account: "me", prs: [])
         let mine = PullRequest.make(id: "PR_1", author: "me")
         tracker.sync(account: "me", prs: [mine])
-        #expect(tracker.reasons(for: mine).isEmpty)
+        #expect(tracker.labels(for: mine).isEmpty)
     }
 
     @Test func forgettingAnAccountStartsItFresh() {
@@ -38,7 +38,7 @@ struct ReadTrackerTests {
         tracker.forget(account: "me")
         #expect(tracker.baselines.isEmpty)
         tracker.sync(account: "me", prs: [theirs])
-        #expect(tracker.reasons(for: theirs).isEmpty)
+        #expect(tracker.labels(for: theirs).isEmpty)
     }
 
     @Test func explainsWhatChanged() {
@@ -50,7 +50,7 @@ struct ReadTrackerTests {
             comments: ["c1", "c2", "c3"],
             reviews: [Activity(id: "r1", author: "octavio")]
         )
-        #expect(tracker.reasons(for: after) == ["2 new comments", "octavio reviewed", "Approved", "CI failed"])
+        #expect(tracker.labels(for: after) == ["2 new comments", "octavio reviewed", "Approved", "CI failed"])
     }
 
     @Test func openingMarksRead() {
@@ -66,8 +66,14 @@ struct ReadTrackerTests {
         let theirs = PullRequest.make(id: "PR_2", author: "octavio", headOID: "a", commitCount: 3)
         tracker.sync(account: "me", prs: [mine, theirs])
 
-        #expect(tracker.reasons(for: .make(id: "PR_1", author: "me", headOID: "b", commitCount: 2)).isEmpty)
-        #expect(tracker.reasons(for: .make(id: "PR_2", author: "octavio", headOID: "b", commitCount: 5)) == ["2 new commits"])
-        #expect(tracker.reasons(for: .make(id: "PR_2", author: "octavio", headOID: "c", commitCount: 3)) == ["force-push"])
+        #expect(tracker.labels(for: .make(id: "PR_1", author: "me", headOID: "b", commitCount: 2)).isEmpty)
+        #expect(tracker.labels(for: .make(id: "PR_2", author: "octavio", headOID: "b", commitCount: 5)) == ["2 new commits"])
+        #expect(tracker.labels(for: .make(id: "PR_2", author: "octavio", headOID: "c", commitCount: 3)) == ["force-push"])
+    }
+}
+
+extension ReadTracker {
+    fileprivate func labels(for pr: PullRequest) -> [String] {
+        changes(for: pr).map(\.label)
     }
 }

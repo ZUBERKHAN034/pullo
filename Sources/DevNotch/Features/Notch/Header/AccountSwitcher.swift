@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct AccountSwitcher: View {
-    @ObservedObject var model: NotchViewModel
-    @ObservedObject var store: PRStore
-    @ObservedObject var accounts: AccountStore
-    @ObservedObject var tracker: ReadTracker
+    @Environment(PRListModel.self) private var list
+    @Environment(PRStore.self) private var store
+    @Environment(AccountStore.self) private var accounts
+    @Environment(ReadTracker.self) private var tracker
     @Namespace private var selection
 
     var body: some View {
@@ -16,9 +16,9 @@ struct AccountSwitcher: View {
                     .font(.panel(.label, .semibold))
             }
             ForEach(accounts.accounts) { account in
-                let selected = account.login == model.currentLogin
+                let selected = account.login == list.currentLogin
                 Button {
-                    model.selectAccount(account.login)
+                    list.selectAccount(account.login)
                 } label: {
                     HStack(spacing: 6) {
                         Avatar(url: account.avatarURL, login: account.login, size: 18)

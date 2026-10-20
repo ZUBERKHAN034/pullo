@@ -3,7 +3,7 @@ import SwiftUI
 
 #if DEBUG
     struct PointerView: View {
-        @ObservedObject var model: DemoStageModel
+        let model: DemoStageModel
 
         var body: some View {
             ArrowShape()

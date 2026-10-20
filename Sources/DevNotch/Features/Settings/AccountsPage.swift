@@ -2,7 +2,8 @@ import AppKit
 import SwiftUI
 
 struct AccountsPage: View {
-    @ObservedObject var accounts: AccountStore
+    @Environment(NotchInteraction.self) private var notch
+    @Environment(AccountStore.self) private var accounts
     @State private var removing: Account?
 
     var body: some View {
@@ -48,8 +49,8 @@ struct AccountsPage: View {
                         }
                     }
                 }
-                if let message = accounts.importError {
-                    Text(message).font(.caption).foregroundStyle(.orange)
+                if let failure = accounts.importFailure {
+                    Text(failure.message).font(.caption).foregroundStyle(.orange)
                 }
                 LabeledContent("Logged in with gh just now?") {
                     Button("Check again") { accounts.reloadGHUsers() }

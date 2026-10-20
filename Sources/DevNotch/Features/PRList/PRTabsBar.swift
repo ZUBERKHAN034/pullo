@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct PRTabsBar: View {
-    @ObservedObject var model: NotchViewModel
-    @ObservedObject var store: PRStore
-    @ObservedObject var tracker: ReadTracker
+    @Environment(PRListModel.self) private var list
+    @Environment(PRStore.self) private var store
+    @Environment(ReadTracker.self) private var tracker
     @Namespace private var selection
 
     var body: some View {
@@ -12,19 +12,19 @@ struct PRTabsBar: View {
                 tabButton(tab)
             }
             Spacer()
-            SearchTrigger(action: model.startSearch)
-            if unreadCount(in: model.tab) > 0 {
-                IconButton(symbol: "envelope.open", help: "Mark all as read", action: model.markAllRead)
+            SearchTrigger(action: list.startSearch)
+            if unreadCount(in: list.tab) > 0 {
+                IconButton(symbol: "envelope.open", help: "Mark all as read", action: list.markAllRead)
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
             }
         }
-        .animation(Motion.navigate, value: unreadCount(in: model.tab))
+        .animation(Motion.navigate, value: unreadCount(in: list.tab))
     }
 
     private func tabButton(_ tab: PRTab) -> some View {
-        let selected = model.tab == tab
+        let selected = list.tab == tab
         return Button {
-            model.selectTab(tab)
+            list.selectTab(tab)
         } label: {
             HStack(spacing: 6) {
                 Text(tab.title)
@@ -47,9 +47,9 @@ struct PRTabsBar: View {
     }
 
     private func count(for tab: PRTab, selected: Bool) -> some View {
-        let total = model.prs(in: tab).count
+        let total = list.prs(in: tab).count
         let unread = unreadCount(in: tab)
-        let loaded = store.snapshots[model.currentLogin ?? ""] != nil
+        let loaded = store.snapshots[list.currentLogin ?? ""] != nil
         return Text(loaded ? "\(total)" : "–")
             .font(.panel(.caption, .bold, design: .rounded))
             .foregroundStyle(unread > 0 ? Color.unread : selected ? .textStrong : .textSecondary)
@@ -60,6 +60,6 @@ struct PRTabsBar: View {
     }
 
     private func unreadCount(in tab: PRTab) -> Int {
-        model.prs(in: tab).filter(tracker.isUnread).count
+        list.prs(in: tab).filter(tracker.isUnread).count
     }
 }

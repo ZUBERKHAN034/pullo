@@ -2,11 +2,9 @@ import AppKit
 import SwiftUI
 
 struct SettingsForm: View {
-    @ObservedObject var settings: AppSettings
-    @ObservedObject var accounts: AccountStore
-    let model: NotchViewModel
+    @Environment(AccountStore.self) private var accounts
     let updater: Updater?
-    @ObservedObject var navigation: SettingsNavigation
+    @Bindable var navigation: SettingsNavigation
 
     var body: some View {
         NavigationSplitView {
@@ -31,9 +29,9 @@ struct SettingsForm: View {
     @ViewBuilder
     private var detail: some View {
         switch navigation.page ?? .general {
-        case .general: GeneralPage(settings: settings)
-        case .alerts: AlertsPage(settings: settings, accounts: accounts, model: model)
-        case .accounts: AccountsPage(accounts: accounts)
+        case .general: GeneralPage()
+        case .alerts: AlertsPage()
+        case .accounts: AccountsPage()
         case .shortcuts: ShortcutsPage()
         case .updates: if let updater { UpdatesPage(updater: updater) }
         case .about: AboutPage()

@@ -1,0 +1,243 @@
+import AppKit
+import Observation
+import SwiftUI
+
+@MainActor
+@Observable
+final class NotchInteraction {
+    private(set) var state: NotchState = .closed {
+        didSet { onStateChange?(state) }
+    }
+
+    private(set) var peekAlert: NotchAlert?
+    var geometry: NotchGeometry
+
+    let list: PRListModel
+    private let accounts: AccountStore
+    private let settings: AppSettings
+    private let system: any SystemActions
+
+    @ObservationIgnored var onStateChange: ((NotchState) -> Void)?
+    @ObservationIgnored var onOpenSettings: ((SettingsPage?) -> Void)?
+
+    @ObservationIgnored private var alerts = AlertQueue()
+    @ObservationIgnored private var peekTask: Task<Void, Never>?
+    @ObservationIgnored private var hoverTask: Task<Void, Never>?
+    @ObservationIgnored private var waitingForPointerExit = false
+    @ObservationIgnored private var holdingPeek = false
+
+    init(list: PRListModel, accounts: AccountStore, settings: AppSettings, system: any SystemActions, geometry: NotchGeometry) {
+        self.list = list
+        self.accounts = accounts
+        self.settings = settings
+        self.system = system
+        self.geometry = geometry
+    }
+
+    var layout: NotchLayout { NotchLayout(geometry: geometry) }
+
+    // MARK: - Pointer
+
+    func mouseMoved(to point: NSPoint) {
+        let inside = layout.hitRect(for: state).contains(point)
+
+        if waitingForPointerExit {
+            if !inside { waitingForPointerExit = false }
+            return
+        }
+
+        switch state {
+        case .peek:
+            if inside {
+                guard !holdingPeek else { return }
+                holdingPeek = true
+                peekTask?.cancel()
+            } else if holdingPeek {
+                holdingPeek = false
+                dismissPeek(after: .seconds(1.5))
+            }
+        case .closed:
+            guard inside else { return cancelHover() }
+            scheduleHover(after: .milliseconds(80)) { notch in
+                if notch.layout.hitRect(for: notch.state).contains(NSEvent.mouseLocation) { notch.open() }
+            }
+        case .open:
+            if list.keyboardMode {
+                if inside { list.keyboardMode = false }
+                return
+            }
+            guard !inside else { return cancelHover() }
+            scheduleHover(after: .milliseconds(200)) { notch in
+                if !notch.layout.hitRect(for: .open).contains(NSEvent.mouseLocation) { notch.close() }
+            }
+        }
+    }
+
+    func mouseDown(at point: NSPoint) {
+        if state == .open, !layout.hitRect(for: .open).contains(point) { close() }
+    }
+
+    private func scheduleHover(after delay: Duration, _ action: @escaping (NotchInteraction) -> Void) {
+        guard hoverTask == nil else { return }
+        hoverTask = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard let self, !Task.isCancelled else { return }
+            hoverTask = nil
+            action(self)
+        }
+    }
+
+    private func cancelHover() {
+        hoverTask?.cancel()
+        hoverTask = nil
+    }
+
+    // MARK: - Transitions
+
+    func open(viaKeyboard: Bool = false) {
+        peekTask?.cancel()
+        holdingPeek = false
+        alerts.removeAll()
+        list.keyboardMode = viaKeyboard
+        if viaKeyboard { list.selectFirstIfNeeded() }
+        withAnimation(Motion.open) {
+            state = .open
+            peekAlert = nil
+        }
+    }
+
+    func toggleFromKeyboard() {
+        if state == .open { close() } else { open(viaKeyboard: true) }
+    }
+
+    func close(pointerStaysOver: Bool = false) {
+        cancelHover()
+        peekTask?.cancel()
+        holdingPeek = false
+        waitingForPointerExit = pointerStaysOver
+        list.reset()
+        withAnimation(Motion.close) { state = .closed }
+    }
+
+    // MARK: - Alerts
+
+    func enqueue(_ alerts: [NotchAlert]) {
+        guard state != .open, !alerts.isEmpty else { return }
+        self.alerts.append(alerts)
+        if state == .closed { showNextPeek() }
+    }
+
+    func enqueue(_ alert: NotchAlert) {
+        enqueue([alert])
+    }
+
+    func enqueue(events: [PREvent]) {
+        enqueue(events.filter(settings.allows).map { $0.alert(showingAccount: showsAccounts) })
+    }
+
+    func accountConnected(_ account: Account) {
+        list.selectAccount(account.login)
+        enqueue(NotchAlert(
+            symbol: "person.crop.circle.badge.checkmark",
+            tint: .green,
+            headline: "Account connected",
+            detail: "@\(account.login) · loading your PRs"
+        ))
+    }
+
+    func previewAlert() {
+        close(pointerStaysOver: true)
+        let prs = list.visiblePRs.isEmpty ? [PullRequest.sample] : list.visiblePRs
+        let events = (0..<Int.random(in: 1...3)).map { _ in
+            let pr = prs.randomElement() ?? .sample
+            let kind = PREvent.Kind.allCases.randomElement() ?? .approved
+            return PREvent(kind: kind, pr: pr, actor: kind == .reviewRequested ? pr.author : "octocat")
+        }
+        Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(450))
+            guard let self else { return }
+            enqueue(events.map { $0.alert(showingAccount: self.showsAccounts) })
+        }
+    }
+
+    func tapPeek(_ alert: NotchAlert) {
+        if let pr = alert.pr {
+            open(pr)
+        } else if let url = alert.url {
+            openInBrowser(url)
+        } else {
+            open()
+        }
+    }
+
+    private var showsAccounts: Bool {
+        accounts.accounts.count > 1
+    }
+
+    private func showNextPeek() {
+        guard state == .closed, let alert = alerts.next() else { return }
+        withAnimation(Motion.peek) {
+            peekAlert = alert
+            state = .peek
+        }
+        if settings.haptics { system.tapTrackpad() }
+        if let sound = settings.sound { system.play(sound: sound) }
+        dismissPeek(after: AlertQueue.displayTime(for: alert))
+    }
+
+    private func dismissPeek(after delay: Duration) {
+        peekTask?.cancel()
+        peekTask = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard let self, !Task.isCancelled, state == .peek else { return }
+            withAnimation(Motion.close) { self.state = .closed }
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
+            showNextPeek()
+        }
+    }
+
+    // MARK: - Opening
+
+    func openInBrowser(_ url: URL) {
+        system.open(url)
+        close(pointerStaysOver: true)
+    }
+
+    func open(_ pr: PullRequest) {
+        list.markRead(pr)
+        openInBrowser(pr.url)
+    }
+
+    // MARK: - Keyboard
+
+    func handleKey(_ event: NSEvent) -> Bool {
+        guard state == .open, let command = KeyCommand(
+            keyCode: Int(event.keyCode),
+            characters: event.charactersIgnoringModifiers ?? "",
+            command: event.modifierFlags.contains(.command),
+            searching: list.isSearching
+        ) else { return false }
+        return perform(command)
+    }
+
+    func perform(_ command: KeyCommand) -> Bool {
+        switch command {
+        case .quit: system.quit()
+        case .search: list.startSearch()
+        case .close: if list.isSearching { list.stopSearch() } else { close() }
+        case .moveUp: list.moveSelection(by: -1)
+        case .moveDown: list.moveSelection(by: 1)
+        case .switchTab: list.selectTab(list.tab == .mine ? .review : .mine)
+        case .selectAccount(let number): return list.selectAccount(number: number)
+        case .open, .copyBranch, .markRead:
+            guard let pr = list.selectedPR else { return false }
+            switch command {
+            case .open: open(pr)
+            case .copyBranch: list.copyBranch(pr)
+            default: list.markRead(pr)
+            }
+        }
+        return true
+    }
+}

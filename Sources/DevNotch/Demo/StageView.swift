@@ -3,7 +3,7 @@ import SwiftUI
 
 #if DEBUG
     struct StageView: View {
-        @ObservedObject var model: DemoStageModel
+        let model: DemoStageModel
         let menuBarHeight: CGFloat
 
         var body: some View {

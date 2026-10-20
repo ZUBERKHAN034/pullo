@@ -1,13 +1,15 @@
 import AppKit
+import Observation
 import SwiftUI
 
 #if DEBUG
     @MainActor
-    final class DemoStageModel: ObservableObject {
-        @Published var caption: DemoCaption?
-        @Published var titleCard: DemoCaption?
-        @Published var cursor: CGPoint
-        @Published var cursorVisible = false
+    @Observable
+    final class DemoStageModel {
+        var caption: DemoCaption?
+        var titleCard: DemoCaption?
+        var cursor: CGPoint
+        var cursorVisible = false
 
         init(cursor: CGPoint) {
             self.cursor = cursor

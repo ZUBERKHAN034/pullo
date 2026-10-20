@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct FailedChecksList: View {
+    @Environment(NotchInteraction.self) private var notch
     let pr: PullRequest
-    let model: NotchViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -13,7 +13,7 @@ struct FailedChecksList: View {
             }
             ForEach(pr.failedChecks) { check in
                 Button {
-                    if let url = check.url { model.openInBrowser(url) }
+                    if let url = check.url { notch.openInBrowser(url) }
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "xmark.circle.fill")

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct GHImportOptions: View {
-    @ObservedObject var accounts: AccountStore
+    @Environment(AccountStore.self) private var accounts
 
     var body: some View {
         VStack(spacing: 8) {
@@ -29,8 +29,8 @@ struct GHImportOptions: View {
             if importable.isEmpty {
                 PillButton(title: "Check again", symbol: "arrow.clockwise") { accounts.reloadGHUsers() }
             }
-            if let message = accounts.importError {
-                Text(message).font(.panel(.small)).foregroundStyle(.orange).lineLimit(2)
+            if let failure = accounts.importFailure {
+                Text(failure.message).font(.panel(.small)).foregroundStyle(.orange).lineLimit(2)
             }
         }
     }

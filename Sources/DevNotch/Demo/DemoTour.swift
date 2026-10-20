@@ -1,6 +1,5 @@
 import AppKit
 import Carbon.HIToolbox
-import Combine
 import SwiftUI
 
 #if DEBUG
@@ -11,15 +10,15 @@ import SwiftUI
             let kind: String
         }
 
-        private let model: NotchViewModel
+        private let model: NotchInteraction
         private let store: PRStore
         private let source: DemoSource
         private let stage: DemoStage
         private var clockStart = CACurrentMediaTime()
         private(set) var cues: [Cue] = []
-        private var stateWatch: AnyCancellable?
+        private var forwardStateChange: ((NotchState) -> Void)?
 
-        init(model: NotchViewModel, store: PRStore, source: DemoSource, stage: DemoStage) {
+        init(model: NotchInteraction, store: PRStore, source: DemoSource, stage: DemoStage) {
             self.model = model
             self.store = store
             self.source = source
@@ -29,8 +28,11 @@ import SwiftUI
         func run(startingAt start: Double = CACurrentMediaTime()) async {
             clockStart = start
             var previous = model.state
-            stateWatch = model.$state.dropFirst().sink { [weak self] state in
-                guard let self, state != previous else { return }
+            forwardStateChange = model.onStateChange
+            model.onStateChange = { [weak self] state in
+                guard let self else { return }
+                forwardStateChange?(state)
+                guard state != previous else { return }
                 switch state {
                 case .peek: cue("peek")
                 case .open: cue("open")
@@ -108,7 +110,7 @@ import SwiftUI
             stage.model.caption = DemoCaption(title: "Search with ⌘F", subtitle: "By title, repo, number, branch or author.")
             await wait(0.6)
             for character in "pay" {
-                model.searchQuery.append(character)
+                model.list.searchQuery.append(character)
                 cue("type")
                 await wait(0.2)
             }
@@ -138,7 +140,7 @@ import SwiftUI
             cue("end-card")
             await wait(3.6)
             cue("end")
-            stateWatch = nil
+            model.onStateChange = forwardStateChange
         }
 
         private func cue(_ kind: String) {
