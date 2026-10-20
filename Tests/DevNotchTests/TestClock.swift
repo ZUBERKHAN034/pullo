@@ -44,21 +44,31 @@ final class TestClock: Clock, @unchecked Sendable {
 
     func advance(by duration: Duration) async {
         let target = now.advanced(by: duration)
-        while true {
-            await settle()
-            let next: Sleeper? = lock.withLock {
-                guard let index = sleepers.indices.min(by: { sleepers[$0].deadline < sleepers[$1].deadline }),
-                      sleepers[index].deadline <= target
-                else { return nil }
-                let sleeper = sleepers.remove(at: index)
-                current = max(current, sleeper.deadline)
-                return sleeper
-            }
-            guard let next else { break }
+        while let next = await nextSleeper(dueBy: target) {
             next.continuation.resume()
         }
         lock.withLock { current = target }
         await settle()
+    }
+
+    private func nextSleeper(dueBy target: Instant) async -> Sleeper? {
+        for _ in 0..<20 {
+            await settle()
+            if let sleeper = takeSleeper(dueBy: target) { return sleeper }
+            try? await Task.sleep(for: .milliseconds(1))
+        }
+        return nil
+    }
+
+    private func takeSleeper(dueBy target: Instant) -> Sleeper? {
+        lock.withLock {
+            guard let index = sleepers.indices.min(by: { sleepers[$0].deadline < sleepers[$1].deadline }),
+                  sleepers[index].deadline <= target
+            else { return nil }
+            let sleeper = sleepers.remove(at: index)
+            current = max(current, sleeper.deadline)
+            return sleeper
+        }
     }
 
     func settle() async {
