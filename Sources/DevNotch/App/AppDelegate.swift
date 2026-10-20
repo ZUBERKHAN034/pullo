@@ -3,16 +3,15 @@ import Combine
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let demo = DemoMode.current
-    private lazy var defaults = demo == nil ? UserDefaults.standard : DemoData.freshDefaults()
-    private lazy var demoSource = DemoSource()
+    private let demo: DemoMode? = DemoMode.current
+    private lazy var defaults = demo?.defaults ?? .standard
     private lazy var accounts = AccountStore(defaults: defaults)
     private lazy var settings = AppSettings(defaults: defaults)
     private lazy var tracker = ReadTracker(defaults: defaults)
     private lazy var store = PRStore(
         accounts: accounts,
         tracker: tracker,
-        source: demo == nil ? GitHubSource(accounts: accounts) : demoSource
+        source: demo?.source ?? GitHubSource(accounts: accounts)
     )
     private lazy var model = NotchViewModel(
         store: store, accounts: accounts, settings: settings, tracker: tracker,
@@ -54,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if let demo {
-            Task { await demo.play(model: model, store: store, source: demoSource) }
+            Task { await demo.play(model: model, store: store) }
             return
         }
 
