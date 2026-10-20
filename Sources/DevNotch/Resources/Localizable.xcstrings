@@ -2272,6 +2272,22 @@
         }
       }
     },
+    "Style": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estilo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estilo"
+          }
+        }
+      }
+    },
     "Switch account": {
       "localizations": {
         "es": {
