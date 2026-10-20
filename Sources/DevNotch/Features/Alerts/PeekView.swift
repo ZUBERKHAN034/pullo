@@ -64,12 +64,19 @@ struct PeekView: View {
                 }
                 .lineLimit(1)
             }
-            if alert.stack.count > 2 {
-                Text("+\(alert.stack.count - 2) more")
+            if let footnote {
+                Text(footnote)
                     .font(.panel(.caption, .medium))
                     .foregroundStyle(.textTertiary)
+                    .lineLimit(1)
             }
         }
+    }
+
+    private var footnote: String? {
+        let more = alert.stack.count > 2 ? String(localized: "+\(alert.stack.count - 2) more") : nil
+        let parts = [alert.note, more].compactMap(\.self)
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     @ViewBuilder
