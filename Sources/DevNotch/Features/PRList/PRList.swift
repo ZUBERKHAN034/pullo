@@ -16,11 +16,11 @@ struct PRList: View {
                             case .header(let title, let count):
                                 HStack(spacing: 6) {
                                     Text(title.uppercased())
-                                    Text("\(count)").foregroundStyle(Color.tertiaryText)
+                                    Text("\(count)").foregroundStyle(.textTertiary)
                                 }
-                                .font(.system(size: 10, weight: .bold))
+                                .font(.panel(.micro, .bold))
                                 .kerning(0.6)
-                                .foregroundStyle(Color.secondaryText)
+                                .foregroundStyle(.textSecondary)
                                 .padding(.horizontal, 10)
                                 .padding(.top, index == 0 ? 2 : 10)
                                 .padding(.bottom, 2)

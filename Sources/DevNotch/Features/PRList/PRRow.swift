@@ -20,8 +20,8 @@ struct PRRow: View {
                     .zIndex(1)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(pr.title)
-                        .font(.system(size: 12.5, weight: isUnread ? .semibold : .medium))
-                        .foregroundStyle(.white.opacity(isUnread ? 1 : 0.88))
+                        .font(.panel(.title, isUnread ? .semibold : .medium))
+                        .foregroundStyle(isUnread ? Color.white : .textStrong)
                         .lineLimit(1)
                     subtitle
                 }
@@ -38,11 +38,11 @@ struct PRRow: View {
         .padding(.vertical, 7)
         .background(
             RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .fill(.white.opacity(hovering || selected ? 0.08 : 0))
+                .fill(hovering || selected ? Color.surfaceSubtle : .clear)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .strokeBorder(.white.opacity(selected ? 0.14 : 0), lineWidth: 1)
+                .strokeBorder(selected ? Color.surfaceStrong : .clear, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
@@ -63,7 +63,7 @@ struct PRRow: View {
             } label: {
                 icon
                     .frame(width: 20, height: 20)
-                    .background(Circle().fill(.white.opacity(showingChecks ? 0.12 : 0)))
+                    .background(Circle().fill(showingChecks ? Color.surfaceStrong : .clear))
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)
@@ -76,13 +76,13 @@ struct PRRow: View {
     private var subtitle: some View {
         Group {
             if isUnread {
-                Text(unreadReasons.joined(separator: " · ")).foregroundColor(.white.opacity(0.82))
-                    + Text(verbatim: "  ·  " + details.joined(separator: " · ")).foregroundColor(.secondaryText)
+                Text(unreadReasons.joined(separator: " · ")).foregroundColor(.textStrong)
+                    + Text(verbatim: "  ·  " + details.joined(separator: " · ")).foregroundColor(.textSecondary)
             } else {
-                Text(details.joined(separator: " · ")).foregroundColor(.secondaryText)
+                Text(details.joined(separator: " · ")).foregroundColor(.textSecondary)
             }
         }
-        .font(.system(size: 11))
+        .font(.panel(.small))
         .lineLimit(1)
     }
 
@@ -105,12 +105,12 @@ struct PRRow: View {
             }
             HStack(spacing: 6) {
                 if isUnread {
-                    Circle().fill(Color.unread).frame(width: 6, height: 6)
+                    UnreadDot()
                         .transition(.scale.combined(with: .opacity))
                 }
                 Text(ageDate.shortAge)
-                    .font(.system(size: 11, weight: .medium).monospacedDigit())
-                    .foregroundStyle(Color.secondaryText)
+                    .font(.panel(.small, .medium).monospacedDigit())
+                    .foregroundStyle(.textSecondary)
                     .hint(ageHelp, edge: .leading)
             }
             .frame(minWidth: 34, alignment: .trailing)

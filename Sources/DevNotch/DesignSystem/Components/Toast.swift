@@ -5,7 +5,7 @@ struct Toast: View {
 
     var body: some View {
         Text(message)
-            .font(.system(size: 11.5, weight: .semibold))
+            .font(.panel(.body, .semibold))
             .foregroundStyle(.black)
             .lineLimit(1)
             .padding(.horizontal, 12)

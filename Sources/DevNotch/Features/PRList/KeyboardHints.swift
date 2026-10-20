@@ -20,15 +20,10 @@ struct KeyboardHints: View {
 
     private func hint(_ key: String, _ label: String) -> some View {
         HStack(spacing: 4) {
-            Text(key)
-                .font(.system(size: 9.5, weight: .bold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.7))
-                .padding(.horizontal, 4)
-                .padding(.vertical, 1)
-                .background(RoundedRectangle(cornerRadius: 4).fill(.white.opacity(0.1)))
+            KeyCap(key: key)
             Text(label)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(Color.tertiaryText)
+                .font(.panel(.micro, .medium))
+                .foregroundStyle(.textTertiary)
         }
     }
 }

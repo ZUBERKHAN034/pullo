@@ -12,9 +12,9 @@ struct StatusIcon: View {
             case .changesRequested: symbol("arrow.uturn.backward.circle.fill", .red)
             case .ciRunning: running
             case .readyToMerge: symbol("checkmark.circle.fill", Color(red: 0.49, green: 0.53, blue: 1))
-            case .draft: symbol("circle.dashed", .white.opacity(0.45))
+            case .draft: symbol("circle.dashed", .textTertiary)
             case .ciPassed: symbol("checkmark.circle.fill", .green)
-            case .noChecks: symbol("circle", .white.opacity(0.35))
+            case .noChecks: symbol("circle", .textMuted)
             }
         }
         .frame(width: size, height: size)

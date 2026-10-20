@@ -14,15 +14,15 @@ struct PillButton: View {
                 if loading {
                     ProgressView().controlSize(.mini)
                 } else if let symbol {
-                    Image(systemName: symbol).font(.system(size: 10.5, weight: .bold))
+                    Image(systemName: symbol).font(.panel(.caption, .bold))
                 }
-                Text(title).font(.system(size: 11.5, weight: .semibold))
+                Text(title).font(.panel(.body, .semibold))
             }
-            .foregroundStyle(prominent ? .black : .white.opacity(0.9))
+            .foregroundStyle(prominent ? .black : .textStrong)
             .padding(.horizontal, 13)
             .padding(.vertical, 7)
             .background(
-                Capsule().fill(prominent ? .white.opacity(hovering ? 1 : 0.9) : .white.opacity(hovering ? 0.16 : 0.1))
+                Capsule().fill(prominent ? .white.opacity(hovering ? 1 : 0.9) : hovering ? .surfaceStrong : .surface)
             )
             .scaleEffect(hovering ? 1.03 : 1)
             .contentShape(Capsule())

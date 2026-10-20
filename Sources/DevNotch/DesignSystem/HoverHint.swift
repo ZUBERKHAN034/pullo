@@ -40,12 +40,12 @@ private struct HoverHint: ViewModifier {
 
     private var label: some View {
         Text(text)
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(.white.opacity(0.92))
+            .font(.panel(.small, .medium))
+            .foregroundStyle(.textStrong)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color(white: 0.17)))
-            .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(.white.opacity(0.1), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(.hairline, lineWidth: 1))
             .shadow(color: .black.opacity(0.5), radius: 6, y: 2)
     }
 }

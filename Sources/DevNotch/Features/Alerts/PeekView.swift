@@ -16,14 +16,14 @@ struct PeekView: View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 6) {
                         Text(alert.headline)
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.panel(.headline, .semibold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                         accountChip
                     }
                     Text(alert.detail)
-                        .font(.system(size: 11))
-                        .foregroundStyle(Color.secondaryText)
+                        .font(.panel(.small))
+                        .foregroundStyle(.textSecondary)
                         .lineLimit(1)
                 }
             } else {
@@ -31,8 +31,8 @@ struct PeekView: View {
             }
             Spacer(minLength: 0)
             Image(systemName: alert.url == nil ? "chevron.down" : "arrow.up.right")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(.white.opacity(0.6))
+                .font(.panel(.small, .bold))
+                .foregroundStyle(.textSecondary)
                 .opacity(hovering ? 1 : 0)
                 .animation(Motion.hover, value: hovering)
         }
@@ -49,13 +49,13 @@ struct PeekView: View {
             ForEach(Array(alert.stack.prefix(2).enumerated()), id: \.element.id) { index, item in
                 HStack(spacing: 6) {
                     Text(item.headline)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.panel(.label, .semibold))
                         .foregroundStyle(.white)
                         .layoutPriority(1)
                     if let reference = item.reference {
                         Text(reference)
-                            .font(.system(size: 11))
-                            .foregroundStyle(Color.secondaryText)
+                            .font(.panel(.small))
+                            .foregroundStyle(.textSecondary)
                     }
                     if index == 0 { accountChip }
                 }
@@ -63,8 +63,8 @@ struct PeekView: View {
             }
             if alert.stack.count > 2 {
                 Text("+\(alert.stack.count - 2) more")
-                    .font(.system(size: 10.5, weight: .medium))
-                    .foregroundStyle(Color.tertiaryText)
+                    .font(.panel(.caption, .medium))
+                    .foregroundStyle(.textTertiary)
             }
         }
     }
@@ -72,12 +72,7 @@ struct PeekView: View {
     @ViewBuilder
     private var accountChip: some View {
         if let account = alert.account {
-            Text(verbatim: "@\(account)")
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(Color.secondaryText)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 1)
-                .background(Capsule().fill(.white.opacity(0.1)))
+            Chip(text: "@\(account)")
         }
     }
 }

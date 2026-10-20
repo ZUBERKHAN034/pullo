@@ -11,9 +11,9 @@ struct AccountSwitcher: View {
         HStack(spacing: 4) {
             if accounts.accounts.isEmpty {
                 Image(systemName: "arrow.triangle.pull")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.panel(.small, .semibold))
                 Text("DevNotch")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.panel(.label, .semibold))
             }
             ForEach(accounts.accounts) { account in
                 let selected = account.login == model.currentLogin
@@ -25,16 +25,14 @@ struct AccountSwitcher: View {
                             .opacity(selected ? 1 : 0.55)
                             .overlay(alignment: .topTrailing) {
                                 if !selected, hasUnread(account.login) {
-                                    Circle()
-                                        .fill(Color.unread)
-                                        .frame(width: 7, height: 7)
+                                    UnreadDot(size: 7)
                                         .overlay(Circle().stroke(.black, lineWidth: 1.5))
                                         .offset(x: 2, y: -2)
                                 }
                             }
                         if selected {
                             Text(account.login)
-                                .font(.system(size: 11.5, weight: .semibold))
+                                .font(.panel(.body, .semibold))
                                 .lineLimit(1)
                                 .transition(.opacity.combined(with: .scale(scale: 0.8, anchor: .leading)))
                         }
@@ -45,7 +43,7 @@ struct AccountSwitcher: View {
                     .background {
                         if selected {
                             Capsule()
-                                .fill(.white.opacity(0.12))
+                                .fill(.surfaceStrong)
                                 .matchedGeometryEffect(id: "account", in: selection)
                         }
                     }
@@ -55,7 +53,7 @@ struct AccountSwitcher: View {
                 .hint("@\(account.login) · ⌘\((accounts.accounts.firstIndex(of: account) ?? 0) + 1)")
             }
         }
-        .foregroundStyle(.white.opacity(0.85))
+        .foregroundStyle(.textStrong)
     }
 
     private func hasUnread(_ login: String) -> Bool {

@@ -30,15 +30,15 @@ struct GHImportOptions: View {
                 PillButton(title: "Check again", symbol: "arrow.clockwise") { accounts.reloadGHUsers() }
             }
             if let message = accounts.importError {
-                Text(message).font(.system(size: 11)).foregroundStyle(.orange).lineLimit(2)
+                Text(message).font(.panel(.small)).foregroundStyle(.orange).lineLimit(2)
             }
         }
     }
 
     private func hint(_ text: String) -> some View {
         Text(.init(text))
-            .font(.system(size: 11.5))
-            .foregroundStyle(.white.opacity(0.55))
+            .font(.panel(.body))
+            .foregroundStyle(.textSecondary)
             .multilineTextAlignment(.center)
     }
 }

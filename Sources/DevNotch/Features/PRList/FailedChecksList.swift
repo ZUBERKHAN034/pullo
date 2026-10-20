@@ -8,8 +8,8 @@ struct FailedChecksList: View {
         VStack(alignment: .leading, spacing: 4) {
             if pr.failedChecks.isEmpty {
                 Text("GitHub didn't say which checks failed.")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.secondaryText)
+                    .font(.panel(.small))
+                    .foregroundStyle(.textSecondary)
             }
             ForEach(pr.failedChecks) { check in
                 Button {
@@ -17,16 +17,16 @@ struct FailedChecksList: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 10))
+                            .font(.panel(.micro))
                             .foregroundStyle(.red)
                         Text(check.name)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.8))
+                            .font(.panel(.small, .medium))
+                            .foregroundStyle(.textStrong)
                             .lineLimit(1)
                         if check.url != nil {
                             Image(systemName: "arrow.up.right")
                                 .font(.system(size: 8, weight: .bold))
-                                .foregroundStyle(Color.tertiaryText)
+                                .foregroundStyle(.textTertiary)
                         }
                     }
                     .contentShape(Rectangle())

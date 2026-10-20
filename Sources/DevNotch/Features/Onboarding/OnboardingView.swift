@@ -17,11 +17,11 @@ struct OnboardingView: View {
 
             VStack(spacing: 4) {
                 Text("Connect with GitHub CLI")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.panel(.display, .semibold))
                     .foregroundStyle(.white)
                 Text("DevNotch uses the accounts you're already logged into with `gh`. No token is stored.")
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .font(.panel(.body))
+                    .foregroundStyle(.textTertiary)
             }
             GHImportOptions(accounts: accounts)
         }

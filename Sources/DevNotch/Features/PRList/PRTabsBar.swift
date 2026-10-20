@@ -30,14 +30,14 @@ struct PRTabsBar: View {
                 Text(tab.title)
                 count(for: tab, selected: selected)
             }
-            .font(.system(size: 12, weight: .semibold))
-            .foregroundStyle(.white.opacity(selected ? 1 : 0.45))
+            .font(.panel(.label, .semibold))
+            .foregroundStyle(selected ? Color.white : .textTertiary)
             .padding(.horizontal, 11)
             .padding(.vertical, 6)
             .background {
                 if selected {
                     Capsule()
-                        .fill(.white.opacity(0.1))
+                        .fill(.surface)
                         .matchedGeometryEffect(id: "tab", in: selection)
                 }
             }
@@ -51,12 +51,12 @@ struct PRTabsBar: View {
         let unread = unreadCount(in: tab)
         let loaded = store.snapshots[model.currentLogin ?? ""] != nil
         return Text(loaded ? "\(total)" : "–")
-            .font(.system(size: 10.5, weight: .bold, design: .rounded))
-            .foregroundStyle(unread > 0 ? Color.unread : .white.opacity(selected ? 0.9 : 0.6))
+            .font(.panel(.caption, .bold, design: .rounded))
+            .foregroundStyle(unread > 0 ? Color.unread : selected ? .textStrong : .textSecondary)
             .contentTransition(.numericText())
             .padding(.horizontal, 5)
             .padding(.vertical, 1)
-            .background(Capsule().fill(unread > 0 ? Color.unread.opacity(0.18) : .white.opacity(selected ? 0.16 : 0.08)))
+            .background(Capsule().fill(unread > 0 ? Color.unread.opacity(0.18) : selected ? .surfaceStrong : .surfaceSubtle))
     }
 
     private func unreadCount(in tab: PRTab) -> Int {

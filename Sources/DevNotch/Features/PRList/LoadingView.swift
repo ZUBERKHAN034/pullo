@@ -22,8 +22,8 @@ struct LoadingView: View {
                 TimelineView(.periodic(from: .now, by: 1.6)) { context in
                     let index = Int(context.date.timeIntervalSinceReferenceDate / 1.6) % Self.messages.count
                     Text(Self.messages[index])
-                        .font(.system(size: 12.5, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.75))
+                        .font(.panel(.title, .semibold))
+                        .foregroundStyle(.textStrong)
                         .id(index)
                         .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top)).combined(with: .opacity))
                         .animation(Motion.navigate, value: index)
@@ -61,7 +61,7 @@ private struct SkeletonRow: View {
             if tag { Capsule().frame(width: 52, height: 14) }
             RoundedRectangle(cornerRadius: 3).frame(width: 24, height: 8)
         }
-        .foregroundStyle(.white.opacity(0.08))
+        .foregroundStyle(.surfaceSubtle)
         .padding(.horizontal, 10)
         .padding(.vertical, 9)
     }

@@ -12,7 +12,7 @@ struct ErrorBanner: View {
                 Spacer()
                 Image(systemName: "chevron.right")
             }
-            .font(.system(size: 11, weight: .medium))
+            .font(.panel(.small, .medium))
             .foregroundStyle(.orange)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)

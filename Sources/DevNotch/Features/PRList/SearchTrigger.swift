@@ -8,19 +8,19 @@ struct SearchTrigger: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 10.5, weight: .semibold))
+                    .font(.panel(.caption, .semibold))
                 Text("Filter")
-                    .font(.system(size: 11.5, weight: .medium))
+                    .font(.panel(.body, .medium))
                 Spacer(minLength: 8)
                 Text("⌘F")
-                    .font(.system(size: 9.5, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.tertiaryText)
+                    .font(.keycap)
+                    .foregroundStyle(.textTertiary)
             }
-            .foregroundStyle(hovering ? Color.white.opacity(0.85) : Color.secondaryText)
+            .foregroundStyle(hovering ? .textStrong : .textSecondary)
             .padding(.horizontal, 10)
             .frame(width: 128, height: 26)
-            .background(Capsule().fill(.white.opacity(hovering ? 0.1 : 0.06)))
-            .overlay(Capsule().strokeBorder(.white.opacity(0.1), lineWidth: 1))
+            .background(Capsule().fill(hovering ? .surface : .surfaceSubtle))
+            .overlay(Capsule().strokeBorder(.hairline, lineWidth: 1))
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
