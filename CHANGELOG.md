@@ -4,6 +4,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+### Added
+- Drag a pull request out of the panel to drop its link into Slack, an email or anywhere else.
+
 ## [0.4.0] - 2026-10-20
 
 ### Added
