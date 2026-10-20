@@ -1,6 +1,4 @@
-enum NotchState: Equatable {
-    case closed, peek, open
-}
+
 
 enum PRTab: CaseIterable {
     case mine, review

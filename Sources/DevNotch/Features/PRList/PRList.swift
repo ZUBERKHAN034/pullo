@@ -1,13 +1,5 @@
 import SwiftUI
 
-struct PRSection: Identifiable {
-    let title: String?
-    let kind: PRTab
-    let prs: [PullRequest]
-
-    var id: String { title ?? "all" }
-}
-
 struct PRList: View {
     let sections: [PRSection]
     @ObservedObject var model: NotchViewModel

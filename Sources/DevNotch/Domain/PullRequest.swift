@@ -1,43 +1,5 @@
 import Foundation
 
-enum CIState: String, Codable, Equatable {
-    case success, failure, pending
-
-    init?(rollup: String?) {
-        switch rollup {
-        case "SUCCESS": self = .success
-        case "FAILURE", "ERROR": self = .failure
-        case "PENDING", "EXPECTED": self = .pending
-        default: return nil
-        }
-    }
-}
-
-enum ReviewDecision: String, Codable, Equatable {
-    case approved, changesRequested, reviewRequired
-
-    init?(raw: String?) {
-        switch raw {
-        case "APPROVED": self = .approved
-        case "CHANGES_REQUESTED": self = .changesRequested
-        case "REVIEW_REQUIRED": self = .reviewRequired
-        default: return nil
-        }
-    }
-}
-
-struct FailedCheck: Identifiable, Equatable {
-    let name: String
-    let url: URL?
-
-    var id: String { "\(name)|\(url?.absoluteString ?? "")" }
-}
-
-enum ReviewRequest: Equatable {
-    case direct
-    case team([String])
-}
-
 struct PullRequest: Identifiable, Equatable {
     let id: String
     let account: String
@@ -83,9 +45,4 @@ struct PullRequest: Identifiable, Equatable {
     var needsAction: Bool {
         ci == .failure || review == .changesRequested || hasConflict
     }
-}
-
-struct Activity: Codable, Equatable {
-    let id: String
-    let author: String
 }
