@@ -18,7 +18,12 @@ enum DemoRecorderError: LocalizedError {
 /// Records only DevNotch's own windows in a region of the screen, so nothing else on the desktop ends up in the demo.
 final class DemoRecorder: NSObject, SCStreamOutput, @unchecked Sendable {
     /// Host time of the first recorded frame, to line the tour's cues up with the video.
-    private(set) var firstFrameTime: Double?
+    var firstFrameTime: Double? {
+        queue.sync { firstFrame }
+    }
+
+    /// Written by frames arriving on `queue`, so it's only ever touched there.
+    private var firstFrame: Double?
 
     private var stream: SCStream?
     private var writer: AVAssetWriter?
@@ -81,9 +86,9 @@ final class DemoRecorder: NSObject, SCStreamOutput, @unchecked Sendable {
 
     func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
         guard type == .screen, sampleBuffer.isValid, Self.isNewFrame(sampleBuffer), let writer, let input else { return }
-        if firstFrameTime == nil {
+        if firstFrame == nil {
             writer.startSession(atSourceTime: sampleBuffer.presentationTimeStamp)
-            firstFrameTime = sampleBuffer.presentationTimeStamp.seconds
+            firstFrame = sampleBuffer.presentationTimeStamp.seconds
         }
         if input.isReadyForMoreMediaData { input.append(sampleBuffer) }
     }

@@ -12,7 +12,7 @@ struct PRList: View {
     let sections: [PRSection]
     @ObservedObject var model: NotchViewModel
     @ObservedObject var tracker: ReadTracker
-    @ViewState private var appeared = false
+    @State private var appeared = false
 
     var body: some View {
         ScrollViewReader { proxy in

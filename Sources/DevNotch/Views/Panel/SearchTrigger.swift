@@ -3,7 +3,7 @@ import SwiftUI
 /// Looks like the search field it opens, so it's clear the list can be filtered.
 struct SearchTrigger: View {
     let action: () -> Void
-    @ViewState private var hovering = false
+    @State private var hovering = false
 
     var body: some View {
         Button(action: action) {

@@ -12,8 +12,8 @@ private struct HoverHint: ViewModifier {
     let text: String
     /// Which side of the view the hint opens on; pick the side with room.
     let edge: HorizontalEdge
-    @ViewState private var shown = false
-    @ViewState private var pending: Task<Void, Never>?
+    @State private var shown = false
+    @State private var pending: Task<Void, Never>?
 
     func body(content: Content) -> some View {
         content

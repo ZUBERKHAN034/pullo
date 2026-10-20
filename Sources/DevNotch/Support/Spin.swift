@@ -7,7 +7,7 @@ struct Spin: ViewModifier {
     let active: Bool
     var period: Double = 0.9
     /// Turns count from when it started, so it begins upright instead of at whatever angle the clock is on.
-    @ViewState private var start = Date()
+    @State private var start = Date()
 
     func body(content: Content) -> some View {
         // One view whether it spins or not, so starting and stopping doesn't swap it out mid-frame.

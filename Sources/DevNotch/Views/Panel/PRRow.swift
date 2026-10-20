@@ -8,8 +8,8 @@ struct PRRow: View {
     let unreadReasons: [String]
     @ObservedObject var model: NotchViewModel
 
-    @ViewState private var hovering = false
-    @ViewState private var showingChecks = false
+    @State private var hovering = false
+    @State private var showingChecks = false
 
     private var isUnread: Bool { !unreadReasons.isEmpty }
 

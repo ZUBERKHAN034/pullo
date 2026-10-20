@@ -8,7 +8,7 @@ struct IconButton: View {
     /// Most icon buttons sit at the right edge, so the hint opens to their left.
     var hintEdge: HorizontalEdge = .leading
     let action: () -> Void
-    @ViewState private var hovering = false
+    @State private var hovering = false
 
     var body: some View {
         Button(action: action) {

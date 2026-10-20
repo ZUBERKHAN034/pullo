@@ -16,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     private lazy var model = NotchViewModel(
         store: store, accounts: accounts, settings: settings, tracker: tracker,
-        geometry: NotchGeometry.notchedScreen.map(NotchGeometry.init(screen:)) ?? .placeholder
+        geometry: NotchGeometry.notchedScreen.map { NotchGeometry(screen: $0) } ?? .placeholder
     )
     // Sparkle checks on its own schedule from the moment it starts, so launch touches it instead of waiting for Settings.
     private lazy var updater = demo == nil ? Updater() : nil

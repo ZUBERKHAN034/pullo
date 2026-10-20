@@ -84,7 +84,7 @@ struct AlertsPage: View {
 
 struct AccountsPage: View {
     @ObservedObject var accounts: AccountStore
-    @ViewState private var removing: Account?
+    @State private var removing: Account?
 
     var body: some View {
         Form {

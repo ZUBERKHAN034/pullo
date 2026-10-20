@@ -6,7 +6,7 @@ struct PillButton: View {
     var prominent = false
     var loading = false
     let action: () -> Void
-    @ViewState private var hovering = false
+    @State private var hovering = false
 
     var body: some View {
         Button(action: action) {

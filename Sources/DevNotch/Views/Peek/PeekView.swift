@@ -3,7 +3,7 @@ import SwiftUI
 struct PeekView: View {
     let alert: NotchAlert
     let onTap: () -> Void
-    @ViewState private var hovering = false
+    @State private var hovering = false
 
     var body: some View {
         HStack(spacing: 11) {
