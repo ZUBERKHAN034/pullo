@@ -55,7 +55,7 @@ final class DemoStage {
         pointer.orderFrontRegardless()
     }
 
-    private static func window<Content: View>(frame: NSRect, level: Int, content: Content) -> NSWindow {
+    private static func window(frame: NSRect, level: Int, content: some View) -> NSWindow {
         let window = NSWindow(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
         window.isOpaque = false
         window.backgroundColor = .clear

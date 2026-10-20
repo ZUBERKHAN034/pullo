@@ -135,7 +135,7 @@ struct PRNode: Decodable {
         let people = [author.map { ($0.login, $0.avatarUrl) }]
             + (comments.nodes + reviews.nodes).map { node in node.author.map { ($0.login, $0.avatarUrl) } }
             + latestReviews.nodes.map { review in review.author.map { ($0.login, $0.avatarUrl) } }
-        for case let (login, url?)? in people { avatars[login] = url }
+        for case (let login, let url?)? in people { avatars[login] = url }
         return avatars
     }
 }

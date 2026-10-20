@@ -1,6 +1,6 @@
+@testable import DevNotch
 import Foundation
 import Testing
-@testable import DevNotch
 
 private actor FakeSource: PRSource {
     var snapshots: [String: Snapshot]

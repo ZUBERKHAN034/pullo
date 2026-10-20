@@ -74,7 +74,7 @@ struct GitHubClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: ["query": Self.outcomesQuery, "variables": ["ids": ids]])
-        let decoded = try JSONDecoder().decode(OutcomeResponse.self, from: try await send(request))
+        let decoded = try await JSONDecoder().decode(OutcomeResponse.self, from: send(request))
         return decoded.data?.nodes.compactMap { $0.value?.outcome } ?? []
     }
 

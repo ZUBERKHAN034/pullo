@@ -77,7 +77,10 @@ final class DemoTour {
         await moveCursor(to: CGPoint(x: notch.x + 12, y: notch.y), duration: 1.0)
         await wait(0.15)
         model.open()
-        stage.model.caption = DemoCaption(title: "Hover over the notch to see your PRs", subtitle: "Each one shows what changed since you last looked.")
+        stage.model.caption = DemoCaption(
+            title: "Hover over the notch to see your PRs",
+            subtitle: "Each one shows what changed since you last looked."
+        )
         await wait(0.9)
         // Parked in the empty corner by the shortcut hints, so it covers nothing in the screenshots.
         await moveCursor(to: CGPoint(x: screen.width / 2 + 285, y: notch.y + 322), duration: 0.8)

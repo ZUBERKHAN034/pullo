@@ -24,8 +24,8 @@ struct NotchGeometry: Equatable {
 }
 
 // In an extension so the memberwise initializer stays available.
+@MainActor
 extension NotchGeometry {
-    @MainActor
     init(screen: NSScreen) {
         let frame = screen.frame
         if screen.safeAreaInsets.top > 0,

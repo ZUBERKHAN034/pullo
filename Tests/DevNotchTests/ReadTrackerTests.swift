@@ -1,6 +1,6 @@
+@testable import DevNotch
 import Foundation
 import Testing
-@testable import DevNotch
 
 @MainActor
 struct ReadTrackerTests {

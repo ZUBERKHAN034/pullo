@@ -1,9 +1,14 @@
+@testable import DevNotch
 import Foundation
 import Testing
-@testable import DevNotch
 
 struct PREventTests {
-    private func kinds(_ old: [PullRequest], _ new: [PullRequest], reviewOld: [PullRequest] = [], reviewNew: [PullRequest] = []) -> [PREvent.Kind] {
+    private func kinds(
+        _ old: [PullRequest],
+        _ new: [PullRequest],
+        reviewOld: [PullRequest] = [],
+        reviewNew: [PullRequest] = []
+    ) -> [PREvent.Kind] {
         PREvent.diff(
             old: Snapshot(mine: old, reviewRequests: reviewOld),
             new: Snapshot(mine: new, reviewRequests: reviewNew)

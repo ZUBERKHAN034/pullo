@@ -1,5 +1,5 @@
-import Testing
 @testable import DevNotch
+import Testing
 
 struct PRStatusTests {
     @Test func mostUrgentComesFirst() {

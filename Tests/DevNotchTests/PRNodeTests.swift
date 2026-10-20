@@ -1,6 +1,6 @@
+@testable import DevNotch
 import Foundation
 import Testing
-@testable import DevNotch
 
 struct PRNodeTests {
     private func decode(_ json: String) throws -> PRNode {

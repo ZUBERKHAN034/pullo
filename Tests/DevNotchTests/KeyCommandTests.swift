@@ -1,6 +1,6 @@
 import Carbon.HIToolbox
-import Testing
 @testable import DevNotch
+import Testing
 
 struct KeyCommandTests {
     private func command(_ keyCode: Int, _ characters: String = "", command: Bool = false, searching: Bool = false) -> KeyCommand? {

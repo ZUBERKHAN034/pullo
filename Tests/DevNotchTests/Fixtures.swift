@@ -1,5 +1,5 @@
-import Foundation
 @testable import DevNotch
+import Foundation
 
 extension PullRequest {
     static func make(

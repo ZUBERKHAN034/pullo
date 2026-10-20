@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class PRStore: ObservableObject {
@@ -65,7 +65,7 @@ final class PRStore: ObservableObject {
 
     private func refreshAllAccounts() async {
         let current = accounts.accounts
-        let source = self.source
+        let source = source
         let results = await withTaskGroup(of: (String, Result<Snapshot, Error>).self) { group in
             for account in current {
                 group.addTask { await Self.fetch(account, from: source) }
@@ -114,14 +114,14 @@ final class PRStore: ObservableObject {
         let stillThere = Set(new.mine.map(\.id))
         let gone = old.mine.filter { !stillThere.contains($0.id) }
         guard !gone.isEmpty, let account = accounts.accounts.first(where: { $0.login == login }) else { return [] }
-        let outcomes = (try? await source.outcomes(of: gone.map(\.id), for: account)) ?? []
+        let outcomes = await (try? source.outcomes(of: gone.map(\.id), for: account)) ?? []
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }
     }
 
     /// Kept out of the task group's closure: the Swift 6.4 optimizer dropped every result when the call was inline.
     private nonisolated static func fetch(_ account: Account, from source: PRSource) async -> (String, Result<Snapshot, Error>) {
         do {
-            return (account.login, .success(try await source.snapshot(for: account)))
+            return try await (account.login, .success(source.snapshot(for: account)))
         } catch {
             return (account.login, .failure(error))
         }
