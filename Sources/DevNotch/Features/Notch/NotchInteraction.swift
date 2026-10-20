@@ -16,6 +16,7 @@ final class NotchInteraction {
     private let accounts: AccountStore
     private let settings: AppSettings
     private let system: any SystemActions
+    private let clock: any Clock<Duration>
 
     @ObservationIgnored var onStateChange: ((NotchState) -> Void)?
     @ObservationIgnored var onOpenSettings: ((SettingsPage?) -> Void)?
@@ -25,13 +26,22 @@ final class NotchInteraction {
     @ObservationIgnored private var hoverTask: Task<Void, Never>?
     @ObservationIgnored private var waitingForPointerExit = false
     @ObservationIgnored private var holdingPeek = false
+    @ObservationIgnored private var pointer: NSPoint?
 
-    init(list: PRListModel, accounts: AccountStore, settings: AppSettings, system: any SystemActions, geometry: NotchGeometry) {
+    init(
+        list: PRListModel,
+        accounts: AccountStore,
+        settings: AppSettings,
+        system: any SystemActions,
+        geometry: NotchGeometry,
+        clock: any Clock<Duration> = ContinuousClock()
+    ) {
         self.list = list
         self.accounts = accounts
         self.settings = settings
         self.system = system
         self.geometry = geometry
+        self.clock = clock
     }
 
     var layout: NotchLayout { NotchLayout(geometry: geometry) }
@@ -39,6 +49,7 @@ final class NotchInteraction {
     // MARK: - Pointer
 
     func mouseMoved(to point: NSPoint) {
+        pointer = point
         let inside = layout.hitRect(for: state).contains(point)
 
         if waitingForPointerExit {
@@ -59,7 +70,7 @@ final class NotchInteraction {
         case .closed:
             guard inside else { return cancelHover() }
             scheduleHover(after: .milliseconds(80)) { notch in
-                if notch.layout.hitRect(for: notch.state).contains(NSEvent.mouseLocation) { notch.open() }
+                if notch.isPointerOver(notch.state) { notch.open() }
             }
         case .open:
             if list.keyboardMode {
@@ -68,7 +79,7 @@ final class NotchInteraction {
             }
             guard !inside else { return cancelHover() }
             scheduleHover(after: .milliseconds(200)) { notch in
-                if !notch.layout.hitRect(for: .open).contains(NSEvent.mouseLocation) { notch.close() }
+                if !notch.isPointerOver(.open) { notch.close() }
             }
         }
     }
@@ -79,12 +90,17 @@ final class NotchInteraction {
 
     private func scheduleHover(after delay: Duration, _ action: @escaping (NotchInteraction) -> Void) {
         guard hoverTask == nil else { return }
+        let clock = clock
         hoverTask = Task { [weak self] in
-            try? await Task.sleep(for: delay)
+            try? await clock.sleep(for: delay)
             guard let self, !Task.isCancelled else { return }
             hoverTask = nil
             action(self)
         }
+    }
+
+    private func isPointerOver(_ state: NotchState) -> Bool {
+        pointer.map(layout.hitRect(for: state).contains) ?? false
     }
 
     private func cancelHover() {
@@ -153,8 +169,9 @@ final class NotchInteraction {
             let kind = PREvent.Kind.allCases.randomElement() ?? .approved
             return PREvent(kind: kind, pr: pr, actor: kind == .reviewRequested ? pr.author : "octocat")
         }
+        let clock = clock
         Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(450))
+            try? await clock.sleep(for: .milliseconds(450))
             guard let self else { return }
             enqueue(events.map { $0.alert(showingAccount: self.showsAccounts) })
         }
@@ -187,11 +204,12 @@ final class NotchInteraction {
 
     private func dismissPeek(after delay: Duration) {
         peekTask?.cancel()
+        let clock = clock
         peekTask = Task { [weak self] in
-            try? await Task.sleep(for: delay)
+            try? await clock.sleep(for: delay)
             guard let self, !Task.isCancelled, state == .peek else { return }
             withAnimation(Motion.close) { self.state = .closed }
-            try? await Task.sleep(for: .milliseconds(500))
+            try? await clock.sleep(for: .milliseconds(500))
             guard !Task.isCancelled else { return }
             showNextPeek()
         }
