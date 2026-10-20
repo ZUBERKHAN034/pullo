@@ -54,6 +54,20 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
           rm "$RUNNER_TEMP/cert.p12"
 
+      - name: Install the provisioning profile
+        env:
+          PROFILE_BASE64: ${{ secrets.DEVELOPER_ID_PROFILE }}
+        run: |
+          PROFILE="$RUNNER_TEMP/devnotch.provisionprofile"
+          echo "$PROFILE_BASE64" | base64 --decode > "$PROFILE"
+          PLIST=$(security cms -D -i "$PROFILE")
+          UUID=$(plutil -extract UUID raw - <<< "$PLIST")
+          echo "PROFILE_NAME=$(plutil -extract Name raw - <<< "$PLIST")" >> "$GITHUB_ENV"
+          for dir in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$dir"
+            cp "$PROFILE" "$dir/$UUID.provisionprofile"
+          done
+
       - name: Archive
         env:
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -63,13 +77,15 @@ jobs:
             -archivePath "$RUNNER_TEMP/DevNotch.xcarchive" \
             -clonedSourcePackagesDirPath "$RUNNER_TEMP/packages" \
             MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
-            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Developer ID Application"
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Developer ID Application" \
+            CODE_SIGN_ENTITLEMENTS=DevNotch.entitlements PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
 
       - name: Export with Developer ID
         env:
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           plutil -replace teamID -string "$TEAM_ID" ExportOptions.plist
+          plutil -replace provisioningProfiles -json "{\"dev.jrdan.devnotch\": \"$PROFILE_NAME\"}" ExportOptions.plist
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/DevNotch.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \

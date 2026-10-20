@@ -50,6 +50,7 @@ final class AppDependencies {
         accounts.onAccountAdded = { [weak self] account in
             guard let self else { return }
             notch.accountConnected(account)
+            system.requestFocusAccess()
             Task { await self.store.refresh() }
         }
         accounts.onAccountRemoved = { [weak self] account in

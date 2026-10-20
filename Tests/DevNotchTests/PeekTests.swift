@@ -101,5 +101,32 @@ extension NotchBehavior {
             h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
             #expect(h.notch.state == .closed)
         }
+
+        @Test func alertsStayHiddenDuringFocus() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert())
+            #expect(h.notch.state == .closed)
+            #expect(h.system.taps == 0)
+            #expect(h.system.sounds.isEmpty)
+        }
+
+        @Test func alertsHeldBackByFocusDoNotPileUpForLater() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert("during focus"))
+            h.system.isInFocus = false
+            h.notch.enqueue(h.alert("after focus"))
+            #expect(h.notch.peekAlert?.headline == "after focus")
+            #expect(h.notch.peekAlert?.stack.isEmpty == true)
+        }
+
+        @Test func aTestAlertShowsEvenDuringFocus() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.previewAlert()
+            await h.clock.advance(by: .milliseconds(450))
+            #expect(h.notch.state == .peek)
+        }
     }
 }

@@ -172,8 +172,9 @@ final class NotchInteraction {
         let clock = clock
         Task { [weak self] in
             try? await clock.sleep(for: .milliseconds(450))
-            guard let self else { return }
-            enqueue(events.map { $0.alert(showingAccount: self.showsAccounts) })
+            guard let self, state == .closed else { return }
+            alerts.append(events.map { $0.alert(showingAccount: self.showsAccounts) })
+            showNextPeek(evenInFocus: true)
         }
     }
 
@@ -191,8 +192,8 @@ final class NotchInteraction {
         accounts.accounts.count > 1
     }
 
-    private func showNextPeek() {
-        guard state == .closed, let alert = alerts.next() else { return }
+    private func showNextPeek(evenInFocus: Bool = false) {
+        guard state == .closed, let alert = alerts.next(), evenInFocus || !system.isInFocus else { return }
         withAnimation(Motion.peek) {
             peekAlert = alert
             state = .peek
