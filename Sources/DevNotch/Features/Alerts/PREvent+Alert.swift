@@ -12,7 +12,8 @@ extension PREvent {
             actor: actor,
             actorAvatar: actorAvatar ?? actor.flatMap { pr.avatars[$0] },
             account: showingAccount ? pr.account : nil,
-            priority: priority
+            priority: priority,
+            category: AlertCategory(self)
         )
     }
 

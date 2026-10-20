@@ -6,6 +6,11 @@
 - Write for people who use the app, not for people who read the code: what changed for them, in one short sentence. Leave out refactors, tests, CI and build changes unless the user feels them, like a smaller download.
 - To release, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD`, add a new empty `## [Unreleased]` above it, update the links at the bottom, merge, then push the `vX.Y.Z` tag. The release workflow publishes that section on GitHub and in the update window, and fails if it's missing.
 
+## Betas
+- A beta is tagged `vX.Y.Z-beta.N` and gets its own `## [X.Y.Z-beta.N] - YYYY-MM-DD` section, listing what changed since the previous beta or stable release. Leave `[Unreleased]` alone until the stable release.
+- The workflow publishes it as a GitHub pre-release on Sparkle's `beta` channel, so only people who turned on "Get beta versions" get it. The download links keep pointing to the latest stable release.
+- The stable `X.Y.Z` release lists everything since the previous stable release, betas included.
+
 ## Code
 - No comments in code, except `// MARK:`.
 - Commit messages and pull requests in English.

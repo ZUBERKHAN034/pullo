@@ -206,7 +206,7 @@ final class NotchInteraction {
             state = .peek
         }
         if settings.haptics { system.tapTrackpad() }
-        if let sound = settings.sound { system.play(sound: sound) }
+        if let sound = settings.sound(for: alert.category) { system.play(sound: sound) }
         dismissPeek(after: AlertQueue.displayTime(for: alert))
     }
 

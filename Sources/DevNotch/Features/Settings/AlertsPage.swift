@@ -29,15 +29,27 @@ struct AlertsPage: View {
                 Text("Alerts drop down from the notch when something changes on a PR.")
             }
 
-            Section("Alert me when") {
+            Section {
                 ForEach(AlertCategory.allCases, id: \.self) { category in
-                    Toggle(category.title, isOn: Binding(
-                        get: { !settings.mutedCategories.contains(category) },
-                        set: { enabled in
-                            if enabled == settings.mutedCategories.contains(category) { settings.toggle(category) }
+                    LabeledContent(category.title) {
+                        HStack(spacing: 12) {
+                            soundPicker(for: category)
+                                .disabled(settings.mutedCategories.contains(category))
+                            Toggle(category.title, isOn: Binding(
+                                get: { !settings.mutedCategories.contains(category) },
+                                set: { enabled in
+                                    if enabled == settings.mutedCategories.contains(category) { settings.toggle(category) }
+                                }
+                            ))
+                            .toggleStyle(.switch)
+                            .labelsHidden()
                         }
-                    ))
+                    }
                 }
+            } header: {
+                Text("Alert me when")
+            } footer: {
+                Text("Each kind of alert can play its own sound. Default uses the sound above.")
             }
 
             if accounts.accounts.count > 1 {
@@ -55,5 +67,22 @@ struct AlertsPage: View {
                 }
             }
         }
+    }
+
+    private func soundPicker(for category: AlertCategory) -> some View {
+        Picker(String(localized: "Sound for \(category.title)"), selection: Binding(
+            get: { settings.categorySounds[category] },
+            set: { name in
+                settings.categorySounds[category] = name
+                if let sound = settings.sound(for: category) { system.play(sound: sound) }
+            }
+        )) {
+            Text("Default").tag(String?.none)
+            Text("None").tag(String?.some(""))
+            Divider()
+            ForEach(AppSettings.systemSounds, id: \.self) { Text($0).tag(String?.some($0)) }
+        }
+        .labelsHidden()
+        .fixedSize()
     }
 }
