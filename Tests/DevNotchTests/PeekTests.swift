@@ -102,6 +102,43 @@ extension NotchBehavior {
             #expect(h.notch.state == .closed)
         }
 
+        @Test func eachKindOfAlertCanPlayItsOwnSound() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.sound = "Glass"
+            h.settings.categorySounds[.ciFailed] = "Basso"
+            h.notch.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            #expect(h.system.sounds == ["Basso"])
+        }
+
+        @Test func kindsWithoutTheirOwnSoundUseTheDefault() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.sound = "Glass"
+            h.settings.categorySounds[.ciFailed] = "Basso"
+            h.notch.enqueue(events: [PREvent(kind: .approved, pr: pr, actor: "octocat")])
+            #expect(h.system.sounds == ["Glass"])
+        }
+
+        @Test func aKindCanBeSilencedWhileOthersPlay() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.sound = "Glass"
+            h.settings.categorySounds[.ciPassed] = ""
+            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
+            #expect(h.notch.state == .peek)
+            #expect(h.system.sounds.isEmpty)
+        }
+
+        @Test func groupedAlertsPlayTheSoundOfTheMostImportantOne() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.categorySounds[.ciPassed] = "Pop"
+            h.settings.categorySounds[.ciFailed] = "Basso"
+            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil), PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            #expect(h.system.sounds == ["Basso"])
+        }
+
         @Test func alertsStayHiddenDuringFocus() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
