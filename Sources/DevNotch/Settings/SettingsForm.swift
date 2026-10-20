@@ -30,6 +30,12 @@ enum SettingsPage: String, CaseIterable, Identifiable {
     }
 }
 
+/// Which page the settings window shows, so the panel can open it on a given one.
+@MainActor
+final class SettingsNavigation: ObservableObject {
+    @Published var page: SettingsPage? = .general
+}
+
 /// System Settings–style window: a sidebar of pages and the selected page on the right.
 struct SettingsForm: View {
     @ObservedObject var settings: AppSettings
@@ -37,11 +43,11 @@ struct SettingsForm: View {
     let model: NotchViewModel
     /// Nil in demo mode, where nothing should reach the network.
     let updater: Updater?
-    @ViewState private var page: SettingsPage? = .general
+    @ObservedObject var navigation: SettingsNavigation
 
     var body: some View {
         NavigationSplitView {
-            List(pages, selection: Binding(get: { page }, set: { page = $0 })) { page in
+            List(pages, selection: $navigation.page) { page in
                 Label(page.title, systemImage: page.symbol)
             }
             .navigationSplitViewColumnWidth(min: 170, ideal: 180, max: 200)
@@ -50,7 +56,7 @@ struct SettingsForm: View {
             detail
                 .formStyle(.grouped)
                 .toggleStyle(.switch)
-                .navigationTitle((page ?? .general).title)
+                .navigationTitle((navigation.page ?? .general).title)
         }
         .frame(width: 700, height: 500)
     }
@@ -62,7 +68,7 @@ struct SettingsForm: View {
 
     @ViewBuilder
     private var detail: some View {
-        switch page ?? .general {
+        switch navigation.page ?? .general {
         case .general: GeneralPage(settings: settings)
         case .alerts: AlertsPage(settings: settings, accounts: accounts, model: model)
         case .accounts: AccountsPage(accounts: accounts)

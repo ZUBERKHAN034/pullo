@@ -13,7 +13,3 @@ enum PRTab: CaseIterable {
         }
     }
 }
-
-enum PanelScreen {
-    case prs, accounts
-}

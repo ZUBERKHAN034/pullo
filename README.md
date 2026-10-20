@@ -80,7 +80,7 @@ So it never has to store a token. DevNotch asks `gh` for a token on each refresh
 
 ### How do I add another account?
 
-Run `gh auth login` with the other account, then add it from the accounts button in the panel.
+Run `gh auth login` with the other account, then add it in Settings › Accounts.
 
 ### Does it work with external displays or Macs without a notch?
 

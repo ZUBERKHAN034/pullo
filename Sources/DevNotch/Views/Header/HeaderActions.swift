@@ -10,8 +10,7 @@ struct HeaderActions: View {
             IconButton(symbol: "arrow.triangle.2.circlepath", help: refreshHelp, spinning: store.isLoading) {
                 Task { await store.refresh() }
             }
-            IconButton(symbol: "person.2", help: "Accounts", active: model.screen == .accounts) { model.show(.accounts) }
-            IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?() }
+            IconButton(symbol: "gearshape", help: "Settings") { model.onOpenSettings?(nil) }
         }
     }
 

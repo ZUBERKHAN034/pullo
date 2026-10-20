@@ -21,8 +21,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     // Sparkle checks on its own schedule from the moment it starts, so launch touches it instead of waiting for Settings.
     private lazy var updater = demo == nil ? Updater() : nil
-    private lazy var settingsWindow = SettingsWindowController { [unowned self] in
-        SettingsForm(settings: settings, accounts: accounts, model: model, updater: updater)
+    private lazy var settingsWindow = SettingsWindowController { [unowned self] navigation in
+        SettingsForm(settings: settings, accounts: accounts, model: model, updater: updater, navigation: navigation)
     }
     private var panel: NotchPanel?
     private var hotKey: HotKey?
@@ -45,9 +45,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         store.onEvents = { [weak self] events in self?.model.enqueue(events: events) }
         model.onNeedsKeyFocus = { [weak panel] in panel?.makeKeyAndOrderFront(nil) }
-        model.onOpenSettings = { [weak self] in
+        model.onOpenSettings = { [weak self] page in
             self?.model.close()
-            self?.settingsWindow.show()
+            self?.settingsWindow.show(page: page)
         }
         accounts.onAccountAdded = { [weak self] account in self?.model.accountConnected(account) }
         accounts.onAccountRemoved = { [weak self] account in

@@ -7,7 +7,6 @@ final class NotchViewModel: ObservableObject {
     @Published private(set) var state: NotchState = .closed
     @Published private(set) var peekAlert: NotchAlert?
     @Published private(set) var tab: PRTab = .mine
-    @Published private(set) var screen: PanelScreen = .prs
     @Published private(set) var selectedLogin: String?
     @Published var geometry: NotchGeometry
     /// PR highlighted by keyboard navigation.
@@ -27,7 +26,8 @@ final class NotchViewModel: ObservableObject {
 
     /// The panel needs key focus for typing (search); AppKit-side, so the delegate provides it.
     var onNeedsKeyFocus: (() -> Void)?
-    var onOpenSettings: (() -> Void)?
+    /// Nil opens Settings where it was left.
+    var onOpenSettings: ((SettingsPage?) -> Void)?
 
     private var queue: [NotchAlert] = []
     private var peekTask: Task<Void, Never>?
@@ -154,7 +154,6 @@ final class NotchViewModel: ObservableObject {
         selectedPRID = nil
         isSearching = false
         searchQuery = ""
-        screen = .prs
         withAnimation(Motion.close) { state = .closed }
     }
 
@@ -176,7 +175,6 @@ final class NotchViewModel: ObservableObject {
     }
 
     func accountConnected(_ account: Account) {
-        screen = .prs
         selectedLogin = account.login
         enqueue(NotchAlert(
             symbol: "person.crop.circle.badge.checkmark",
@@ -278,33 +276,20 @@ final class NotchViewModel: ObservableObject {
         }
     }
 
-    /// Toggles a secondary screen; showing the one already up goes back to the list.
-    func show(_ screen: PanelScreen) {
-        withAnimation(Motion.navigate) {
-            self.screen = self.screen == screen ? .prs : screen
-        }
-    }
-
     func selectTab(_ tab: PRTab) {
         withAnimation(Motion.navigate) { self.tab = tab }
         resetSelection()
     }
 
     func selectAccount(_ login: String) {
-        withAnimation(Motion.navigate) {
-            selectedLogin = login
-            screen = .prs
-        }
+        withAnimation(Motion.navigate) { selectedLogin = login }
         resetSelection()
     }
 
     func startSearch() {
         keyboardMode = true
         onNeedsKeyFocus?()
-        withAnimation(Motion.navigate) {
-            screen = .prs
-            isSearching = true
-        }
+        withAnimation(Motion.navigate) { isSearching = true }
         selectedPRID = visiblePRs.first?.id
     }
 
@@ -336,9 +321,8 @@ final class NotchViewModel: ObservableObject {
         case .search:
             startSearch()
         case .close:
-            if isSearching { stopSearch() } else if screen == .prs { close() } else { show(screen) }
+            if isSearching { stopSearch() } else { close() }
         default:
-            guard screen == .prs else { return false }
             return performListCommand(command)
         }
         return true

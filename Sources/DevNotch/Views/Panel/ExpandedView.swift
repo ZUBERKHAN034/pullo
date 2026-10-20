@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Everything below the notch when the panel is open: picks the screen and shows toasts over it.
+/// Everything below the notch when the panel is open: onboarding or the PRs, with toasts over them.
 struct ExpandedView: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore
@@ -12,9 +12,6 @@ struct ExpandedView: View {
         ZStack(alignment: .top) {
             if accounts.accounts.isEmpty {
                 OnboardingView(accounts: accounts)
-                    .transition(.reveal(delay: 0.05))
-            } else if model.screen == .accounts {
-                AccountsView(model: model, store: store, accounts: accounts)
                     .transition(.reveal(delay: 0.05))
             } else {
                 PRBrowser(model: model, store: store, tracker: tracker)
