@@ -34,6 +34,18 @@ jobs:
           # Sparkle compares CFBundleVersion, so it has to grow with every release; the commit count always does.
           echo "BUILD=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
 
+      - name: Release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES=$(awk -v version="$VERSION" '/^## /{inside = ($2 == version); next} inside' CHANGELOG.md)
+          [ -n "$(printf %s "$NOTES" | tr -d '[:space:]')" ] || { echo "::error::CHANGELOG.md has no section for $VERSION"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/feed"
+          printf '%s\n' "$NOTES" > "$RUNNER_TEMP/notes.md"
+          gh api markdown -f text="$NOTES" -f mode=markdown \
+            | sed -E 's#<a id="user-content-[^"]*"[^>]*><span[^>]*></span></a>##g' \
+            > "$RUNNER_TEMP/feed/DevNotch-$VERSION.html"
+
       - name: Test
         run: swift test
 
@@ -126,16 +138,6 @@ jobs:
           xcrun stapler staple "$DMG"
           spctl --assess --type open --context context:primary-signature --verbose "$DMG"
           rm "$RUNNER_TEMP/api_key.p8"
-
-      - name: Release notes
-        run: |
-          PREVIOUS=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
-          git log --pretty='- %s' ${PREVIOUS:+"$PREVIOUS.."}"$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
-          {
-            echo "<ul>"
-            git log --pretty='<li>%s</li>' ${PREVIOUS:+"$PREVIOUS.."}"$GITHUB_REF_NAME" | sed 's/&/\&amp;/g'
-            echo "</ul>"
-          } > "$RUNNER_TEMP/feed/DevNotch-$VERSION.html"
 
       - name: Update the Sparkle feed
         env:
