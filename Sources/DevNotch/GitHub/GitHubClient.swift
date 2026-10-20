@@ -16,12 +16,12 @@ struct GitHubClient {
     fragment pr on PullRequest {
       id number title url isDraft createdAt updatedAt reviewDecision mergeable headRefName
       repository { nameWithOwner }
-      author { login }
+      author { login avatarUrl }
       headRefOid
       commitCount: commits { totalCount }
-      comments(last: 20) { nodes { id author { __typename login } } }
-      reviews(last: 20) { nodes { id author { __typename login } } }
-      latestReviews(first: 20) { nodes { state author { login } } }
+      comments(last: 20) { nodes { id author { __typename login avatarUrl } } }
+      reviews(last: 20) { nodes { id author { __typename login avatarUrl } } }
+      latestReviews(first: 20) { nodes { state author { login avatarUrl } } }
       reviewRequests(first: 20) { nodes { requestedReviewer { __typename ... on User { login } ... on Team { name } } } }
       commits(last: 1) { nodes { commit { statusCheckRollup {
         state
@@ -57,6 +57,25 @@ struct GitHubClient {
             mine: payload.mine.nodes.compactMap { $0.value?.pullRequest(account: account) },
             reviewRequests: payload.review.nodes.compactMap { $0.value?.pullRequest(account: account) }
         )
+    }
+
+    private static let outcomesQuery = """
+    query($ids: [ID!]!) {
+      nodes(ids: $ids) { ... on PullRequest {
+        id state
+        mergedBy { login avatarUrl }
+        timelineItems(last: 1, itemTypes: [CLOSED_EVENT]) { nodes { ... on ClosedEvent { actor { login avatarUrl } } } }
+      } }
+    }
+    """
+
+    func fetchOutcomes(ids: [String]) async throws -> [PROutcome] {
+        var request = request(for: "https://api.github.com/graphql")
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: ["query": Self.outcomesQuery, "variables": ["ids": ids]])
+        let decoded = try JSONDecoder().decode(OutcomeResponse.self, from: try await send(request))
+        return decoded.data?.nodes.compactMap { $0.value?.outcome } ?? []
     }
 
     func fetchUser() async throws -> GitHubUser {

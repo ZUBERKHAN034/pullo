@@ -64,6 +64,8 @@ struct PullRequest: Identifiable, Equatable {
     let changeRequesters: [String]
     let reviewRequest: ReviewRequest
     let failedChecks: [FailedCheck]
+    /// Avatar of each person on the PR, by login.
+    var avatars: [String: URL] = [:]
 
     var isDirectRequest: Bool { reviewRequest == .direct }
 

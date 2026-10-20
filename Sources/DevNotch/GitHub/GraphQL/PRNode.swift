@@ -1,10 +1,14 @@
 import Foundation
 
 struct PRNode: Decodable {
-    struct Login: Decodable { let login: String }
+    struct Login: Decodable {
+        let login: String
+        let avatarUrl: URL?
+    }
     struct Actor: Decodable {
         let __typename: String
         let login: String
+        let avatarUrl: URL?
     }
     struct Activities: Decodable {
         struct Node: Decodable {
@@ -120,8 +124,19 @@ struct PRNode: Decodable {
             approvers: reviewers("APPROVED"),
             changeRequesters: reviewers("CHANGES_REQUESTED"),
             reviewRequest: isDirect ? .direct : .team(teams),
-            failedChecks: failedChecks
+            failedChecks: failedChecks,
+            avatars: avatars
         )
+    }
+
+    /// Everyone who shows up on the PR, so alerts can put a face to who did what.
+    private var avatars: [String: URL] {
+        var avatars: [String: URL] = [:]
+        let people = [author.map { ($0.login, $0.avatarUrl) }]
+            + (comments.nodes + reviews.nodes).map { node in node.author.map { ($0.login, $0.avatarUrl) } }
+            + latestReviews.nodes.map { review in review.author.map { ($0.login, $0.avatarUrl) } }
+        for case let (login, url?)? in people { avatars[login] = url }
+        return avatars
     }
 }
 

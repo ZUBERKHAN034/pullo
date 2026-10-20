@@ -3,13 +3,15 @@ import Foundation
 /// Something that changed on a PR between two polls.
 struct PREvent: Equatable {
     enum Kind: CaseIterable {
-        case ciPassed, ciFailed, approved, changesRequested, reviewRequested, newComment
+        case ciPassed, ciFailed, approved, changesRequested, reviewRequested, newComment, merged, closed
     }
 
     let kind: Kind
     let pr: PullRequest
     /// Who caused it, when GitHub tells us.
     let actor: String?
+    /// Their avatar when the PR doesn't already know it, e.g. whoever merged it.
+    var actorAvatar: URL?
 }
 
 extension PREvent {

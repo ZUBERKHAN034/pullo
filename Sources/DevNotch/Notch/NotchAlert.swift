@@ -10,6 +10,9 @@ struct NotchAlert: Identifiable, Equatable {
     var url: URL?
     /// The PR it's about, so opening it from the alert marks it read like opening it from the list does.
     var pr: PullRequest?
+    /// Who did it, shown as their avatar with the alert's symbol as a badge; nil shows just the symbol.
+    var actor: String?
+    var actorAvatar: URL?
     /// Shown as a small chip when more than one account is connected.
     var account: String?
     /// Alerts folded into this one when several arrive together, most important first.

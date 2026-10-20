@@ -8,14 +8,7 @@ struct PeekView: View {
     var body: some View {
         HStack(spacing: 11) {
             if alert.stack.isEmpty {
-                ZStack {
-                    Circle().fill(alert.tint.opacity(0.2))
-                    Image(systemName: alert.symbol)
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(alert.tint)
-                        .symbolEffect(.bounce, options: .speed(0.8), value: alert.id)
-                }
-                .frame(width: 30, height: 30)
+                AlertIcon(alert: alert)
             } else {
                 StackedIcons(alerts: Array(alert.stack.prefix(3)))
             }

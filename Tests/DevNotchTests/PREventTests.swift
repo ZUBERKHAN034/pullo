@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import DevNotch
 
@@ -89,5 +90,39 @@ struct StackedAlertTests {
         ].map { $0.alert(showingAccount: false) }
         let headlines = NotchAlert.summary(of: alerts).stack.map(\.headline)
         #expect(headlines == ["CI failed", "marina commented", "octavio approved"])
+    }
+}
+
+struct PROutcomeTests {
+    let pr = PullRequest.make(account: "me")
+
+    @Test func yourOwnMergeOrCloseIsNotNews() {
+        #expect(PROutcome(id: "PR_1", state: .merged, actor: "me", actorAvatar: nil).event(for: pr) == nil)
+        #expect(PROutcome(id: "PR_1", state: .closed, actor: "ME", actorAvatar: nil).event(for: pr) == nil)
+    }
+
+    @Test func someoneElsesIs() {
+        let event = PROutcome(id: "PR_1", state: .merged, actor: "ana", actorAvatar: nil).event(for: pr)
+        #expect(event?.kind == .merged)
+        #expect(event?.alert(showingAccount: false).headline == "ana merged your PR")
+    }
+
+    @Test func stillOpenIsNotNews() {
+        #expect(PROutcome(id: "PR_1", state: .stillOpen, actor: nil, actorAvatar: nil).event(for: pr) == nil)
+    }
+}
+
+struct AlertAvatarTests {
+    @Test func alertCarriesTheActorsAvatar() {
+        let url = URL(string: "https://avatars.githubusercontent.com/u/1")!
+        var pr = PullRequest.make()
+        pr.avatars = ["octavio": url]
+        let alert = PREvent(kind: .approved, pr: pr, actor: "octavio").alert(showingAccount: false)
+        #expect(alert.actor == "octavio")
+        #expect(alert.actorAvatar == url)
+    }
+
+    @Test func ciAlertsHaveNoFace() {
+        #expect(PREvent(kind: .ciFailed, pr: .make(), actor: nil).alert(showingAccount: false).actor == nil)
     }
 }
