@@ -56,8 +56,10 @@ final class NotchPanelController {
         panel.setFrame(target.panelFrame, display: true)
     }
 
-    private func mouseMoved() {
-        notch.mouseMoved(to: NSEvent.mouseLocation)
+    private func pointerChanged(_ event: NSEvent) {
+        let buttonHeld = event.type == .leftMouseDragged
+        notch.mouseMoved(to: NSEvent.mouseLocation, buttonHeld: buttonHeld)
+        if notch.state == .open, buttonHeld { return }
         updateMouseCapture()
     }
 
@@ -69,20 +71,20 @@ final class NotchPanelController {
     }
 
     private func installEventMonitors() {
-        let pointer: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged]
+        let pointer: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .leftMouseUp]
         if let global = NSEvent.addGlobalMonitorForEvents(matching: pointer.union(.leftMouseDown), handler: { [weak self] event in
             MainActor.assumeIsolated {
                 if event.type == .leftMouseDown {
                     self?.notch.mouseDown(at: NSEvent.mouseLocation)
                 } else {
-                    self?.mouseMoved()
+                    self?.pointerChanged(event)
                 }
             }
         }) {
             monitors.append(global)
         }
         if let local = NSEvent.addLocalMonitorForEvents(matching: pointer, handler: { [weak self] event in
-            MainActor.assumeIsolated { self?.mouseMoved() }
+            MainActor.assumeIsolated { self?.pointerChanged(event) }
             return event
         }) {
             monitors.append(local)
