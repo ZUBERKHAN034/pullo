@@ -4,7 +4,7 @@ DevNotch is a macOS app that puts your GitHub pull requests in the notch. It let
 
 <img src="docs/media/demo.gif" alt="DevNotch showing an alert and the list of pull requests" width="720">
 
-Requires macOS 14 or later and the [GitHub CLI](https://cli.github.com).
+Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI](https://cli.github.com).
 
 ## Features
 

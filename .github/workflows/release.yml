@@ -71,6 +71,9 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath "$RUNNER_TEMP/export"
 
+      - name: Drop Intel slices from Sparkle
+        run: .github/thin-sparkle.sh "$RUNNER_TEMP/export/DevNotch.app"
+
       - name: Notarize the app
         env:
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
