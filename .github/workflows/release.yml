@@ -30,7 +30,10 @@ jobs:
 
       - name: Version from the tag
         run: |
-          echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          if [[ "$VERSION" == *-beta.* ]]; then echo "CHANNEL=beta" >> "$GITHUB_ENV"; else echo "CHANNEL=" >> "$GITHUB_ENV"; fi
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$ ]] || { echo "::error::Tags look like v1.2.3 or v1.2.3-beta.4, got $GITHUB_REF_NAME"; exit 1; }
           # Sparkle compares CFBundleVersion, so it has to grow with every release; the commit count always does.
           echo "BUILD=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
 
@@ -146,16 +149,23 @@ jobs:
         run: |
           # Start from the published feed so earlier versions stay listed.
           gh release download --pattern appcast.xml --dir "$RUNNER_TEMP/feed" || true
+          echo "STABLE_TAG=$(gh release view --json tagName -q .tagName 2>/dev/null)" >> "$GITHUB_ENV"
           # The tools ship with the resolved package, so they always match the framework inside the app.
           printf %s "$SPARKLE_PRIVATE_KEY" | "$RUNNER_TEMP/packages/artifacts/sparkle/Sparkle/bin/generate_appcast" --ed-key-file - \
             --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/v$VERSION/" \
             --embed-release-notes \
+            ${CHANNEL:+--channel "$CHANNEL"} \
             "$RUNNER_TEMP/feed"
+          python3 .github/check-appcast.py "$RUNNER_TEMP/feed/appcast.xml" "$BUILD" "$CHANNEL"
 
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v$VERSION" \
+          gh release create "v$VERSION" ${CHANNEL:+--prerelease} \
             --title "DevNotch $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
             "$RUNNER_TEMP/DevNotch.dmg" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/feed/appcast.xml"
+          # Installed copies read the feed from the latest stable release, so a beta has to update that copy too.
+          if [ -n "$CHANNEL" ] && [ -n "$STABLE_TAG" ]; then
+            gh release upload "$STABLE_TAG" "$RUNNER_TEMP/feed/appcast.xml" --clobber
+          fi

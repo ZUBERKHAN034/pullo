@@ -75,6 +75,10 @@ Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI
 
 ## FAQ
 
+### Can I try new features early?
+
+Turn on **Get beta versions** in Settings → Updates. Betas may have bugs. If you turn it off again, you keep the beta you have until a newer stable version is out.
+
 ### Why does it need the GitHub CLI?
 
 So it never has to store a token. DevNotch asks `gh` for a token on each refresh and keeps it in memory only. There's no server and no sign-up: the app talks to the GitHub API directly.

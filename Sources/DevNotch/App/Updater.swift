@@ -5,11 +5,12 @@ import Sparkle
 final class Updater: ObservableObject {
     @Published private(set) var canCheckForUpdates = false
 
-    private let controller = SPUStandardUpdaterController(
-        startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil
-    )
+    private let channels: UpdateChannels
+    private let controller: SPUStandardUpdaterController
 
-    init() {
+    init(channels: UpdateChannels = UpdateChannels()) {
+        self.channels = channels
+        controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: channels, userDriverDelegate: nil)
         controller.updater.publisher(for: \.canCheckForUpdates).assign(to: &$canCheckForUpdates)
     }
 
@@ -18,6 +19,15 @@ final class Updater: ObservableObject {
         set {
             objectWillChange.send()
             controller.updater.automaticallyChecksForUpdates = newValue
+        }
+    }
+
+    var receivesBetas: Bool {
+        get { channels.receivesBetas }
+        set {
+            objectWillChange.send()
+            channels.receivesBetas = newValue
+            controller.updater.resetUpdateCycleAfterShortDelay()
         }
     }
 
