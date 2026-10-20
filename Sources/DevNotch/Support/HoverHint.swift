@@ -1,8 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Explains a control on hover. Stands in for `.help`: the panel never activates the app, and macOS only
-    /// shows system tooltips for the active one, so they never appeared.
     func hint(_ text: String, edge: HorizontalEdge = .trailing) -> some View {
         modifier(HoverHint(text: text, edge: edge))
     }
@@ -28,8 +26,6 @@ private struct HoverHint: ViewModifier {
                     withAnimation(Motion.fade) { shown = true }
                 }
             }
-            // Always laid out and faded in: inside an `if`, SwiftUI drops the alignment guide and the hint lands on
-            // top of the view instead of beside it.
             .overlay(alignment: edge == .trailing ? .trailing : .leading) {
                 label
                     .fixedSize()

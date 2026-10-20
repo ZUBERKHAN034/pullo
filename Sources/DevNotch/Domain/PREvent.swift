@@ -22,8 +22,6 @@ extension PREvent {
                 if pr.ci == .success { events.append(PREvent(kind: .ciPassed, pr: pr, actor: nil)) }
                 if pr.ci == .failure { events.append(PREvent(kind: .ciFailed, pr: pr, actor: nil)) }
             }
-            // Each reviewer is news, so a second approval alerts too, and so do repos that don't require reviews,
-            // where the PR's review decision never changes.
             let newApprovers = pr.approvers.filter { !before.approvers.contains($0) }
             let newRequesters = pr.changeRequesters.filter { !before.changeRequesters.contains($0) }
             if let approver = newApprovers.last {

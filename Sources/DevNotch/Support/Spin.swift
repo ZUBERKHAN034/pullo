@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A `repeatForever` animation leaks into whatever else animates nearby (rows sliding in, the panel opening)
-/// and makes the spinner jump; reading the time each frame can't.
 struct Spin: ViewModifier {
     let active: Bool
     var period: Double = 0.9

@@ -3,7 +3,6 @@ import Foundation
 enum GHCLI {
     static var isInstalled: Bool { executable != nil }
 
-    // GUI apps don't inherit the shell PATH, so look for gh where installers put it.
     private static var executable: String? {
         ["/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh"]
             .first(where: FileManager.default.isExecutableFile(atPath:))
@@ -17,7 +16,6 @@ enum GHCLI {
         return users(inHostsFile: hosts, host: host)
     }
 
-    /// gh writes hosts.yml in a fixed shape (host → users → one key per account), so a line scan is enough.
     static func users(inHostsFile text: String, host: String) -> [String] {
         var users: [String] = []
         var inHost = false
@@ -48,7 +46,6 @@ enum GHCLI {
         return users
     }
 
-    /// gh can stall, e.g. waiting on a keychain prompt nobody sees, so it gets a deadline instead of hanging a thread.
     static func token(for user: String, host: String = "github.com", timeout: Duration = .seconds(10)) throws -> String {
         guard let executable else { throw GitHubError.noToken }
         let process = Process()
@@ -64,7 +61,6 @@ enum GHCLI {
             process.terminate()
             throw GitHubError.ghTimedOut
         }
-        // A token is far smaller than the pipe's buffer, so gh can exit before anyone reads it.
         let data = output.fileHandleForReading.readDataToEndOfFile()
 
         let token = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)

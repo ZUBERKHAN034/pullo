@@ -49,7 +49,6 @@ struct GitHubClient {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(GQLResponse.self, from: data)
-        // Partial data comes back alongside errors when an org blocks the token (SAML); show what we can.
         guard let payload = decoded.data else {
             throw GitHubError.api(decoded.errors?.map(\.message).joined(separator: "\n") ?? "Empty response from GitHub.")
         }

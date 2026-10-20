@@ -36,7 +36,6 @@ final class ReadTracker: ObservableObject {
         knownAccounts = Set(defaults.stringArray(for: .readKnownAccounts) ?? [])
     }
 
-    /// The first sync of an account starts everything as read, so a fresh install doesn't light up every PR.
     func sync(account: String, prs: [PullRequest]) {
         let firstSync = !knownAccounts.contains(account)
         var updated = baselines.filter { !$0.key.hasPrefix("\(account)|") }

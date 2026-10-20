@@ -67,8 +67,6 @@ struct PullRequest: Identifiable, Equatable {
 
     var othersCommentIDs: [String] { othersComments.map(\.id) }
 
-    /// Drops the company suffix GitHub's managed accounts share (`ana_acme` next to your `you_acme`), since
-    /// everyone in the list has it.
     func displayLogin(_ login: String) -> String {
         guard let underscore = account.lastIndex(of: "_") else { return login }
         let suffix = account[underscore...]

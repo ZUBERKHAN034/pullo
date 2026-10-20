@@ -23,7 +23,6 @@ struct NotchRootView: View {
                     .transition(.reveal(delay: 0.07))
             }
         }
-        // Content keeps its final layout and the animated shape clips it, so it reads as uncovered, not stretched.
         .frame(width: size.width, height: size.height, alignment: .top)
         .padding(.horizontal, radii.top)
         .background(Color.black)

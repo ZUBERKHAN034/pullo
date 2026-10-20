@@ -44,7 +44,6 @@ struct PREventTests {
     }
 
     @Test func approvalAlertsWithoutRequiredReviews() {
-        // Repos that don't require reviews never set a review decision.
         #expect(kinds([.make(review: nil)], [.make(review: nil, approvers: ["octavio"])]) == [.approved])
     }
 

@@ -16,7 +16,6 @@ struct NotchGeometry: Equatable {
         )
     }
 
-    /// Nil only for the moment no display is attached at all, e.g. mid-way through a display change.
     @MainActor
     static var notchedScreen: NSScreen? {
         NSScreen.screens.first { $0.safeAreaInsets.top > 0 } ?? NSScreen.main ?? NSScreen.screens.first
@@ -25,7 +24,6 @@ struct NotchGeometry: Equatable {
     static let placeholder = NotchGeometry(screenFrame: .zero, notchSize: CGSize(width: 180, height: 24), hasNotch: false)
 }
 
-// In an extension so the memberwise initializer stays available.
 @MainActor
 extension NotchGeometry {
     init(screen: NSScreen) {
@@ -41,7 +39,6 @@ extension NotchGeometry {
             )
             return
         }
-        // External displays have no notch: anchor a virtual one to the top center of the menu bar.
         let menuBarHeight = max(frame.maxY - screen.visibleFrame.maxY, 24)
         self.init(screenFrame: frame, notchSize: CGSize(width: 180, height: menuBarHeight), hasNotch: false)
     }

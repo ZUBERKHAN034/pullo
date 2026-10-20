@@ -1,6 +1,5 @@
 import Carbon.HIToolbox
 
-/// A system-wide shortcut through Carbon, which unlike a global key monitor needs no Accessibility permission.
 final class HotKey {
     private var hotKeyRef: EventHotKeyRef?
     private var handlerRef: EventHandlerRef?

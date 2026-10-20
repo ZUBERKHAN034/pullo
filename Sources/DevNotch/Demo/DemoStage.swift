@@ -22,7 +22,6 @@ final class DemoStageModel: ObservableObject {
 @MainActor
 final class DemoStage {
     let model: DemoStageModel
-    /// The recorded region, in display points with a top-left origin (what ScreenCaptureKit expects).
     let captureRect: CGRect
 
     private let backdrop: NSWindow
@@ -169,7 +168,6 @@ private struct TitleCard: View {
     }
 }
 
-/// A drawn arrow standing in for the real pointer, which ScreenCaptureKit leaves out.
 private struct PointerView: View {
     @ObservedObject var model: DemoStageModel
 

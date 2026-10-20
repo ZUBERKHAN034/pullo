@@ -28,7 +28,6 @@ final class NotchViewModel: ObservableObject {
     private var peekTask: Task<Void, Never>?
     private var hoverTask: Task<Void, Never>?
     private var toastTask: Task<Void, Never>?
-    /// Set after closing while the pointer is still over the notch, so it doesn't spring right back open.
     private var waitingForPointerExit = false
     private var holdingPeek = false
 
@@ -288,7 +287,6 @@ final class NotchViewModel: ObservableObject {
 
     // MARK: - Keyboard
 
-    /// Returns whether the key was used, so unused keys keep flowing to the focused field or app.
     func handleKey(_ event: NSEvent) -> Bool {
         guard state == .open, let command = KeyCommand(
             keyCode: Int(event.keyCode),

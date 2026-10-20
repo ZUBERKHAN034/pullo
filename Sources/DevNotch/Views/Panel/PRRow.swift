@@ -17,7 +17,6 @@ struct PRRow: View {
             HStack(spacing: 10) {
                 leading
                     .frame(width: 18)
-                    // Its hover hint opens over the title, so it has to draw above it.
                     .zIndex(1)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(pr.title)

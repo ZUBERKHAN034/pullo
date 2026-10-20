@@ -38,7 +38,6 @@ struct NotchLayout {
         case .peek:
             return rect.insetBy(dx: 0, dy: -2)
         case .open:
-            // Some slack, so brushing past the edge doesn't close the panel.
             return rect.insetBy(dx: -16, dy: -16)
         }
     }

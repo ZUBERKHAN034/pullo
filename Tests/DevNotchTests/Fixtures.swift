@@ -60,7 +60,6 @@ final class ScratchDefaults {
 
     deinit {
         defaults.removePersistentDomain(forName: suite)
-        // cfprefsd keeps the file around even after the domain is removed.
         let file = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Preferences/\(suite).plist")
         try? FileManager.default.removeItem(at: file)
     }

@@ -20,7 +20,6 @@ final class DemoRecorder: NSObject, SCStreamOutput, @unchecked Sendable {
         queue.sync { firstFrame }
     }
 
-    /// Written by frames arriving on `queue`, so it's only ever touched there.
     private var firstFrame: Double?
 
     private var stream: SCStream?
@@ -91,7 +90,6 @@ final class DemoRecorder: NSObject, SCStreamOutput, @unchecked Sendable {
         if input.isReadyForMoreMediaData { input.append(sampleBuffer) }
     }
 
-    /// ScreenCaptureKit also sends "nothing changed" buffers without pixels; only complete frames go in the file.
     private static func isNewFrame(_ buffer: CMSampleBuffer) -> Bool {
         guard let attachments = CMSampleBufferGetSampleAttachmentsArray(buffer, createIfNecessary: false) as? [[SCStreamFrameInfo: Any]],
               let raw = attachments.first?[.status] as? Int

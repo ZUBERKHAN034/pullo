@@ -47,7 +47,6 @@ final class PRStore: ObservableObject {
     }
 
     func refresh() async {
-        // A refresh requested mid-flight (e.g. an account was just added) runs right after, not never.
         guard !isLoading else {
             refreshQueued = true
             return
@@ -99,14 +98,11 @@ final class PRStore: ObservableObject {
 
         lastUpdated = snapshots.isEmpty ? nil : Date()
 
-        // Two accounts can see the same PR; alert once.
         var seen = Set<String>()
         let unique = events.filter { seen.insert("\($0.pr.id)|\($0.kind)").inserted }
         if !unique.isEmpty { onEvents?(unique) }
     }
 
-    /// Your PRs that left the open list: asks GitHub whether each was merged or closed, since one that just
-    /// slipped past the 40 most recent also disappears. Best effort; a failed lookup means no alert.
     private func departures(from old: Snapshot, to new: Snapshot, login: String) async -> [PREvent] {
         let stillThere = Set(new.mine.map(\.id))
         let gone = old.mine.filter { !stillThere.contains($0.id) }
@@ -115,7 +111,6 @@ final class PRStore: ObservableObject {
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }
     }
 
-    /// Kept out of the task group's closure: the Swift 6.4 optimizer dropped every result when the call was inline.
     private nonisolated static func fetch(_ account: Account, from source: PRSource) async -> (String, Result<Snapshot, Error>) {
         do {
             return try await (account.login, .success(source.snapshot(for: account)))

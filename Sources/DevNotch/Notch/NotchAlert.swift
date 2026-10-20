@@ -17,7 +17,6 @@ struct NotchAlert: Identifiable, Equatable {
     var reference: String? { pr.map { "\($0.repoName) #\($0.number)" } }
 
     static func summary(of alerts: [NotchAlert]) -> NotchAlert {
-        // Stable: equal priorities keep the order they arrived in.
         let sorted = alerts.enumerated()
             .sorted { $0.element.priority != $1.element.priority ? $0.element.priority > $1.element.priority : $0.offset < $1.offset }
             .map(\.element)

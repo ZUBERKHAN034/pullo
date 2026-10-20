@@ -32,7 +32,6 @@ struct PRNode: Decodable {
                 let login: String?
                 let name: String?
             }
-            /// Null when the token can't see the requested team.
             let requestedReviewer: Reviewer?
         }
         let nodes: [Node]
