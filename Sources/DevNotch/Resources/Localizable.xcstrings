@@ -919,6 +919,22 @@
         }
       }
     },
+    "Default": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Predeterminado"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Padrão"
+          }
+        }
+      }
+    },
     "DevNotch": {
       "shouldTranslate": false
     },
@@ -1014,6 +1030,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rascunho, ainda não está pronto para revisão"
+          }
+        }
+      }
+    },
+    "Each kind of alert can play its own sound. Default uses the sound above.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada tipo de alerta puede reproducir su propio sonido. Predeterminado usa el sonido de arriba."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada tipo de alerta pode tocar um som próprio. Padrão usa o som acima."
           }
         }
       }
@@ -2124,6 +2156,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Som"
+          }
+        }
+      }
+    },
+    "Sound for %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonido para %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Som para %@"
           }
         }
       }

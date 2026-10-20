@@ -4,6 +4,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+### Added
+- Each kind of alert can play its own sound, so you can tell a failed CI from an approval without looking. Set it in Settings → Alerts.
+
 ## [0.5.0] - 2026-10-20
 
 ### Added

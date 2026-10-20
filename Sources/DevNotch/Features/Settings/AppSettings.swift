@@ -10,6 +10,7 @@ final class AppSettings {
     var mutedAccounts: Set<String> { didSet { save() } }
     var haptics: Bool { didSet { save() } }
     var sound: String? { didSet { save() } }
+    var categorySounds: [AlertCategory: String] { didSet { save() } }
     var panelStyle: PanelStyle { didSet { save() } }
     private(set) var launchAtLogin: Bool
     private(set) var launchAtLoginFailure: String?
@@ -24,12 +25,21 @@ final class AppSettings {
         haptics = defaults.object(for: .haptics) as? Bool ?? true
         let storedSound = defaults.object(for: .sound) as? String ?? "Glass"
         sound = storedSound.isEmpty ? nil : storedSound
+        let storedCategorySounds = defaults.object(for: .categorySounds) as? [String: String] ?? [:]
+        categorySounds = Dictionary(uniqueKeysWithValues: storedCategorySounds.compactMap { key, value in
+            AlertCategory(rawValue: key).map { ($0, value) }
+        })
         panelStyle = (defaults.object(for: .panelStyle) as? String).flatMap(PanelStyle.init(rawValue:)) ?? .solid
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
     func allows(_ event: PREvent) -> Bool {
         !mutedCategories.contains(AlertCategory(event)) && !mutedAccounts.contains(event.pr.account)
+    }
+
+    func sound(for category: AlertCategory?) -> String? {
+        guard let category, let chosen = categorySounds[category] else { return sound }
+        return chosen.isEmpty ? nil : chosen
     }
 
     func toggle(_ category: AlertCategory) {
@@ -61,6 +71,7 @@ final class AppSettings {
         defaults.set(Array(mutedAccounts), for: .mutedAccounts)
         defaults.set(haptics, for: .haptics)
         defaults.set(sound ?? "", for: .sound)
+        defaults.set(Dictionary(uniqueKeysWithValues: categorySounds.map { ($0.key.rawValue, $0.value) }), for: .categorySounds)
         defaults.set(panelStyle.rawValue, for: .panelStyle)
     }
 }

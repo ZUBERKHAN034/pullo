@@ -13,6 +13,7 @@ struct NotchAlert: Identifiable, Equatable {
     var account: String?
     var stack: [NotchAlert] = []
     var priority = 0
+    var category: AlertCategory?
 
     var reference: String? { pr.map { "\($0.repoName) #\($0.number)" } }
 
@@ -26,7 +27,8 @@ struct NotchAlert: Identifiable, Equatable {
             headline: String(localized: "\(alerts.count) updates"),
             detail: alerts.map(\.headline).joined(separator: " · "),
             account: Set(alerts.map(\.account)).count == 1 ? alerts.first?.account : nil,
-            stack: sorted
+            stack: sorted,
+            category: sorted.first?.category
         )
     }
 }
