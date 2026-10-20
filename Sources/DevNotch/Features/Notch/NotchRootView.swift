@@ -29,5 +29,6 @@ struct NotchRootView: View {
         .shadow(color: .black.opacity(state == .closed ? 0 : 0.55), radius: state == .open ? 26 : 14, y: 8)
         .opacity(state == .closed && !notch.geometry.hasNotch ? 0 : 1)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .animation(Motion.peek, value: notch.liveCI)
     }
 }

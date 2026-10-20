@@ -108,6 +108,7 @@ extension NotchBehavior {
             h.settings.sound = "Glass"
             h.settings.categorySounds[.ciFailed] = "Basso"
             h.notch.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            await h.clock.advance(by: .seconds(2))
             #expect(h.system.sounds == ["Basso"])
         }
 
@@ -126,6 +127,7 @@ extension NotchBehavior {
             h.settings.sound = "Glass"
             h.settings.categorySounds[.ciPassed] = ""
             h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
+            await h.clock.advance(by: .seconds(2))
             #expect(h.notch.state == .peek)
             #expect(h.system.sounds.isEmpty)
         }
@@ -136,6 +138,7 @@ extension NotchBehavior {
             h.settings.categorySounds[.ciPassed] = "Pop"
             h.settings.categorySounds[.ciFailed] = "Basso"
             h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil), PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            await h.clock.advance(by: .seconds(2))
             #expect(h.system.sounds == ["Basso"])
         }
 

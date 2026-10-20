@@ -30,6 +30,7 @@ struct SettingsForm: View {
     private var detail: some View {
         switch navigation.page ?? .general {
         case .general: GeneralPage()
+        case .appearance: AppearancePage()
         case .alerts: AlertsPage()
         case .accounts: AccountsPage()
         case .shortcuts: ShortcutsPage()

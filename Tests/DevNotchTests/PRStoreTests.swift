@@ -47,6 +47,17 @@ struct PRStoreTests {
         #expect(store.errors.isEmpty)
     }
 
+    @Test func pollsFasterWhileChecksRun() async {
+        let defaults = makeDefaults(accounts: ["work"])
+        let source = FakeSource(["work": Snapshot(mine: [.make(id: "PR_1", account: "work")], reviewRequests: [])])
+        let store = PRStore(accounts: AccountStore(defaults: defaults), tracker: ReadTracker(defaults: defaults), source: source)
+        await store.refresh()
+        #expect(store.pollInterval == .seconds(60))
+        await source.set("work", Snapshot(mine: [.make(id: "PR_1", account: "work", ci: .pending)], reviewRequests: []))
+        await store.refresh()
+        #expect(store.pollInterval == .seconds(30))
+    }
+
     @Test func anAccountThatFailsKeepsItsError() async {
         let defaults = makeDefaults(accounts: ["work", "gone"])
         let source = FakeSource(["work": Snapshot(mine: [], reviewRequests: [])])

@@ -25,6 +25,7 @@ struct PullRequest: Identifiable, Equatable {
     let failedChecks: [FailedCheck]
     var avatars: [String: URL] = [:]
     var size: PRSize?
+    var checks: CheckProgress?
 
     var isDirectRequest: Bool { reviewRequest == .direct }
 

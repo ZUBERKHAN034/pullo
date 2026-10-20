@@ -164,6 +164,22 @@
         }
       }
     },
+    "%lld of %lld checks done": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld de %2$lld checks terminados"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld de %2$lld checks concluídos"
+          }
+        }
+      }
+    },
     "%lld people reviewed": {
       "localizations": {
         "es": {
@@ -695,6 +711,22 @@
         }
       }
     },
+    "Checks failed on %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los checks fallaron en %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks falharam em %@"
+          }
+        }
+      }
+    },
     "Checks failed · click to see which": {
       "localizations": {
         "es": {
@@ -723,6 +755,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Checks passaram"
+          }
+        }
+      }
+    },
+    "Checks passed on %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los checks pasaron en %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks passaram em %@"
+          }
+        }
+      }
+    },
+    "Checks running on %@, %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks en curso en %1$@, %2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks rodando em %1$@, %2$@"
           }
         }
       }
@@ -2128,6 +2192,22 @@
         }
       }
     },
+    "Show CI progress on the notch": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar el progreso del CI en el notch"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar o progresso do CI no notch"
+          }
+        }
+      }
+    },
     "Solid": {
       "localizations": {
         "es": {
@@ -2188,6 +2268,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Código-fonte no GitHub"
+          }
+        }
+      }
+    },
+    "Style": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estilo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estilo"
           }
         }
       }
@@ -2444,6 +2540,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Boas-vindas ao DevNotch"
+          }
+        }
+      }
+    },
+    "While checks run on your pull requests, the notch widens to show how many are done.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se ejecutan los checks de tus pull requests, el notch se ensancha para mostrar cuántos terminaron."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto os checks dos seus pull requests rodam, o notch se alarga para mostrar quantos já terminaram."
           }
         }
       }

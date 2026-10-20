@@ -49,6 +49,7 @@ struct PRNode: Decodable {
                             let state: String?
                             let targetUrl: URL?
                         }
+                        let totalCount: Int?
                         let nodes: [Context]
                     }
                     let state: String
@@ -127,8 +128,20 @@ struct PRNode: Decodable {
             reviewRequest: isDirect ? .direct : .team(teams),
             failedChecks: failedChecks,
             avatars: avatars,
-            size: size
+            size: size,
+            checks: rollup?.contexts.flatMap(checkProgress)
         )
+    }
+
+    private func checkProgress(_ contexts: Commits.Node.Commit.Rollup.Contexts) -> CheckProgress? {
+        let unfinished: Set = ["PENDING", "EXPECTED"]
+        let done = contexts.nodes.count { context in
+            if let conclusion = context.conclusion { return !conclusion.isEmpty }
+            if let state = context.state { return !unfinished.contains(state) }
+            return false
+        }
+        let total = max(contexts.totalCount ?? contexts.nodes.count, contexts.nodes.count)
+        return total > 0 ? CheckProgress(done: done, total: total) : nil
     }
 
     private var size: PRSize? {

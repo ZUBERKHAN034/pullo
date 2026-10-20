@@ -20,6 +20,19 @@ struct PRNodeTests {
         #expect(try decode(json).pullRequest(account: "me").size == nil)
     }
 
+    @Test func countsFinishedChecks() throws {
+        let pr = try decode(json).pullRequest(account: "me")
+        #expect(pr.checks == CheckProgress(done: 3, total: 3))
+    }
+
+    @Test func countsRunningChecksAsNotDone() throws {
+        let running = json
+            .replacingOccurrences(of: "\"conclusion\": \"SUCCESS\"", with: "\"conclusion\": null")
+            .replacingOccurrences(of: "\"contexts\": { \"nodes\"", with: "\"contexts\": { \"totalCount\": 4, \"nodes\"")
+        let pr = try decode(running).pullRequest(account: "me")
+        #expect(pr.checks == CheckProgress(done: 2, total: 4))
+    }
+
     private let json = """
     {
       "id": "PR_1", "number": 383, "title": "feat: canal web", "url": "https://github.com/a/b/pull/383",
