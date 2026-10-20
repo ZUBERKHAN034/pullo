@@ -25,10 +25,12 @@ private actor FakeSource: PRSource {
 
 @MainActor
 struct PRStoreTests {
+    private let scratch = ScratchDefaults()
+
     private func makeDefaults(accounts: [String]) -> UserDefaults {
-        let defaults = UserDefaults(suiteName: "DevNotchTests.\(UUID().uuidString)")!
+        let defaults = scratch.defaults
         let list = accounts.map { Account(login: $0, avatarURL: nil) }
-        defaults.set(try? JSONEncoder().encode(list), forKey: "accounts")
+        defaults.set(try? JSONEncoder().encode(list), for: .accounts)
         return defaults
     }
 

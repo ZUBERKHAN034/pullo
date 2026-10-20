@@ -221,8 +221,8 @@ struct AboutPage: View {
                 .padding(.vertical, 4)
             }
             Section {
-                Link("Source code on GitHub", destination: URL(string: "https://github.com/jordan-cod/devnotch")!)
-                Link("Report an issue", destination: URL(string: "https://github.com/jordan-cod/devnotch/issues/new")!)
+                Link("Source code on GitHub", destination: URL(static: "https://github.com/jordan-cod/devnotch"))
+                Link("Report an issue", destination: URL(static: "https://github.com/jordan-cod/devnotch/issues/new"))
                 LabeledContent("License", value: "MIT")
             }
         }

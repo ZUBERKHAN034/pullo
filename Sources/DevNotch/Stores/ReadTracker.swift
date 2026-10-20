@@ -32,11 +32,11 @@ final class ReadTracker: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        if let data = defaults.data(forKey: "readBaselines"),
+        if let data = defaults.data(for: .readBaselines),
            let saved = try? JSONDecoder().decode([String: ReadBaseline].self, from: data) {
             baselines = saved
         }
-        knownAccounts = Set(defaults.stringArray(forKey: "readKnownAccounts") ?? [])
+        knownAccounts = Set(defaults.stringArray(for: .readKnownAccounts) ?? [])
     }
 
     /// The first sync of an account starts everything as read, so a fresh install doesn't light up every PR.
@@ -104,8 +104,8 @@ final class ReadTracker: ObservableObject {
     }
 
     private func save() {
-        if let data = try? JSONEncoder().encode(baselines) { defaults.set(data, forKey: "readBaselines") }
-        defaults.set(Array(knownAccounts), forKey: "readKnownAccounts")
+        if let data = try? JSONEncoder().encode(baselines) { defaults.set(data, for: .readBaselines) }
+        defaults.set(Array(knownAccounts), for: .readKnownAccounts)
     }
 
     private static func key(_ pr: PullRequest) -> String {

@@ -2,13 +2,13 @@
 included:
   - Sources
   - Tests
+# modifier_order is left to SwiftFormat, which orders them differently.
 only_rules:
   - force_unwrapping
   - force_try
   - force_cast
   - implicitly_unwrapped_optional
   - fatal_error_message
-  - modifier_order
   - lower_acl_than_parent
   - private_over_fileprivate
   - unused_closure_parameter

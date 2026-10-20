@@ -1,0 +1,15 @@
+import Foundation
+
+/// Every key the app keeps in UserDefaults, so a typo can't quietly read or write a different one.
+enum DefaultsKey: String {
+    case accounts
+    case mutedCategories, mutedAccounts, haptics, sound
+    case readBaselines, readKnownAccounts
+}
+
+extension UserDefaults {
+    func set(_ value: Any?, for key: DefaultsKey) { set(value, forKey: key.rawValue) }
+    func object(for key: DefaultsKey) -> Any? { object(forKey: key.rawValue) }
+    func data(for key: DefaultsKey) -> Data? { data(forKey: key.rawValue) }
+    func stringArray(for key: DefaultsKey) -> [String]? { stringArray(forKey: key.rawValue) }
+}

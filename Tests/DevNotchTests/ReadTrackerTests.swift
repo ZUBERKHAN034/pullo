@@ -4,7 +4,12 @@ import Testing
 
 @MainActor
 struct ReadTrackerTests {
-    let tracker = ReadTracker(defaults: UserDefaults(suiteName: "DevNotchTests.\(UUID().uuidString)")!)
+    private let scratch = ScratchDefaults()
+    private let tracker: ReadTracker
+
+    init() {
+        tracker = ReadTracker(defaults: scratch.defaults)
+    }
 
     @Test func firstSyncStartsEverythingAsRead() {
         let pr = PullRequest.make()

@@ -9,10 +9,10 @@ enum DemoData {
     static func freshDefaults() -> UserDefaults {
         let suite = "dev.jrdan.devnotch.demo"
         UserDefaults().removePersistentDomain(forName: suite)
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.set(try? JSONEncoder().encode([work, personal]), forKey: "accounts")
-        defaults.set(false, forKey: "haptics")
-        defaults.set("", forKey: "sound")
+        guard let defaults = UserDefaults(suiteName: suite) else { preconditionFailure("No defaults suite \(suite)") }
+        defaults.set(try? JSONEncoder().encode([work, personal]), for: .accounts)
+        defaults.set(false, for: .haptics)
+        defaults.set("", for: .sound)
         return defaults
     }
 
@@ -95,7 +95,7 @@ enum DemoData {
         let created = Date().addingTimeInterval(-hoursAgo * 3600)
         return PullRequest(
             id: id, account: account.login, number: number, title: title,
-            url: URL(string: "https://github.com/\(repo)/pull/\(number)")!,
+            url: .pullRequest(repo: repo, number: number),
             repo: repo, branch: branch, author: author, isDraft: draft,
             createdAt: created, updatedAt: created,
             ci: ci, review: review, hasConflict: conflict,

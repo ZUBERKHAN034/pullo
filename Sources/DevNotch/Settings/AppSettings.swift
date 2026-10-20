@@ -15,11 +15,11 @@ final class AppSettings: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        let stored = defaults.stringArray(forKey: "mutedCategories") ?? []
+        let stored = defaults.stringArray(for: .mutedCategories) ?? []
         mutedCategories = Set(stored.compactMap(AlertCategory.init(rawValue:)))
-        mutedAccounts = Set(defaults.stringArray(forKey: "mutedAccounts") ?? [])
-        haptics = defaults.object(forKey: "haptics") as? Bool ?? true
-        let storedSound = defaults.object(forKey: "sound") as? String ?? "Glass"
+        mutedAccounts = Set(defaults.stringArray(for: .mutedAccounts) ?? [])
+        haptics = defaults.object(for: .haptics) as? Bool ?? true
+        let storedSound = defaults.object(for: .sound) as? String ?? "Glass"
         sound = storedSound.isEmpty ? nil : storedSound
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
@@ -58,9 +58,9 @@ final class AppSettings: ObservableObject {
     }
 
     private func save() {
-        defaults.set(mutedCategories.map(\.rawValue), forKey: "mutedCategories")
-        defaults.set(Array(mutedAccounts), forKey: "mutedAccounts")
-        defaults.set(haptics, forKey: "haptics")
-        defaults.set(sound ?? "", forKey: "sound")
+        defaults.set(mutedCategories.map(\.rawValue), for: .mutedCategories)
+        defaults.set(Array(mutedAccounts), for: .mutedAccounts)
+        defaults.set(haptics, for: .haptics)
+        defaults.set(sound ?? "", for: .sound)
     }
 }

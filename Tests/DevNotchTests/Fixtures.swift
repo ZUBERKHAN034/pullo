@@ -27,7 +27,7 @@ extension PullRequest {
             account: account,
             number: number,
             title: title,
-            url: URL(string: "https://github.com/\(repo)/pull/\(number)")!,
+            url: .pullRequest(repo: repo, number: number),
             repo: repo,
             branch: branch,
             author: author,
@@ -46,5 +46,23 @@ extension PullRequest {
             reviewRequest: reviewRequest,
             failedChecks: []
         )
+    }
+}
+
+/// A defaults domain of its own for one test, deleted when the test lets go of it.
+final class ScratchDefaults {
+    private let suite = "DevNotchTests.\(UUID().uuidString)"
+    let defaults: UserDefaults
+
+    init() {
+        guard let defaults = UserDefaults(suiteName: suite) else { preconditionFailure("No defaults suite \(suite)") }
+        self.defaults = defaults
+    }
+
+    deinit {
+        defaults.removePersistentDomain(forName: suite)
+        // cfprefsd keeps the file around even after the domain is removed.
+        let file = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Preferences/\(suite).plist")
+        try? FileManager.default.removeItem(at: file)
     }
 }

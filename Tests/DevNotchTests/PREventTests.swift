@@ -119,7 +119,7 @@ struct PROutcomeTests {
 
 struct AlertAvatarTests {
     @Test func alertCarriesTheActorsAvatar() {
-        let url = URL(string: "https://avatars.githubusercontent.com/u/1")!
+        let url = URL(static: "https://avatars.githubusercontent.com/u/1")
         var pr = PullRequest.make()
         pr.avatars = ["octavio": url]
         let alert = PREvent(kind: .approved, pr: pr, actor: "octavio").alert(showingAccount: false)

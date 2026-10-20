@@ -13,12 +13,11 @@ final class AccountStore: ObservableObject {
     var onAccountRemoved: ((Account) -> Void)?
 
     private let defaults: UserDefaults
-    private let defaultsKey = "accounts"
     private var tokens: [String: String] = [:]
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        if let data = defaults.data(forKey: defaultsKey),
+        if let data = defaults.data(for: .accounts),
            let saved = try? JSONDecoder().decode([Account].self, from: data) {
             accounts = saved
         }
@@ -84,7 +83,7 @@ final class AccountStore: ObservableObject {
 
     private func persist() {
         if let data = try? JSONEncoder().encode(accounts) {
-            defaults.set(data, forKey: defaultsKey)
+            defaults.set(data, for: .accounts)
         }
     }
 }
