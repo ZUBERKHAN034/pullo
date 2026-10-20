@@ -4,6 +4,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+### Added
+- Alerts that arrive during a Focus are no longer lost. When the Focus ends, DevNotch shows them together in one alert.
+
 ## [0.4.0] - 2026-10-20
 
 ### Added

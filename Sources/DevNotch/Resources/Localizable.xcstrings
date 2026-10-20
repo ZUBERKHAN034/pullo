@@ -2336,6 +2336,22 @@
         }
       }
     },
+    "While you were in Focus": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras estabas en concentración"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto você estava em Foco"
+          }
+        }
+      }
+    },
     "Your GitHub pull requests in the notch.": {
       "localizations": {
         "es": {

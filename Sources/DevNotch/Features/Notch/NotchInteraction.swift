@@ -27,6 +27,8 @@ final class NotchInteraction {
     @ObservationIgnored private var waitingForPointerExit = false
     @ObservationIgnored private var holdingPeek = false
     @ObservationIgnored private var pointer: NSPoint?
+    @ObservationIgnored private var missedDuringFocus: [NotchAlert] = []
+    @ObservationIgnored private var focusWatch: Task<Void, Never>?
 
     init(
         list: PRListModel,
@@ -114,6 +116,7 @@ final class NotchInteraction {
         peekTask?.cancel()
         holdingPeek = false
         alerts.removeAll()
+        forgetMissedAlerts()
         list.keyboardMode = viaKeyboard
         if viaKeyboard { list.selectFirstIfNeeded() }
         withAnimation(Motion.open) {
@@ -193,7 +196,11 @@ final class NotchInteraction {
     }
 
     private func showNextPeek(evenInFocus: Bool = false) {
-        guard state == .closed, let alert = alerts.next(), evenInFocus || !system.isInFocus else { return }
+        guard state == .closed, let alert = alerts.next() else { return }
+        if !evenInFocus, system.isInFocus {
+            holdUntilFocusEnds(alert)
+            return
+        }
         withAnimation(Motion.peek) {
             peekAlert = alert
             state = .peek
@@ -201,6 +208,36 @@ final class NotchInteraction {
         if settings.haptics { system.tapTrackpad() }
         if let sound = settings.sound { system.play(sound: sound) }
         dismissPeek(after: AlertQueue.displayTime(for: alert))
+    }
+
+    private func holdUntilFocusEnds(_ alert: NotchAlert) {
+        missedDuringFocus += alert.stack.isEmpty ? [alert] : alert.stack
+        guard focusWatch == nil else { return }
+        let clock = clock
+        focusWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await clock.sleep(for: .seconds(5))
+                guard let self, !Task.isCancelled else { return }
+                if !system.isInFocus {
+                    showMissedAlerts()
+                    return
+                }
+            }
+        }
+    }
+
+    private func showMissedAlerts() {
+        focusWatch = nil
+        guard !missedDuringFocus.isEmpty else { return }
+        alerts.append([NotchAlert.summary(of: missedDuringFocus, note: String(localized: "While you were in Focus"))])
+        missedDuringFocus.removeAll()
+        if state == .closed { showNextPeek() }
+    }
+
+    private func forgetMissedAlerts() {
+        focusWatch?.cancel()
+        focusWatch = nil
+        missedDuringFocus.removeAll()
     }
 
     private func dismissPeek(after delay: Duration) {

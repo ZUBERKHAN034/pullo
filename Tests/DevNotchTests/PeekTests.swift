@@ -111,7 +111,7 @@ extension NotchBehavior {
             #expect(h.system.sounds.isEmpty)
         }
 
-        @Test func alertsHeldBackByFocusDoNotPileUpForLater() async {
+        @Test func alertsArrivingAfterFocusShowRightAway() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
             h.notch.enqueue(h.alert("during focus"))
@@ -119,6 +119,41 @@ extension NotchBehavior {
             h.notch.enqueue(h.alert("after focus"))
             #expect(h.notch.peekAlert?.headline == "after focus")
             #expect(h.notch.peekAlert?.stack.isEmpty == true)
+        }
+
+        @Test func alertsMissedDuringFocusShowTogetherWhenItEnds() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert("first"))
+            h.notch.enqueue(h.alert("second"))
+            h.system.isInFocus = false
+            await h.clock.advance(by: .seconds(5))
+            #expect(h.notch.state == .peek)
+            #expect(h.notch.peekAlert?.stack.map(\.headline) == ["first", "second"])
+            #expect(h.notch.peekAlert?.note == "While you were in Focus")
+            #expect(h.system.sounds.count == 1)
+        }
+
+        @Test func missedAlertsWaitForTheWholeFocus() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert())
+            await h.clock.advance(by: .seconds(60))
+            #expect(h.notch.state == .closed)
+            h.system.isInFocus = false
+            await h.clock.advance(by: .seconds(5))
+            #expect(h.notch.state == .peek)
+        }
+
+        @Test func openingThePanelDuringFocusForgetsWhatWasMissed() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert())
+            h.notch.open()
+            h.notch.close()
+            h.system.isInFocus = false
+            await h.clock.advance(by: .seconds(10))
+            #expect(h.notch.state == .closed)
         }
 
         @Test func aTestAlertShowsEvenDuringFocus() async {
