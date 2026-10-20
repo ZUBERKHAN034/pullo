@@ -4,6 +4,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-20
+
 ### Added
 - A glass look for the panel and alerts on macOS 26 and later, with or without a dark top behind the notch. Pick it in Settings → General. It follows your Liquid Glass setting and stays solid when Reduce transparency is on.
 
@@ -53,7 +55,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.3.1...HEAD
+[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/jordan-cod/devnotch/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/jordan-cod/devnotch/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jordan-cod/devnotch/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/jordan-cod/devnotch/compare/v0.2.0...v0.2.1
