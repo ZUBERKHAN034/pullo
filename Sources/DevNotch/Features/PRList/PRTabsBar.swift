@@ -14,7 +14,7 @@ struct PRTabsBar: View {
             Spacer()
             SearchTrigger(action: list.startSearch)
             if unreadCount(in: list.tab) > 0 {
-                IconButton(symbol: "envelope.open", help: "Mark all as read", action: list.markAllRead)
+                IconButton(symbol: "envelope.open", help: String(localized: "Mark all as read"), action: list.markAllRead)
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
             }
         }

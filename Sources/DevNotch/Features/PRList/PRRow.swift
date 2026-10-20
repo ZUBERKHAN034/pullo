@@ -97,9 +97,10 @@ struct PRRow: View {
     private var details: [String] {
         var parts = ["\(pr.repoName) #\(pr.number)"]
         if kind == .review {
-            parts.append("by \(pr.displayLogin(pr.author))")
+            parts.append(String(localized: "by \(pr.displayLogin(pr.author))"))
             if case .team(let teams) = pr.reviewRequest, let team = teams.first {
-                parts.append("via \(teams.count > 1 ? "\(team) +\(teams.count - 1)" : team)")
+                let teamName = teams.count > 1 ? "\(team) +\(teams.count - 1)" : team
+                parts.append(String(localized: "via \(teamName)"))
             }
         }
         return parts + statuses.compactMap(\.label)
@@ -108,7 +109,7 @@ struct PRRow: View {
     private var badges: some View {
         HStack(spacing: 8) {
             if hovering || selected, isUnread {
-                IconButton(symbol: "envelope.open", help: "Mark as read · r") { list.markRead(pr) }
+                IconButton(symbol: "envelope.open", help: String(localized: "Mark as read · r")) { list.markRead(pr) }
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
             HStack(spacing: 6) {
@@ -128,7 +129,9 @@ struct PRRow: View {
     private var ageDate: Date { kind == .mine ? pr.updatedAt : pr.createdAt }
 
     private var ageHelp: String {
-        guard kind == .review else { return "Updated \(ageDate.shortAge) ago" }
-        return pr.isDirectRequest ? "Waiting on your review for \(ageDate.shortAge)" : "Opened \(ageDate.shortAge) ago"
+        guard kind == .review else { return String(localized: "Updated \(ageDate.shortAge) ago") }
+        return pr
+            .isDirectRequest ? String(localized: "Waiting on your review for \(ageDate.shortAge)") :
+            String(localized: "Opened \(ageDate.shortAge) ago")
     }
 }

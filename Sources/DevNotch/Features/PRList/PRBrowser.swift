@@ -17,7 +17,7 @@ struct PRBrowser: View {
                 }
             }
             if let login = list.currentLogin, store.snapshots[login] != nil, store.errors[login] != nil {
-                ErrorBanner(message: "Couldn't refresh @\(login)") { notch.onOpenSettings?(.accounts) }
+                ErrorBanner(message: String(localized: "Couldn't refresh @\(login)")) { notch.onOpenSettings?(.accounts) }
             }
             content
             if list.keyboardMode {
@@ -31,7 +31,7 @@ struct PRBrowser: View {
         let login = list.currentLogin ?? ""
         let loaded = store.snapshots[login] != nil
         if !loaded, let error = store.errors[login] {
-            MessageView(symbol: "key.slash", title: "Can't reach GitHub", detail: error) {
+            MessageView(symbol: "key.slash", title: String(localized: "Can't reach GitHub"), detail: error) {
                 Task { await store.refresh() }
             }
         } else if !loaded {
@@ -41,8 +41,9 @@ struct PRBrowser: View {
         } else if list.visiblePRs.isEmpty {
             MessageView(
                 symbol: list.tab == .mine ? "tray" : "checkmark.circle",
-                title: list.tab == .mine ? "No open PRs" : "Nothing to review",
-                detail: list.tab == .mine ? "PRs you open will show up here." : "No one is waiting on you."
+                title: list.tab == .mine ? String(localized: "No open PRs") : String(localized: "Nothing to review"),
+                detail: list
+                    .tab == .mine ? String(localized: "PRs you open will show up here.") : String(localized: "No one is waiting on you.")
             )
             .id("\(login)|\(list.tab)")
         } else {
@@ -57,11 +58,15 @@ struct PRBrowser: View {
         if list.searchQuery.trimmingCharacters(in: .whitespaces).isEmpty {
             MessageView(
                 symbol: "magnifyingglass",
-                title: "Search @\(list.currentLogin ?? "")'s PRs",
-                detail: "Title, repo, #number, branch or author. Searches both tabs."
+                title: String(localized: "Search @\(list.currentLogin ?? "")'s PRs"),
+                detail: String(localized: "Title, repo, #number, branch or author. Searches both tabs.")
             )
         } else if results.isEmpty {
-            MessageView(symbol: "questionmark.circle", title: "No results", detail: "No PR matches \"\(list.searchQuery)\".")
+            MessageView(
+                symbol: "questionmark.circle",
+                title: String(localized: "No results"),
+                detail: String(localized: "No PR matches \"\(list.searchQuery)\".")
+            )
         } else {
             let mineIDs = Set(list.prs(in: .mine).map(\.id))
             PRList(
@@ -77,8 +82,8 @@ struct PRBrowser: View {
         let prs = list.visiblePRs
         guard list.tab == .review else { return [PRSection(title: nil, kind: .mine, prs: prs)] }
         return [
-            PRSection(title: "For you", kind: .review, prs: prs.filter(\.isDirectRequest)),
-            PRSection(title: "Via team", kind: .review, prs: prs.filter { !$0.isDirectRequest }),
+            PRSection(title: String(localized: "For you"), kind: .review, prs: prs.filter(\.isDirectRequest)),
+            PRSection(title: String(localized: "Via team"), kind: .review, prs: prs.filter { !$0.isDirectRequest }),
         ].filter { !$0.prs.isEmpty }
     }
 }

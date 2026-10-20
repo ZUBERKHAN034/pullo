@@ -17,7 +17,7 @@ struct SearchBar: View {
                 KeyCap(key: "esc")
             }
             .buttonStyle(.plain)
-            .hint("Close search", edge: .leading)
+            .hint(String(localized: "Close search"), edge: .leading)
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 6)

@@ -5,26 +5,26 @@ enum PRStatus: Equatable {
 
     var label: String? {
         switch self {
-        case .conflict: "Conflict"
-        case .ciFailed: "CI failed"
-        case .changesRequested: "Changes requested"
-        case .ciRunning: "CI running"
-        case .readyToMerge: "Ready to merge"
-        case .draft: "Draft"
+        case .conflict: String(localized: "Conflict")
+        case .ciFailed: String(localized: "CI failed")
+        case .changesRequested: String(localized: "Changes requested")
+        case .ciRunning: String(localized: "CI running")
+        case .readyToMerge: String(localized: "Ready to merge")
+        case .draft: String(localized: "Draft")
         case .ciPassed, .noChecks: nil
         }
     }
 
     var explanation: String {
         switch self {
-        case .conflict: "Conflicts with the base branch"
-        case .ciFailed: "Checks failed · click to see which"
-        case .changesRequested: "A reviewer requested changes"
-        case .ciRunning: "Checks are running"
-        case .readyToMerge: "Approved and checks passed · ready to merge"
-        case .draft: "Draft, not ready for review"
-        case .ciPassed: "Checks passed"
-        case .noChecks: "No checks on this PR"
+        case .conflict: String(localized: "Conflicts with the base branch")
+        case .ciFailed: String(localized: "Checks failed · click to see which")
+        case .changesRequested: String(localized: "A reviewer requested changes")
+        case .ciRunning: String(localized: "Checks are running")
+        case .readyToMerge: String(localized: "Approved and checks passed · ready to merge")
+        case .draft: String(localized: "Draft, not ready for review")
+        case .ciPassed: String(localized: "Checks passed")
+        case .noChecks: String(localized: "No checks on this PR")
         }
     }
 }

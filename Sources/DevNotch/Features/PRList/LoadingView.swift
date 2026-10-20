@@ -2,11 +2,11 @@ import SwiftUI
 
 struct LoadingView: View {
     private static let messages = [
-        "Waking up GitHub…",
-        "Counting your PRs…",
-        "Checking CI…",
-        "Finding review requests…",
-        "Reading comments…",
+        String(localized: "Waking up GitHub…"),
+        String(localized: "Counting your PRs…"),
+        String(localized: "Checking CI…"),
+        String(localized: "Finding review requests…"),
+        String(localized: "Reading comments…"),
     ]
     private static let rows: [(title: CGFloat, subtitle: CGFloat, tag: Bool)] = [
         (230, 150, true), (190, 170, false), (260, 120, true), (170, 140, false),

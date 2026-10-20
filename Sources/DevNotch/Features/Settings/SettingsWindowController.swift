@@ -20,7 +20,7 @@ final class SettingsWindowController {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "DevNotch Settings"
+            window.title = String(localized: "DevNotch Settings")
             window.titlebarAppearsTransparent = true
             window.toolbarStyle = .unified
             window.isReleasedWhenClosed = false

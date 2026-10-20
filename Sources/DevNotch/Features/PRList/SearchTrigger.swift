@@ -26,6 +26,6 @@ struct SearchTrigger: View {
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
-        .hint("Filter by title, repo, #number, branch or author", edge: .leading)
+        .hint(String(localized: "Filter by title, repo, #number, branch or author"), edge: .leading)
     }
 }

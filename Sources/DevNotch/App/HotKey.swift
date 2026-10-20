@@ -20,7 +20,7 @@ final class HotKey {
             Unmanaged.passUnretained(self).toOpaque(),
             &handlerRef
         )
-        let id = EventHotKeyID(signature: OSType(0x444E_5443), id: 1) // "DNTC"
+        let id = EventHotKeyID(signature: OSType(0x444E_5443), id: 1)
         let registered = RegisterEventHotKey(
             UInt32(shortcut.keyCode), UInt32(shortcut.modifiers), id, GetApplicationEventTarget(), 0, &hotKeyRef
         )
