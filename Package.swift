@@ -12,7 +12,7 @@ let package = Package(
             name: "DevNotch",
             dependencies: [.product(name: "Sparkle", package: "Sparkle")],
             path: "Sources/DevNotch",
-            exclude: ["Resources/Localizable.xcstrings"]
+            exclude: ["Resources/Localizable.xcstrings", "Resources/InfoPlist.xcstrings"]
         ),
         .testTarget(name: "DevNotchTests", dependencies: ["DevNotch"], path: "Tests/DevNotchTests"),
     ]

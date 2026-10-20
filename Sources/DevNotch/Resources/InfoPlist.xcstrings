@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSFocusStatusUsageDescription" : {
+      "comment" : "Privacy - Focus Status Usage Description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DevNotch holds its alerts while a Focus is on."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DevNotch retiene sus alertas mientras un modo de concentración está activo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DevNotch segura os alertas enquanto um Foco estiver ativado."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
