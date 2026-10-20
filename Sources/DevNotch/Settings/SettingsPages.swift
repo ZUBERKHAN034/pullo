@@ -154,7 +154,7 @@ struct ShortcutsPage: View {
     var body: some View {
         Form {
             Section {
-                row("Open or close the panel", "⌥⌘P")
+                row("Open or close the panel", Shortcut.togglePanel.symbols)
             } header: {
                 Text("Anywhere")
             } footer: {

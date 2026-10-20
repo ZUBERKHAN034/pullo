@@ -15,7 +15,7 @@ struct DemoMode: Equatable {
 
     @MainActor
     func play(model: NotchViewModel, store: PRStore, source: DemoSource) async {
-        let screen = NotchGeometry.notchedScreen
+        guard let screen = NotchGeometry.notchedScreen else { return }
         let stage = DemoStage(screen: screen, menuBarHeight: model.geometry.notchSize.height)
         stage.show()
         try? await Task.sleep(for: .seconds(1))

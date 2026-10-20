@@ -1,5 +1,4 @@
 import AppKit
-import Carbon.HIToolbox
 import Combine
 
 @MainActor
@@ -17,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     private lazy var model = NotchViewModel(
         store: store, accounts: accounts, settings: settings, tracker: tracker,
-        geometry: NotchGeometry(screen: NotchGeometry.notchedScreen)
+        geometry: NotchGeometry.notchedScreen.map(NotchGeometry.init(screen:)) ?? .placeholder
     )
     // Sparkle checks on its own schedule from the moment it starts, so launch touches it instead of waiting for Settings.
     private lazy var updater = demo == nil ? Updater() : nil
@@ -65,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = updater
         if accounts.accounts.isEmpty { greetFirstLaunch() }
 
-        hotKey = HotKey(keyCode: kVK_ANSI_P, modifiers: cmdKey | optionKey) { [weak self] in
+        hotKey = HotKey(.togglePanel) { [weak self] in
             MainActor.assumeIsolated { self?.toggleFromKeyboard() }
         }
 
@@ -128,7 +127,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// A display was plugged in, removed or rearranged, or the lid opened or closed.
     private func screensChanged() {
-        let target = NotchGeometry(screen: NotchGeometry.notchedScreen)
+        guard let screen = NotchGeometry.notchedScreen else { return }
+        let target = NotchGeometry(screen: screen)
         if target.screenFrame != model.geometry.screenFrame { model.close() }
         model.geometry = target
     }

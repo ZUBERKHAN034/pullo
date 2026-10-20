@@ -6,7 +6,7 @@ final class HotKey {
     private var handlerRef: EventHandlerRef?
     private let action: () -> Void
 
-    init?(keyCode: Int, modifiers: Int, action: @escaping () -> Void) {
+    init?(_ shortcut: Shortcut, action: @escaping () -> Void) {
         self.action = action
         var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
         let installed = InstallEventHandler(
@@ -23,7 +23,7 @@ final class HotKey {
         )
         let id = EventHotKeyID(signature: OSType(0x444E_5443), id: 1) // "DNTC"
         let registered = RegisterEventHotKey(
-            UInt32(keyCode), UInt32(modifiers), id, GetApplicationEventTarget(), 0, &hotKeyRef
+            UInt32(shortcut.keyCode), UInt32(shortcut.modifiers), id, GetApplicationEventTarget(), 0, &hotKeyRef
         )
         guard installed == noErr, registered == noErr else { return nil }
     }

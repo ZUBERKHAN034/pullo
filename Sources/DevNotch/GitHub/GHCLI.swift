@@ -49,7 +49,8 @@ enum GHCLI {
         return users
     }
 
-    static func token(for user: String, host: String = "github.com") throws -> String {
+    /// gh can stall, e.g. waiting on a keychain prompt nobody sees, so it gets a deadline instead of hanging a thread.
+    static func token(for user: String, host: String = "github.com", timeout: Duration = .seconds(10)) throws -> String {
         guard let executable else { throw GitHubError.noToken }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
@@ -57,9 +58,15 @@ enum GHCLI {
         let output = Pipe()
         process.standardOutput = output
         process.standardError = Pipe()
+        let exited = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in exited.signal() }
         try process.run()
+        if exited.wait(timeout: .now() + .milliseconds(Int(timeout / .milliseconds(1)))) == .timedOut {
+            process.terminate()
+            throw GitHubError.ghTimedOut
+        }
+        // A token is far smaller than the pipe's buffer, so gh can exit before anyone reads it.
         let data = output.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
 
         let token = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
         guard process.terminationStatus == 0, !token.isEmpty else { throw GitHubError.noToken }

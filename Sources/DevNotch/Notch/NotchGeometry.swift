@@ -17,10 +17,14 @@ struct NotchGeometry: Equatable {
     }
 
     /// The built-in screen, where the notch is. With the lid closed there's none, so it falls back to the main screen.
+    /// Nil only for the moment no display is attached at all, e.g. mid-way through a display change.
     @MainActor
-    static var notchedScreen: NSScreen {
-        NSScreen.screens.first { $0.safeAreaInsets.top > 0 } ?? NSScreen.main ?? NSScreen.screens[0]
+    static var notchedScreen: NSScreen? {
+        NSScreen.screens.first { $0.safeAreaInsets.top > 0 } ?? NSScreen.main ?? NSScreen.screens.first
     }
+
+    /// Stands in until a screen shows up; nothing is drawn against it.
+    static let placeholder = NotchGeometry(screenFrame: .zero, notchSize: CGSize(width: 180, height: 24), hasNotch: false)
 }
 
 // In an extension so the memberwise initializer stays available.

@@ -132,7 +132,7 @@ final class DemoTour {
         await wait(4.0)
 
         stage.model.caption = nil
-        stage.model.titleCard = DemoCaption(title: "DevNotch", subtitle: "Press ⌥⌘P to open it from any app.")
+        stage.model.titleCard = DemoCaption(title: "DevNotch", subtitle: "Press \(Shortcut.togglePanel.symbols) to open it from any app.")
         cue("end-card")
         await wait(3.6)
         cue("end")
