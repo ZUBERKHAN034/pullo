@@ -116,6 +116,22 @@
     "%lld": {
       "shouldTranslate": false
     },
+    "%lld lines added, %lld removed, %lld files": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld líneas añadidas, %lld eliminadas, %lld archivos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld linhas adicionadas, %lld removidas, %lld arquivos"
+          }
+        }
+      }
+    },
     "%lld new comments": {
       "localizations": {
         "es": {
@@ -192,6 +208,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "+%lld mais"
+          }
+        }
+      }
+    },
+    "+%lld −%lld · %lld files changed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld −%lld · %lld archivos modificados"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld −%lld · %lld arquivos alterados"
           }
         }
       }

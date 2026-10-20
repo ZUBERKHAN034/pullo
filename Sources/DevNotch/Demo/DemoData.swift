@@ -101,7 +101,8 @@ import Foundation
                 othersComments: comments.map { Activity(id: $0, author: "marina-dev") }, othersReviews: reviews,
                 headOID: "head-\(id)", commitCount: 3,
                 approvers: approvers, changeRequesters: review == .changesRequested ? ["marina-dev"] : [],
-                reviewRequest: request, failedChecks: failedChecks
+                reviewRequest: request, failedChecks: failedChecks,
+                size: PRSize(additions: number * 37 % 640 + 4, deletions: number * 13 % 180, changedFiles: number % 14 + 1)
             )
         }
     }
