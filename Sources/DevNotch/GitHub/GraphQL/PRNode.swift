@@ -71,6 +71,9 @@ struct PRNode: Decodable {
     let reviewDecision: String?
     let mergeable: String?
     let headRefName: String
+    let additions: Int?
+    let deletions: Int?
+    let changedFiles: Int?
     let repository: Repo
     let author: Login?
     let comments: Activities
@@ -123,8 +126,14 @@ struct PRNode: Decodable {
             changeRequesters: reviewers("CHANGES_REQUESTED"),
             reviewRequest: isDirect ? .direct : .team(teams),
             failedChecks: failedChecks,
-            avatars: avatars
+            avatars: avatars,
+            size: size
         )
+    }
+
+    private var size: PRSize? {
+        guard let additions, let deletions, let changedFiles else { return nil }
+        return PRSize(additions: additions, deletions: deletions, changedFiles: changedFiles)
     }
 
     private var avatars: [String: URL] {

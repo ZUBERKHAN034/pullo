@@ -12,6 +12,7 @@ struct GitHubClient {
     }
     fragment pr on PullRequest {
       id number title url isDraft createdAt updatedAt reviewDecision mergeable headRefName
+      additions deletions changedFiles
       repository { nameWithOwner }
       author { login avatarUrl }
       headRefOid
