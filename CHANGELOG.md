@@ -5,6 +5,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ## [Unreleased]
 
 ### Added
+- Each pull request shows how many lines it adds and removes. Hover over it to see how many files changed.
 - Drag a pull request out of the panel to drop its link into Slack, an email or anywhere else.
 
 ## [0.4.0] - 2026-10-20
