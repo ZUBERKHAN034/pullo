@@ -1,11 +1,9 @@
 import Foundation
 
-/// Made-up accounts and PRs for the demo, in three moments: before, after a round of news, and after CI goes green.
 enum DemoData {
     static let work = Account(login: "ana-acme", avatarURL: nil)
     static let personal = Account(login: "dev-ana", avatarURL: nil)
 
-    /// A throwaway defaults domain, so the demo never touches the real accounts or read state.
     static func freshDefaults() -> UserDefaults {
         let suite = "dev.jrdan.devnotch.demo"
         UserDefaults().removePersistentDomain(forName: suite)
@@ -107,10 +105,8 @@ enum DemoData {
     }
 }
 
-/// Serves whichever demo moment the tour is on, in place of GitHub.
 actor DemoSource: PRSource {
     private var snapshots = DemoData.snapshots(at: .calm)
-    /// The first fetch takes a while, like a real cold start, so the loading state shows up in the demo.
     private var firstFetchDelay: Duration? = .seconds(8.5)
 
     func show(_ moment: DemoData.Moment) {

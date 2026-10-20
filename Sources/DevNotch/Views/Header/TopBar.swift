@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The strip level with the physical notch; holds the header controls when open.
 struct TopBar: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore

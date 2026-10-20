@@ -15,9 +15,7 @@ enum DemoRecorderError: LocalizedError {
     }
 }
 
-/// Records only DevNotch's own windows in a region of the screen, so nothing else on the desktop ends up in the demo.
 final class DemoRecorder: NSObject, SCStreamOutput, @unchecked Sendable {
-    /// Host time of the first recorded frame, to line the tour's cues up with the video.
     var firstFrameTime: Double? {
         queue.sync { firstFrame }
     }

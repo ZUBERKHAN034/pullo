@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Drives the notch: which state it's in, what the panel shows, alerts waiting to drop out, and input.
 @MainActor
 final class NotchViewModel: ObservableObject {
     @Published private(set) var state: NotchState = .closed
@@ -9,9 +8,7 @@ final class NotchViewModel: ObservableObject {
     @Published private(set) var tab: PRTab = .mine
     @Published private(set) var selectedLogin: String?
     @Published var geometry: NotchGeometry
-    /// PR highlighted by keyboard navigation.
     @Published private(set) var selectedPRID: String?
-    /// Opened from the shortcut: stays open until Esc, the shortcut again, or a click outside.
     @Published private(set) var keyboardMode = false
     @Published private(set) var toast: String?
     @Published private(set) var isSearching = false
@@ -24,9 +21,7 @@ final class NotchViewModel: ObservableObject {
     let settings: AppSettings
     let tracker: ReadTracker
 
-    /// The panel needs key focus for typing (search); AppKit-side, so the delegate provides it.
     var onNeedsKeyFocus: (() -> Void)?
-    /// Nil opens Settings where it was left.
     var onOpenSettings: ((SettingsPage?) -> Void)?
 
     private var queue: [NotchAlert] = []
@@ -35,7 +30,6 @@ final class NotchViewModel: ObservableObject {
     private var toastTask: Task<Void, Never>?
     /// Set after closing while the pointer is still over the notch, so it doesn't spring right back open.
     private var waitingForPointerExit = false
-    /// The pointer is over the peek, so it stays out until the pointer leaves.
     private var holdingPeek = false
 
     init(store: PRStore, accounts: AccountStore, settings: AppSettings, tracker: ReadTracker, geometry: NotchGeometry) {
@@ -48,7 +42,6 @@ final class NotchViewModel: ObservableObject {
 
     var layout: NotchLayout { NotchLayout(geometry: geometry) }
 
-    /// The account whose PRs the panel shows; falls back to the first one if the selection was removed.
     var currentLogin: String? {
         if let selectedLogin, accounts.accounts.contains(where: { $0.login == selectedLogin }) {
             return selectedLogin
@@ -60,7 +53,6 @@ final class NotchViewModel: ObservableObject {
         tab == .mine ? store.mine(for: currentLogin) : store.reviewRequests(for: currentLogin)
     }
 
-    /// What the list shows, in display order: the current tab, or search results across both tabs.
     var visiblePRs: [PullRequest] {
         guard isSearching else { return prs(in: tab) }
         var seen = Set<String>()
@@ -79,7 +71,6 @@ final class NotchViewModel: ObservableObject {
 
         switch state {
         case .peek:
-            // Hovering holds the alert so it can be clicked; leaving lets it go after a moment.
             if inside {
                 guard !holdingPeek else { return }
                 holdingPeek = true
@@ -95,7 +86,6 @@ final class NotchViewModel: ObservableObject {
             }
         case .open:
             if keyboardMode {
-                // Once the pointer comes over, it's a regular hover panel again.
                 if inside { keyboardMode = false }
                 return
             }
@@ -110,7 +100,6 @@ final class NotchViewModel: ObservableObject {
         if state == .open, !layout.hitRect(for: .open).contains(point) { close() }
     }
 
-    /// Waits a beat before reacting to the pointer, so passing over the notch doesn't flicker it.
     private func scheduleHover(after delay: Duration, _ action: @escaping (NotchViewModel) -> Void) {
         guard hoverTask == nil else { return }
         hoverTask = Task { [weak self] in
@@ -144,7 +133,6 @@ final class NotchViewModel: ObservableObject {
         if state == .open { close() } else { open(viaKeyboard: true) }
     }
 
-    /// `pointerStaysOver` is for closes triggered from inside the panel, e.g. clicking a PR.
     func close(pointerStaysOver: Bool = false) {
         cancelHover()
         peekTask?.cancel()
@@ -184,7 +172,6 @@ final class NotchViewModel: ObservableObject {
         ))
     }
 
-    /// Fires one to three sample alerts so the single and stacked peeks can both be seen.
     func previewAlert() {
         close(pointerStaysOver: true)
         let prs = visiblePRs.isEmpty ? [PullRequest.sample] : visiblePRs
@@ -210,7 +197,6 @@ final class NotchViewModel: ObservableObject {
         }
     }
 
-    /// Several alerts waiting at once drop out together as one stacked peek.
     private func showNextPeek() {
         guard state == .closed, !queue.isEmpty else { return }
         let alert = queue.count > 1 ? NotchAlert.summary(of: queue) : queue[0]
@@ -245,7 +231,6 @@ final class NotchViewModel: ObservableObject {
         close(pointerStaysOver: true)
     }
 
-    /// Opening a PR is what marks it as read.
     func open(_ pr: PullRequest) {
         tracker.markRead([pr])
         openInBrowser(pr.url)
@@ -361,7 +346,6 @@ final class NotchViewModel: ObservableObject {
         selectedPRID = prs[next].id
     }
 
-    /// After the list changes, keyboard users land on its first PR; pointer users don't get a selection.
     private func resetSelection() {
         guard selectedPRID != nil || keyboardMode else { return }
         selectedPRID = visiblePRs.first?.id

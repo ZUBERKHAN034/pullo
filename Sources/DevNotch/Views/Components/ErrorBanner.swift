@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A tappable orange strip for a problem that has somewhere to go to fix it.
 struct ErrorBanner: View {
     let message: String
     let action: () -> Void

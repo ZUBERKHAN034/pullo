@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The few keys worth showing; the rest are in each button's tooltip.
 struct KeyboardHints: View {
     let searching: Bool
 

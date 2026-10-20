@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Overlapping icons that fan out one after another when several alerts arrive together.
 struct StackedIcons: View {
     let alerts: [NotchAlert]
     @State private var fanned = false

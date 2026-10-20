@@ -1,7 +1,6 @@
 import Combine
 import Sparkle
 
-/// Sparkle's updater, wrapped so SwiftUI can bind to it. The feed and its signing key live in Info.plist.
 @MainActor
 final class Updater: ObservableObject {
     @Published private(set) var canCheckForUpdates = false

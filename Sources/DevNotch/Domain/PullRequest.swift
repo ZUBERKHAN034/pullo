@@ -33,7 +33,6 @@ struct FailedCheck: Identifiable, Equatable {
     var id: String { "\(name)|\(url?.absoluteString ?? "")" }
 }
 
-/// Why a PR is in your review queue.
 enum ReviewRequest: Equatable {
     case direct
     case team([String])
@@ -41,7 +40,6 @@ enum ReviewRequest: Equatable {
 
 struct PullRequest: Identifiable, Equatable {
     let id: String
-    /// Login of the connected account this PR was fetched with.
     let account: String
     let number: Int
     let title: String
@@ -55,7 +53,6 @@ struct PullRequest: Identifiable, Equatable {
     let ci: CIState?
     let review: ReviewDecision?
     let hasConflict: Bool
-    /// Recent comments and reviews by people other than you; bots don't count.
     let othersComments: [Activity]
     let othersReviews: [Activity]
     let headOID: String
@@ -64,7 +61,6 @@ struct PullRequest: Identifiable, Equatable {
     let changeRequesters: [String]
     let reviewRequest: ReviewRequest
     let failedChecks: [FailedCheck]
-    /// Avatar of each person on the PR, by login.
     var avatars: [String: URL] = [:]
 
     var isDirectRequest: Bool { reviewRequest == .direct }

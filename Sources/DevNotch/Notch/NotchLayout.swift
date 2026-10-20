@@ -1,10 +1,8 @@
 import AppKit
 
-/// Sizes and hit areas of the notch in each state, derived from the screen's real notch.
 struct NotchLayout {
     let geometry: NotchGeometry
 
-    /// Content size, not counting the flares the shape adds at the top corners.
     func size(for state: NotchState) -> CGSize {
         let notch = geometry.notchSize
         switch state {
@@ -25,7 +23,6 @@ struct NotchLayout {
         }
     }
 
-    /// Where the pointer counts as "over the notch", in screen coordinates.
     func hitRect(for state: NotchState) -> NSRect {
         let size = size(for: state)
         let width = size.width + radii(for: state).top * 2
@@ -37,7 +34,6 @@ struct NotchLayout {
         )
         switch state {
         case .closed:
-            // A little wider and taller than the notch, so it's easy to hit from the menu bar.
             return NSRect(x: rect.minX - 10, y: rect.minY - 4, width: rect.width + 20, height: rect.height + 6)
         case .peek:
             return rect.insetBy(dx: 0, dy: -2)

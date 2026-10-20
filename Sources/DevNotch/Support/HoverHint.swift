@@ -10,7 +10,6 @@ extension View {
 
 private struct HoverHint: ViewModifier {
     let text: String
-    /// Which side of the view the hint opens on; pick the side with room.
     let edge: HorizontalEdge
     @State private var shown = false
     @State private var pending: Task<Void, Never>?
@@ -23,7 +22,6 @@ private struct HoverHint: ViewModifier {
                     withAnimation(Motion.fade) { shown = false }
                     return
                 }
-                // A short wait, so sweeping the pointer across the panel doesn't flash hints everywhere.
                 pending = Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(400))
                     guard !Task.isCancelled else { return }
@@ -41,7 +39,6 @@ private struct HoverHint: ViewModifier {
                     .opacity(shown ? 1 : 0)
                     .allowsHitTesting(false)
             }
-            // Above its siblings, which would otherwise draw over the hint.
             .zIndex(shown ? 1 : 0)
     }
 

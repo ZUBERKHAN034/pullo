@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// How each kind of PR event looks when it drops out of the notch.
 extension PREvent {
     func alert(showingAccount: Bool) -> NotchAlert {
         NotchAlert(

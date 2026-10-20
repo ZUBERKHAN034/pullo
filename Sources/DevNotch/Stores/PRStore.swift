@@ -3,14 +3,11 @@ import Foundation
 
 @MainActor
 final class PRStore: ObservableObject {
-    /// Each account's PRs, kept apart and already sorted.
     @Published private(set) var snapshots: [String: Snapshot] = [:]
     @Published private(set) var lastUpdated: Date?
-    /// Last error per account login; an account that failed keeps showing its previous PRs.
     @Published private(set) var errors: [String: String] = [:]
     @Published private(set) var isLoading = false
 
-    /// Called once per refresh with everything that changed, so alerts can be grouped.
     var onEvents: (([PREvent]) -> Void)?
 
     private let accounts: AccountStore

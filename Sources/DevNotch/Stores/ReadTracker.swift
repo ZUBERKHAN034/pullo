@@ -1,6 +1,5 @@
 import Foundation
 
-/// What a PR looked like the last time you opened it.
 struct ReadBaseline: Codable, Equatable {
     var commentIDs: Set<String>
     var reviewIDs: Set<String>
@@ -8,7 +7,6 @@ struct ReadBaseline: Codable, Equatable {
     var commitCount: Int
     var ci: CIState?
     var review: ReviewDecision?
-    /// Showed up after the account was already being tracked, and you haven't opened it yet.
     var isNew = false
 
     init(_ pr: PullRequest, isNew: Bool = false) {
@@ -22,7 +20,6 @@ struct ReadBaseline: Codable, Equatable {
     }
 }
 
-/// Tracks what changed on each PR since you last opened it.
 @MainActor
 final class ReadTracker: ObservableObject {
     @Published private(set) var baselines: [String: ReadBaseline] = [:]
@@ -45,7 +42,6 @@ final class ReadTracker: ObservableObject {
         var updated = baselines.filter { !$0.key.hasPrefix("\(account)|") }
         for pr in prs {
             let key = Self.key(pr)
-            // A PR you just opened yourself isn't news to you.
             updated[key] = baselines[key] ?? ReadBaseline(pr, isNew: !firstSync && pr.author != account)
         }
         let newAccount = knownAccounts.insert(account).inserted
@@ -76,7 +72,6 @@ final class ReadTracker: ObservableObject {
             if pr.ci == .failure { reasons.append("CI failed") }
             if pr.ci == .success { reasons.append("CI passed") }
         }
-        // On your own PRs the commits are yours, so only other people's pushes are news.
         if pr.author != pr.account, pr.headOID != base.headOID {
             let added = pr.commitCount - base.commitCount
             reasons.append(added > 0 ? (added == 1 ? "1 new commit" : "\(added) new commits") : "force-push")
@@ -88,7 +83,6 @@ final class ReadTracker: ObservableObject {
         !reasons(for: pr).isEmpty
     }
 
-    /// Drops everything kept for a removed account, so adding it back starts fresh.
     func forget(account: String) {
         baselines = baselines.filter { !$0.key.hasPrefix("\(account)|") }
         knownAccounts.remove(account)

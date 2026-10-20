@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The first fetch of an account: placeholder rows in the shape of real ones, and a line that keeps changing.
 struct LoadingView: View {
     private static let messages = [
         "Waking up GitHub…",
@@ -9,7 +8,6 @@ struct LoadingView: View {
         "Finding review requests…",
         "Reading comments…",
     ]
-    /// Uneven widths so the placeholders read as text, not as a grid.
     private static let rows: [(title: CGFloat, subtitle: CGFloat, tag: Bool)] = [
         (230, 150, true), (190, 170, false), (260, 120, true), (170, 140, false),
     ]

@@ -1,6 +1,5 @@
 import Foundation
 
-/// The GitHub CLI accounts shown in the notch. Only login and avatar are saved; tokens are never stored.
 @MainActor
 final class AccountStore: ObservableObject {
     @Published private(set) var accounts: [Account] = []
@@ -24,7 +23,6 @@ final class AccountStore: ObservableObject {
         reloadGHUsers()
     }
 
-    /// gh accounts not added yet.
     var importableGHUsers: [String] {
         ghUsers.filter { user in !accounts.contains { $0.login.caseInsensitiveCompare(user) == .orderedSame } }
     }
@@ -37,7 +35,6 @@ final class AccountStore: ObservableObject {
         return token
     }
 
-    /// Drops a cached token so the next request asks gh again, e.g. after `gh auth refresh`.
     func invalidateToken(for login: String) {
         tokens[login] = nil
     }

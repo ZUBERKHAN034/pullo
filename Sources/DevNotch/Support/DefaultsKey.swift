@@ -1,6 +1,5 @@
 import Foundation
 
-/// Every key the app keeps in UserDefaults, so a typo can't quietly read or write a different one.
 enum DefaultsKey: String {
     case accounts
     case mutedCategories, mutedAccounts, haptics, sound

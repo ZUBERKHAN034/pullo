@@ -1,6 +1,5 @@
 import Foundation
 
-/// Something that changed on a PR between two polls.
 struct PREvent: Equatable {
     enum Kind: CaseIterable {
         case ciPassed, ciFailed, approved, changesRequested, reviewRequested, newComment, merged, closed
@@ -8,14 +7,11 @@ struct PREvent: Equatable {
 
     let kind: Kind
     let pr: PullRequest
-    /// Who caused it, when GitHub tells us.
     let actor: String?
-    /// Their avatar when the PR doesn't already know it, e.g. whoever merged it.
     var actorAvatar: URL?
 }
 
 extension PREvent {
-    /// Compares two polls and turns state transitions into alerts.
     static func diff(old: Snapshot, new: Snapshot) -> [PREvent] {
         var events: [PREvent] = []
         let oldMine = Dictionary(uniqueKeysWithValues: old.mine.map { ($0.id, $0) })
@@ -36,7 +32,6 @@ extension PREvent {
             if let requester = newRequesters.last {
                 events.append(PREvent(kind: .changesRequested, pr: pr, actor: requester))
             }
-            // Plain comments and "comment" reviews; approvals and change requests already alerted above.
             let newActivity = pr.othersComments.filter { !before.othersCommentIDs.contains($0.id) }
                 + pr.othersReviews.filter { review in
                     !before.othersReviews.contains { $0.id == review.id }

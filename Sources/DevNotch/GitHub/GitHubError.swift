@@ -5,7 +5,6 @@ enum GitHubError: LocalizedError, Equatable {
     case ghTimedOut
     case unauthorized
     case http(Int)
-    /// A readable reason GitHub gave, from GraphQL errors or a REST error body.
     case api(String)
 
     var errorDescription: String? {

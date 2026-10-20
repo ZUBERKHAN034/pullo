@@ -1,6 +1,5 @@
 import Foundation
 
-/// Reads accounts the GitHub CLI already knows about. Tokens stay in gh's own storage; we ask for them on demand.
 enum GHCLI {
     static var isInstalled: Bool { executable != nil }
 

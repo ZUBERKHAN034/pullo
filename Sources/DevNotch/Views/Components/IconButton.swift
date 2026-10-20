@@ -5,7 +5,6 @@ struct IconButton: View {
     let help: String
     var spinning = false
     var active = false
-    /// Most icon buttons sit at the right edge, so the hint opens to their left.
     var hintEdge: HorizontalEdge = .leading
     let action: () -> Void
     @State private var hovering = false

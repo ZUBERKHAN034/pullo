@@ -55,7 +55,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if let demo {
-            // The tour drives everything itself; a stray real mouse move or shortcut shouldn't interfere.
             Task { await demo.play(model: model, store: store, source: demoSource) }
             return
         }
@@ -112,7 +111,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if model.state == .open { panel?.makeKeyAndOrderFront(nil) }
     }
 
-    /// With no account the closed notch shows nothing, so point at it once.
     private func greetFirstLaunch() {
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(1))
@@ -125,7 +123,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// A display was plugged in, removed or rearranged, or the lid opened or closed.
     private func screensChanged() {
         guard let screen = NotchGeometry.notchedScreen else { return }
         let target = NotchGeometry(screen: screen)

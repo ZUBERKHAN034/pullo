@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A band of light sweeping across placeholder shapes while content loads; clock-driven, like `Spin`.
 struct Shimmer: ViewModifier {
     var period: Double = 1.4
 

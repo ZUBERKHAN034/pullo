@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// A regular macOS settings window, opened from the gear in the panel.
 @MainActor
 final class SettingsWindowController {
     private var window: NSWindow?
@@ -12,7 +11,6 @@ final class SettingsWindowController {
         self.content = content
     }
 
-    /// Nil keeps the page it was left on.
     func show(page: SettingsPage? = nil) {
         if let page { navigation.page = page }
         if window == nil {
@@ -23,7 +21,6 @@ final class SettingsWindowController {
                 defer: false
             )
             window.title = "DevNotch Settings"
-            // The sidebar runs up under the title bar, as in System Settings.
             window.titlebarAppearsTransparent = true
             window.toolbarStyle = .unified
             window.isReleasedWhenClosed = false

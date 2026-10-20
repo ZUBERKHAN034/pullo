@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Adds accounts from the GitHub CLI, or explains how to get gh ready when there's nothing to add.
 struct GHImportOptions: View {
     @ObservedObject var accounts: AccountStore
 

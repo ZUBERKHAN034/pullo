@@ -100,7 +100,6 @@ struct GitHubClient {
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         if status == 401 { throw GitHubError.unauthorized }
         guard (200..<300).contains(status) else {
-            // REST errors carry a readable reason (e.g. "Resource not accessible by integration").
             struct Failure: Decodable { let message: String }
             if let failure = try? JSONDecoder().decode(Failure.self, from: data) {
                 throw GitHubError.api(failure.message)

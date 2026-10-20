@@ -14,7 +14,6 @@ struct HeaderActions: View {
         }
     }
 
-    /// When the list last updated lives here rather than taking room in the panel.
     private var refreshHelp: String {
         guard let updated = store.lastUpdated else { return "Refresh" }
         let age = updated.shortAge

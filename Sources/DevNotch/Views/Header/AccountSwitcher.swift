@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Picks whose PRs the panel shows. Accounts never mix in the lists.
 struct AccountSwitcher: View {
     @ObservedObject var model: NotchViewModel
     @ObservedObject var store: PRStore
@@ -25,7 +24,6 @@ struct AccountSwitcher: View {
                         Avatar(url: account.avatarURL, login: account.login, size: 18)
                             .opacity(selected ? 1 : 0.55)
                             .overlay(alignment: .topTrailing) {
-                                // Tells you the other account has news without switching to it.
                                 if !selected, hasUnread(account.login) {
                                     Circle()
                                         .fill(Color.unread)

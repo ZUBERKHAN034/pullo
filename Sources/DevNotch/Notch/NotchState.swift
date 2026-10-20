@@ -1,4 +1,3 @@
-/// How much of the notch is showing.
 enum NotchState: Equatable {
     case closed, peek, open
 }

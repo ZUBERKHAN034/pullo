@@ -4,7 +4,6 @@ struct PRRow: View {
     let pr: PullRequest
     let kind: PRTab
     let selected: Bool
-    /// What changed since you last opened it; empty means read.
     let unreadReasons: [String]
     @ObservedObject var model: NotchViewModel
 
@@ -21,7 +20,6 @@ struct PRRow: View {
                     // Its hover hint opens over the title, so it has to draw above it.
                     .zIndex(1)
                 VStack(alignment: .leading, spacing: 2) {
-                    // Unread shows as a bolder title, what changed on the line below, and a blue dot by the age.
                     Text(pr.title)
                         .font(.system(size: 12.5, weight: isUnread ? .semibold : .medium))
                         .foregroundStyle(.white.opacity(isUnread ? 1 : 0.88))
@@ -57,7 +55,6 @@ struct PRRow: View {
 
     private var statuses: [PRStatus] { pr.statuses(mine: kind == .mine) }
 
-    /// The most urgent state; with failing CI it also opens the list of failed checks.
     @ViewBuilder
     private var leading: some View {
         let icon = StatusIcon(status: statuses.first ?? .noChecks)
@@ -77,7 +74,6 @@ struct PRRow: View {
         }
     }
 
-    /// Everything about the PR in one gray line: what changed if it's unread, then where it lives and its states.
     private var subtitle: some View {
         Group {
             if isUnread {
@@ -91,7 +87,6 @@ struct PRRow: View {
         .lineLimit(1)
     }
 
-    /// The branch stays out of the row; it's in the tooltip and one keystroke away with "c".
     private var details: [String] {
         var parts = ["\(pr.repoName) #\(pr.number)"]
         if kind == .review {
@@ -114,7 +109,6 @@ struct PRRow: View {
                     Circle().fill(Color.unread).frame(width: 6, height: 6)
                         .transition(.scale.combined(with: .opacity))
                 }
-                // Your PRs are sorted by activity, review requests by how long they've waited; the age follows suit.
                 Text(ageDate.shortAge)
                     .font(.system(size: 11, weight: .medium).monospacedDigit())
                     .foregroundStyle(Color.secondaryText)

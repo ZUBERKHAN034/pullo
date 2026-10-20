@@ -42,7 +42,6 @@ struct PRNode: Decodable {
             struct Commit: Decodable {
                 struct Rollup: Decodable {
                     struct Contexts: Decodable {
-                        /// A CheckRun (Actions and apps) or a StatusContext (legacy commit statuses).
                         struct Context: Decodable {
                             let name: String?
                             let conclusion: String?
@@ -129,7 +128,6 @@ struct PRNode: Decodable {
         )
     }
 
-    /// Everyone who shows up on the PR, so alerts can put a face to who did what.
     private var avatars: [String: URL] {
         var avatars: [String: URL] = [:]
         let people = [author.map { ($0.login, $0.avatarUrl) }]

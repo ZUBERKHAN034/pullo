@@ -1,6 +1,5 @@
 import Carbon.HIToolbox
 
-/// What a key press means in the panel, decided apart from what it does.
 enum KeyCommand: Equatable {
     case quit, search, close
     case moveUp, moveDown, open
@@ -23,7 +22,6 @@ enum KeyCommand: Equatable {
         case kVK_DownArrow: self = .moveDown
         case kVK_Return, kVK_ANSI_KeypadEnter: self = .open
         default:
-            // While typing a search, everything else belongs to the text field.
             guard !searching else { return nil }
             switch (keyCode, characters) {
             case (kVK_Tab, _), (kVK_LeftArrow, _), (kVK_RightArrow, _): self = .switchTab

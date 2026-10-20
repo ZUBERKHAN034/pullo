@@ -7,12 +7,10 @@ struct DemoCaption: Equatable, Identifiable {
     let subtitle: String
 }
 
-/// What the stage shows around the notch while the tour plays.
 @MainActor
 final class DemoStageModel: ObservableObject {
     @Published var caption: DemoCaption?
     @Published var titleCard: DemoCaption?
-    /// In stage coordinates, top-left origin.
     @Published var cursor: CGPoint
     @Published var cursorVisible = false
 
@@ -21,7 +19,6 @@ final class DemoStageModel: ObservableObject {
     }
 }
 
-/// A clean backdrop behind the notch: a generated wallpaper and a made-up menu bar, so nothing from the real desktop shows.
 @MainActor
 final class DemoStage {
     let model: DemoStageModel
@@ -43,7 +40,6 @@ final class DemoStage {
             width: size.width,
             height: size.height
         )
-        // The backdrop sits over the real menu bar but under the notch panel; the pointer goes over everything.
         backdrop = Self.window(frame: frame, level: NSWindow.Level.mainMenu.rawValue + 2,
                                content: StageView(model: model, menuBarHeight: menuBarHeight))
         pointer = Self.window(frame: frame, level: NSWindow.Level.mainMenu.rawValue + 4,

@@ -6,7 +6,6 @@ final class AppSettings: ObservableObject {
     @Published var mutedCategories: Set<AlertCategory> { didSet { save() } }
     @Published var mutedAccounts: Set<String> { didSet { save() } }
     @Published var haptics: Bool { didSet { save() } }
-    /// The name of a system sound, or nil for silent alerts.
     @Published var sound: String? { didSet { save() } }
     @Published private(set) var launchAtLogin: Bool
     @Published private(set) var launchAtLoginError: String?

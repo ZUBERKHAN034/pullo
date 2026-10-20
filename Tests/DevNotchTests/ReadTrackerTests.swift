@@ -37,7 +37,6 @@ struct ReadTrackerTests {
         tracker.sync(account: "me", prs: [theirs])
         tracker.forget(account: "me")
         #expect(tracker.baselines.isEmpty)
-        // Added back, it's a first sync again, so nothing lights up.
         tracker.sync(account: "me", prs: [theirs])
         #expect(tracker.reasons(for: theirs).isEmpty)
     }

@@ -1,6 +1,5 @@
 import Foundation
 
-/// The groups of alerts that can be turned off in Settings.
 enum AlertCategory: String, CaseIterable, Codable {
     case ciFailed, ciPassed, approved, changesRequested, directReview, teamReview, newComment, merged, closed
 

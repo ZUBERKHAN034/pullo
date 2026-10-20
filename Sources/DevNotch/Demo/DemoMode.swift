@@ -1,6 +1,5 @@
 import AppKit
 
-/// `--demo` plays the scripted tour on made-up data; `--demo --record <folder>` also records it for the README.
 struct DemoMode: Equatable {
     let recordingFolder: URL?
 

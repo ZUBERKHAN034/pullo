@@ -49,7 +49,6 @@ extension PullRequest {
     }
 }
 
-/// A defaults domain of its own for one test, deleted when the test lets go of it.
 final class ScratchDefaults {
     private let suite = "DevNotchTests.\(UUID().uuidString)"
     let defaults: UserDefaults

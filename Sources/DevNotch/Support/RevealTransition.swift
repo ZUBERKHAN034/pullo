@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Fade + blur + slight drop from the top, delayed so the shape has started growing first.
 struct RevealModifier: ViewModifier {
     let progress: CGFloat
 

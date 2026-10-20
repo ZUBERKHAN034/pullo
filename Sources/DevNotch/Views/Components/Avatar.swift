@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A round GitHub avatar, or the account's initial on a color of its own while there's no picture.
 struct Avatar: View {
     let url: URL?
     let login: String
@@ -17,7 +16,6 @@ struct Avatar: View {
     }
 
     private var initial: some View {
-        // Same login, same color, so an account is recognizable at a glance.
         let hue = Double(login.unicodeScalars.reduce(0) { ($0 &* 31 &+ Int($1.value)) % 360 }) / 360
         return ZStack {
             Circle().fill(LinearGradient(
