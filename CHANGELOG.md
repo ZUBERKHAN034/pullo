@@ -4,6 +4,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+### Added
+- A glass look for the panel and alerts on macOS 26 and later, with or without a dark top behind the notch. Pick it in Settings → General. It follows your Liquid Glass setting and stays solid when Reduce transparency is on.
+
 ## [0.3.1] - 2026-10-20
 
 ### Added

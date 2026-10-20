@@ -2,7 +2,7 @@ import Foundation
 
 enum DefaultsKey: String {
     case accounts
-    case mutedCategories, mutedAccounts, haptics, sound
+    case mutedCategories, mutedAccounts, haptics, sound, panelStyle
     case readBaselines, readKnownAccounts
 }
 
