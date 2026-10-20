@@ -38,7 +38,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          NOTES=$(awk -v version="$VERSION" '/^## /{inside = ($2 == version); next} inside' CHANGELOG.md)
+          NOTES=$(awk -v heading="[$VERSION]" '/^## /{inside = ($2 == heading); next} /^\[[^]]+\]: /{next} inside' CHANGELOG.md)
           [ -n "$(printf %s "$NOTES" | tr -d '[:space:]')" ] || { echo "::error::CHANGELOG.md has no section for $VERSION"; exit 1; }
           mkdir -p "$RUNNER_TEMP/feed"
           printf '%s\n' "$NOTES" > "$RUNNER_TEMP/notes.md"
