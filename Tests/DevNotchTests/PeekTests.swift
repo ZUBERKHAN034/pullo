@@ -102,6 +102,43 @@ extension NotchBehavior {
             #expect(h.notch.state == .closed)
         }
 
+        @Test func eachKindOfAlertCanPlayItsOwnSound() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.sound = "Glass"
+            h.settings.categorySounds[.ciFailed] = "Basso"
+            h.notch.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            #expect(h.system.sounds == ["Basso"])
+        }
+
+        @Test func kindsWithoutTheirOwnSoundUseTheDefault() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.sound = "Glass"
+            h.settings.categorySounds[.ciFailed] = "Basso"
+            h.notch.enqueue(events: [PREvent(kind: .approved, pr: pr, actor: "octocat")])
+            #expect(h.system.sounds == ["Glass"])
+        }
+
+        @Test func aKindCanBeSilencedWhileOthersPlay() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.sound = "Glass"
+            h.settings.categorySounds[.ciPassed] = ""
+            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
+            #expect(h.notch.state == .peek)
+            #expect(h.system.sounds.isEmpty)
+        }
+
+        @Test func groupedAlertsPlayTheSoundOfTheMostImportantOne() async {
+            let pr = PullRequest.make()
+            let h = await NotchHarness(mine: [pr])
+            h.settings.categorySounds[.ciPassed] = "Pop"
+            h.settings.categorySounds[.ciFailed] = "Basso"
+            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil), PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            #expect(h.system.sounds == ["Basso"])
+        }
+
         @Test func alertsStayHiddenDuringFocus() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
@@ -111,7 +148,7 @@ extension NotchBehavior {
             #expect(h.system.sounds.isEmpty)
         }
 
-        @Test func alertsHeldBackByFocusDoNotPileUpForLater() async {
+        @Test func alertsArrivingAfterFocusShowRightAway() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
             h.notch.enqueue(h.alert("during focus"))
@@ -119,6 +156,41 @@ extension NotchBehavior {
             h.notch.enqueue(h.alert("after focus"))
             #expect(h.notch.peekAlert?.headline == "after focus")
             #expect(h.notch.peekAlert?.stack.isEmpty == true)
+        }
+
+        @Test func alertsMissedDuringFocusShowTogetherWhenItEnds() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert("first"))
+            h.notch.enqueue(h.alert("second"))
+            h.system.isInFocus = false
+            await h.clock.advance(by: .seconds(5))
+            #expect(h.notch.state == .peek)
+            #expect(h.notch.peekAlert?.stack.map(\.headline) == ["first", "second"])
+            #expect(h.notch.peekAlert?.note == "While you were in Focus")
+            #expect(h.system.sounds.count == 1)
+        }
+
+        @Test func missedAlertsWaitForTheWholeFocus() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert())
+            await h.clock.advance(by: .seconds(60))
+            #expect(h.notch.state == .closed)
+            h.system.isInFocus = false
+            await h.clock.advance(by: .seconds(5))
+            #expect(h.notch.state == .peek)
+        }
+
+        @Test func openingThePanelDuringFocusForgetsWhatWasMissed() async {
+            let h = await NotchHarness()
+            h.system.isInFocus = true
+            h.notch.enqueue(h.alert())
+            h.notch.open()
+            h.notch.close()
+            h.system.isInFocus = false
+            await h.clock.advance(by: .seconds(10))
+            #expect(h.notch.state == .closed)
         }
 
         @Test func aTestAlertShowsEvenDuringFocus() async {

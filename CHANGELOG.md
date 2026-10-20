@@ -5,8 +5,15 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ## [Unreleased]
 
 ### Added
-- Each pull request shows how many lines it adds and removes. Hover over it to see how many files changed.
+- Each kind of alert can play its own sound, so you can tell a failed CI from an approval without looking. Set it in Settings → Alerts.
+- Alerts that arrive during a Focus are no longer lost. When the Focus ends, DevNotch shows them together in one alert.
 - Drag a pull request out of the panel to drop its link into Slack, an email or anywhere else.
+
+## [0.5.0] - 2026-10-20
+
+### Added
+- Each pull request shows how many lines it adds and removes. Hover over it to see how many files changed.
+- Get beta versions: turn it on in Settings → Updates to try new features before everyone else.
 
 ## [0.4.0] - 2026-10-20
 
@@ -59,7 +66,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/jordan-cod/devnotch/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/jordan-cod/devnotch/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/jordan-cod/devnotch/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jordan-cod/devnotch/compare/v0.2.1...v0.3.0
