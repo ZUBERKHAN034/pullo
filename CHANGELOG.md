@@ -14,6 +14,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Changed
 - The quick search in the panel (⌘F) is now called Search, and it looks through every tab.
 - The left arrow goes to the previous tab, and Tab or the right arrow to the next one.
+- Settings → Appearance shows a preview of each panel style, so you can see what you pick.
 
 ## [0.7.0-beta.2] - 2026-10-21
 
