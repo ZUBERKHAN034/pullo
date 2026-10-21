@@ -5,7 +5,13 @@ import Testing
 struct GitHubClientTests {
     private func client(status: Int = 200, body: String) -> (GitHubClient, String) {
         let token = UUID().uuidString
-        return (GitHubClient(token: token, session: StubURLProtocol.session(token: token, status: status, body: body)), token)
+        return (
+            GitHubClient(token: token, session: StubURLProtocol.session(token: token, status: status, body: body), retryDelays: [
+                .zero,
+                .zero,
+            ]),
+            token
+        )
     }
 
     private let prNode = """
@@ -44,8 +50,81 @@ struct GitHubClientTests {
     }
 
     @Test func errorsWithoutABodyKeepTheStatus() async {
-        let (client, _) = client(status: 502, body: "")
-        await #expect(throws: GitHubError.http(502)) { try await client.fetchUser() }
+        let (client, _) = client(status: 418, body: "")
+        await #expect(throws: GitHubError.http(418)) { try await client.fetchUser() }
+    }
+
+    private func client(_ responses: [StubURLProtocol.Response]) -> (GitHubClient, String) {
+        let token = UUID().uuidString
+        let session = StubURLProtocol.session(token: token, responses: responses)
+        return (GitHubClient(token: token, session: session, retryDelays: [.zero, .zero]), token)
+    }
+
+    private let user = StubURLProtocol.Response(status: 200, body: #"{ "login": "me", "avatar_url": null }"#)
+
+    @Test func aBadGatewayIsTriedAgain() async throws {
+        let (client, token) = client([.init(status: 502, body: ""), user])
+        #expect(try await client.fetchUser().login == "me")
+        #expect(StubURLProtocol.requestCount(token: token) == 2)
+    }
+
+    @Test func givesUpAfterTwoMoreTries() async {
+        let (client, token) = client([.init(status: 503, body: "")])
+        await #expect(throws: GitHubError.server(503)) { try await client.fetchUser() }
+        #expect(StubURLProtocol.requestCount(token: token) == 3)
+    }
+
+    @Test func commandsAreNeverSentTwice() async {
+        let (client, token) = client([.init(status: 502, body: ""), .init(status: 201, body: "")])
+        await #expect(throws: GitHubError.server(502)) { try await client.rerunFailedJobs(in: "acme/api", run: 9) }
+        #expect(StubURLProtocol.requestCount(token: token) == 1)
+    }
+
+    @Test func noConnectionMeansOffline() async {
+        let (client, _) = client([.offline()])
+        await #expect(throws: GitHubError.offline) { try await client.fetchUser() }
+    }
+
+    @Test func aSpentRateLimitSaysWhenItResets() async {
+        let reset = Date(timeIntervalSince1970: 1_800_000_000)
+        let (client, _) = client([.init(
+            status: 403,
+            body: #"{ "message": "API rate limit exceeded for user." }"#,
+            headers: ["X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "1800000000"]
+        )])
+        await #expect(throws: GitHubError.rateLimited(until: reset)) { try await client.fetchUser() }
+    }
+
+    @Test func aSecondaryRateLimitIsNotAPermissionError() async {
+        let (client, _) = client([.init(status: 403, body: #"{ "message": "You have exceeded a secondary rate limit." }"#)])
+        await #expect(throws: GitHubError.rateLimited(until: nil)) { try await client.fetchUser() }
+    }
+
+    @Test func aQueryTooBigForGitHubSwitchesToALighterOne() async throws {
+        let account = UUID().uuidString
+        let page = StubURLProtocol.Response(status: 200, body: #"{ "data": { "mine": { "nodes": [] }, "review": { "nodes": [] } } }"#)
+        let (client, token) = client([.init(status: 502, body: ""), page])
+        _ = try await client.fetchSnapshot(account: account)
+        _ = try await client.fetchSnapshot(account: account)
+        let bodies = StubURLProtocol.bodies(token: token)
+        #expect(bodies.count == 3)
+        #expect(bodies[0].contains("first: 40"))
+        #expect(bodies[1].contains("first: 15"))
+        #expect(bodies[2].contains("first: 15"))
+        #expect(GitHubClient.usesLightQuery(account))
+    }
+
+    @Test func aGraphQLTimeoutCountsAsOverloaded() async throws {
+        let account = UUID().uuidString
+        let timeout = StubURLProtocol.Response(
+            status: 200,
+            body: #"{ "data": null, "errors": [ { "message": "Something went wrong while executing your query. This may be the result of a timeout, or it could be a GitHub bug." } ] }"#
+        )
+        let page = StubURLProtocol.Response(status: 200, body: #"{ "data": { "mine": { "nodes": [] }, "review": { "nodes": [] } } }"#)
+        let (client, token) = client([timeout, page])
+        _ = try await client.fetchSnapshot(account: account)
+        #expect(StubURLProtocol.requestCount(token: token) == 2)
+        #expect(GitHubClient.usesLightQuery(account))
     }
 
     @Test func partialDataIsKeptWhenAnOrgBlocksTheToken() async throws {

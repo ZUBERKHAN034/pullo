@@ -22,9 +22,16 @@ struct GQLResponse: Decodable {
 
     struct GQLError: Decodable {
         let message: String
+        let type: String?
         let path: [Lenient<String>]?
 
         var alias: String? { path?.first?.value }
+
+        var failure: GitHubError? {
+            if type == "RATE_LIMITED" { return .rateLimited(until: nil) }
+            if message.localizedCaseInsensitiveContains("timeout") { return .timedOut }
+            return nil
+        }
     }
 
     let data: Payload?

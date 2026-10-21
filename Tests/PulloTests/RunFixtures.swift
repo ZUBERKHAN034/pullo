@@ -42,6 +42,7 @@ actor StubRunSource: RunSource {
     private var failsDiscovery: Bool
     private var jobLists: [Int: [WorkflowJob]] = [:]
     private var failsCommands = false
+    private var runsFailure: GitHubError?
     private(set) var commands: [String] = []
 
     init(pushed: [String] = [], runs: [String: [WorkflowRun]] = [:], failsDiscovery: Bool = false) {
@@ -52,6 +53,8 @@ actor StubRunSource: RunSource {
 
     func set(_ runs: [WorkflowRun], in repo: String) { byRepo[repo] = runs }
 
+    func failRuns(with error: GitHubError?) { runsFailure = error }
+
     func pushedRepos(for account: Account) async throws -> [String] {
         if failsDiscovery { throw GitHubError.api("Not Found") }
         return pushed
@@ -59,6 +62,7 @@ actor StubRunSource: RunSource {
 
     func runs(in repo: String, for account: Account) async throws -> [WorkflowRun] {
         runRequests.append(repo)
+        if let runsFailure { throw runsFailure }
         return byRepo[repo] ?? []
     }
 

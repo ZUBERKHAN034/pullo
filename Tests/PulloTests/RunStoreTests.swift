@@ -49,7 +49,22 @@ extension NotchBehavior {
             let h = await NotchHarness(runSource: StubRunSource(failsDiscovery: true))
             await h.runs.refresh()
             #expect(!h.runs.isLoaded("me"))
-            #expect(h.runs.errors["me"] == "Not Found")
+            #expect(h.runs.errors["me"]?.detail == "Not Found")
+        }
+
+        @Test func keepsTheRunsAndNotesTheProblemWhenGitHubStopsAnswering() async {
+            let source = StubRunSource(pushed: ["acme/api"], runs: ["acme/api": [.make(id: 1, state: .running)]])
+            let h = await NotchHarness(runSource: source)
+            await h.runs.refresh()
+            await source.failRuns(with: .offline)
+            h.now += 60
+            await h.runs.refresh()
+            #expect(h.runs.runs(for: "me").map(\.id) == [1])
+            #expect(h.runs.errors["me"]?.kind == .offline)
+            await source.failRuns(with: nil)
+            h.now += 60
+            await h.runs.refresh()
+            #expect(h.runs.errors["me"] == nil)
         }
 
         @Test func filtersRunsByWhoStartedThemAndDeploys() async {

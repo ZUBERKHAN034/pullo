@@ -1,54 +1,90 @@
 import Foundation
+import os
 import OSLog
 
 struct GitHubClient {
     let token: String
     var session: URLSession = .shared
+    var retryDelays: [Duration] = [.seconds(1), .seconds(3)]
 
-    static func query(filterCount: Int) -> String {
+    struct QuerySize: Equatable {
+        let prs: Int
+        let checks: Int
+        let activity: Int
+
+        static let full = QuerySize(prs: 40, checks: 30, activity: 20)
+        static let light = QuerySize(prs: 15, checks: 15, activity: 10)
+    }
+
+    private static let lightAccounts = OSAllocatedUnfairLock(initialState: Set<String>())
+
+    static func usesLightQuery(_ account: String) -> Bool {
+        lightAccounts.withLock { $0.contains(account) }
+    }
+
+    static func query(filterCount: Int, size: QuerySize = .full) -> String {
         let aliases = (0..<filterCount).map { "f\($0)" }
         let variables = (["mine", "review"] + aliases).map { "$\($0): String!" }.joined(separator: ", ")
-        let searches = (["mine", "review"] + aliases).map { "  \($0): search(query: $\($0), type: ISSUE, first: 40) { nodes { ...pr } }" }
-        return "query(\(variables)) {\n\(searches.joined(separator: "\n"))\n}\n" + fragment
+        let searches = (["mine", "review"] + aliases)
+            .map { "  \($0): search(query: $\($0), type: ISSUE, first: \(size.prs)) { nodes { ...pr } }" }
+        return "query(\(variables)) {\n\(searches.joined(separator: "\n"))\n}\n" + fragment(size)
     }
 
-    private static let fragment = """
-    fragment pr on PullRequest {
-      id number title url isDraft createdAt updatedAt reviewDecision mergeable headRefName
-      additions deletions changedFiles
-      repository { nameWithOwner }
-      author { login avatarUrl }
-      headRefOid
-      commitCount: commits { totalCount }
-      comments(last: 20) { nodes { id author { __typename login avatarUrl } } }
-      reviews(last: 20) { nodes { id author { __typename login avatarUrl } } }
-      latestReviews(first: 20) { nodes { state author { login avatarUrl } } }
-      reviewRequests(first: 20) { nodes { requestedReviewer { __typename ... on User { login } ... on Team { name } } } }
-      commits(last: 1) { nodes { commit { statusCheckRollup {
-        state
-        contexts(first: 30) { totalCount nodes {
-          ... on CheckRun { name conclusion detailsUrl }
-          ... on StatusContext { context state targetUrl }
-        } }
-      } } } }
+    private static func fragment(_ size: QuerySize) -> String {
+        """
+        fragment pr on PullRequest {
+          id number title url isDraft createdAt updatedAt reviewDecision mergeable headRefName
+          additions deletions changedFiles
+          repository { nameWithOwner }
+          author { login avatarUrl }
+          headRefOid
+          commitCount: commits { totalCount }
+          comments(last: \(size.activity)) { nodes { id author { __typename login avatarUrl } } }
+          reviews(last: \(size.activity)) { nodes { id author { __typename login avatarUrl } } }
+          latestReviews(first: \(size.activity)) { nodes { state author { login avatarUrl } } }
+          reviewRequests(first: \(size.activity)) { nodes { requestedReviewer { __typename ... on User { login } ... on Team { name } } } }
+          commits(last: 1) { nodes { commit { statusCheckRollup {
+            state
+            contexts(first: \(size.checks)) { totalCount nodes {
+              ... on CheckRun { name conclusion detailsUrl }
+              ... on StatusContext { context state targetUrl }
+            } }
+          } } } }
+        }
+        """
     }
-    """
 
     func fetchSnapshot(account: String, filters: [SavedFilter] = []) async throws -> Snapshot {
+        if Self.usesLightQuery(account) {
+            return try await fetchSnapshot(account: account, filters: filters, size: .light, retrying: true)
+        }
+        do {
+            return try await fetchSnapshot(account: account, filters: filters, size: .full, retrying: false)
+        } catch let error as GitHubError where error.isOverloaded {
+            Logger.github
+                .notice(
+                    "The full query for @\(account, privacy: .public) failed (\(error.localizedDescription, privacy: .public)); using the light one from now on"
+                )
+            Self.lightAccounts.withLock { _ = $0.insert(account) }
+            return try await fetchSnapshot(account: account, filters: filters, size: .light, retrying: true)
+        }
+    }
+
+    private func fetchSnapshot(account: String, filters: [SavedFilter], size: QuerySize, retrying: Bool) async throws -> Snapshot {
         let filters = filters.filter { $0.isComplete && !$0.usesBuiltInSearch }
         let aliases = Dictionary(uniqueKeysWithValues: filters.enumerated().map { ("f\($0.offset)", $0.element) })
         var request = request(for: URL(static: "https://api.github.com/graphql"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: [
-            "query": Self.query(filterCount: filters.count),
+            "query": Self.query(filterCount: filters.count, size: size),
             "variables": [
                 "mine": "is:pr is:open author:@me archived:false sort:updated-desc",
                 "review": "is:pr is:open review-requested:@me archived:false sort:updated-desc",
             ].merging(aliases.mapValues(\.searchQuery)) { $1 },
         ])
 
-        let data = try await send(request)
+        let data = try await perform(request, retrying: retrying).data
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(GQLResponse.self, from: data)
@@ -56,6 +92,7 @@ struct GitHubClient {
             Logger.github.error("GitHub reported errors: \(errors.map(\.message).joined(separator: " | "), privacy: .public)")
         }
         guard let payload = decoded.data else {
+            if let failure = decoded.errors?.lazy.compactMap(\.failure).first { throw failure }
             throw GitHubError.api(decoded.errors?.map(\.message).joined(separator: "\n") ?? "Empty response from GitHub.")
         }
         var filtered: [SavedFilter.ID: [PullRequest]] = [:]
@@ -121,8 +158,41 @@ struct GitHubClient {
         return .fresh(data, etag: response.value(forHTTPHeaderField: "ETag"))
     }
 
-    private func perform(_ request: URLRequest, allowing allowed: Set<Int> = []) async throws -> (data: Data, response: HTTPURLResponse) {
-        let (data, response) = try await session.data(for: request)
+    private func perform(
+        _ request: URLRequest,
+        allowing allowed: Set<Int> = [],
+        retrying: Bool = true
+    ) async throws -> (data: Data, response: HTTPURLResponse) {
+        let delays = retrying && Self.canRetry(request) ? retryDelays : []
+        var attempt = 0
+        while true {
+            do {
+                return try await performOnce(request, allowing: allowed)
+            } catch let error as GitHubError where error.isTransient && attempt < delays.count {
+                Logger.github
+                    .notice(
+                        "\(request.url?.path() ?? "", privacy: .public) failed (\(error.localizedDescription, privacy: .public)); trying again"
+                    )
+                try await Task.sleep(for: delays[attempt])
+                attempt += 1
+            }
+        }
+    }
+
+    private static func canRetry(_ request: URLRequest) -> Bool {
+        let method = request.httpMethod ?? "GET"
+        return method == "GET" || request.url?.path() == "/graphql"
+    }
+
+    private func performOnce(_ request: URLRequest, allowing allowed: Set<Int>) async throws -> (data: Data, response: HTTPURLResponse) {
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let error as URLError {
+            Logger.github.error("\(request.url?.path() ?? "", privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            throw GitHubError(error) ?? error
+        }
         let http = response as? HTTPURLResponse
         let status = http?.statusCode ?? 0
         if allowed.contains(status), let http { return (data, http) }
@@ -130,13 +200,28 @@ struct GitHubClient {
             Logger.github.error("\(request.url?.path() ?? "", privacy: .public) returned \(status)")
         }
         if status == 401 { throw GitHubError.unauthorized }
+        if status == 403 || status == 429, let http, let limit = Self.rateLimit(http, data) { throw limit }
+        if (500..<600).contains(status) { throw GitHubError.server(status) }
         guard (200..<300).contains(status), let http else {
-            struct Failure: Decodable { let message: String }
             if let failure = try? JSONDecoder().decode(Failure.self, from: data) {
                 throw GitHubError.api(failure.message)
             }
             throw GitHubError.http(status)
         }
         return (data, http)
+    }
+
+    private struct Failure: Decodable { let message: String }
+
+    static func rateLimit(_ response: HTTPURLResponse, _ data: Data, now: Date = .now) -> GitHubError? {
+        if let seconds = response.value(forHTTPHeaderField: "Retry-After").flatMap(TimeInterval.init) {
+            return .rateLimited(until: now.addingTimeInterval(seconds))
+        }
+        if response.value(forHTTPHeaderField: "X-RateLimit-Remaining") == "0" {
+            let reset = response.value(forHTTPHeaderField: "X-RateLimit-Reset").flatMap(TimeInterval.init)
+            return .rateLimited(until: reset.map(Date.init(timeIntervalSince1970:)))
+        }
+        let message = (try? JSONDecoder().decode(Failure.self, from: data))?.message ?? ""
+        return message.localizedCaseInsensitiveContains("rate limit") ? .rateLimited(until: nil) : nil
     }
 }

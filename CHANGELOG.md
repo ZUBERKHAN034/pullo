@@ -4,6 +4,11 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Fixed
+- When GitHub has a hiccup, like error 502 or a slow answer, Pullo tries again by itself before giving up. If your lists are too big for GitHub to answer in time, it switches to a lighter request that asks for fewer pull requests at once.
+- A short hiccup no longer shows an error. Pullo keeps your list and only warns you if the problem lasts more than a minute and a half, telling you what's wrong (offline, GitHub not responding, request limit reached or sign-in) and when the list was last updated. The warning's button tries again, and only opens Accounts when the problem is signing in.
+- On the Actions side, Pullo now tells you when it can't load runs, instead of quietly showing an old or empty list.
+
 ## [0.8.0] - 2026-10-21
 
 ### Added
