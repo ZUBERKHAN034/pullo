@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-10-21
+
 ### Fixed
 - When GitHub has a hiccup, like error 502 or a slow answer, Pullo tries again by itself before giving up. If your lists are too big for GitHub to answer in time, it switches to a lighter request that asks for fewer pull requests at once.
 - A short hiccup no longer shows an error. Pullo keeps your list and only warns you if the problem lasts more than a minute and a half, telling you what's wrong (offline, GitHub not responding, request limit reached or sign-in) and when the list was last updated. The warning's button tries again, and only opens Accounts when the problem is signing in.
@@ -224,6 +226,7 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/pullo/compare/v0.8.0...HEAD
+[0.8.1]: https://github.com/jordan-cod/pullo/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/jordan-cod/pullo/compare/v0.7.0...v0.8.0
 [0.8.0-beta.5]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.4...v0.8.0-beta.5
 [0.8.0-beta.4]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.3...v0.8.0-beta.4
