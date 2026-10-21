@@ -5,7 +5,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ## [Unreleased]
 
 ### Added
-- Save your own filters for each account, written like a GitHub search (for example `repo:acme/api label:bug`). Each one becomes a tab in the panel. Set them up in Settings → Filters.
+- Choose the panel's tabs for each account in Settings → Tabs. My PRs and To review are now regular tabs you can rename, edit, reorder or remove, and you can add your own, written like a GitHub search (for example `repo:acme/api label:bug`). Alerts keep following your PRs and review requests, whatever tabs you keep.
 
 ### Changed
 - The left arrow goes to the previous tab, and Tab or the right arrow to the next one.

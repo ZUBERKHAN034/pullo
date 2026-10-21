@@ -49,21 +49,23 @@ extension NotchBehavior {
 
         @Test func tabSwitchesBetweenMineAndReview() async {
             let h = await openWithKeyboard()
+            #expect(h.list.title(of: h.list.tab) == "My PRs")
             #expect(h.notch.perform(.switchTab))
-            #expect(h.list.tab == .review)
+            #expect(h.list.title(of: h.list.tab) == "To review")
             #expect(h.notch.perform(.switchTab))
-            #expect(h.list.tab == .mine)
+            #expect(h.list.title(of: h.list.tab) == "My PRs")
         }
 
         @Test func tabsCycleThroughFiltersToo() async {
             let h = await openWithKeyboard()
             let filter = SavedFilter(name: "API", query: "repo:acme/acme-api")
-            h.accounts.setFilters([filter], for: "me")
-            #expect(h.list.tabs == [.mine, .review, .filter(filter.id)])
+            let defaults = h.accounts.filters(for: "me")
+            h.accounts.setFilters(defaults + [filter], for: "me")
+            #expect(h.list.tabs.count == 3)
             _ = h.notch.perform(.previousTab)
             #expect(h.list.tab == .filter(filter.id))
             _ = h.notch.perform(.switchTab)
-            #expect(h.list.tab == .mine)
+            #expect(h.list.tab == .filter(defaults[0].id))
         }
 
         @Test func numbersPickAccountsThatExist() async {

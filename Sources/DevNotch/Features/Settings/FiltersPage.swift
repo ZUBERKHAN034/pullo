@@ -42,6 +42,7 @@ struct FiltersPage: View {
 
     private func filtersSection(for login: String) -> some View {
         let filters = accounts.filters(for: login)
+        let missingPresets = ([.mine, .review] as [SavedFilter.Preset]).filter { preset in !filters.contains { $0.preset == preset } }
         return Section {
             ForEach(filters) { filter in
                 LabeledContent {
@@ -52,24 +53,43 @@ struct FiltersPage: View {
                         } label: {
                             Image(systemName: "trash")
                         }
+                        .disabled(filters.count == 1)
                         .help(String(localized: "Remove"))
                         .accessibilityLabel(String(localized: "Remove"))
                     }
                 } label: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(filter.name)
-                        Text(filter.query).font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1)
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal")
+                            .foregroundStyle(.tertiary)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(filter.name)
+                            Text(filter.query).font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1)
+                        }
                     }
                 }
             }
-            Button("Add filter…") { editing = SavedFilter(name: "", query: "") }
+            .onMove { from, to in
+                var reordered = filters
+                reordered.move(fromOffsets: from, toOffset: to)
+                accounts.setFilters(reordered, for: login)
+            }
+            HStack {
+                Button("Add tab…") { editing = SavedFilter(name: "", query: "") }
+                Spacer()
+                if !missingPresets.isEmpty {
+                    Button("Restore default tabs") {
+                        accounts.setFilters(missingPresets.map { SavedFilter.builtIn($0) } + filters, for: login)
+                    }
+                }
+            }
         } header: {
             Text("Tabs for @\(login)")
         } footer: {
             Text(
                 .init(
                     String(
-                        localized: "Each filter becomes a tab in the panel. Write it like a GitHub search, for example `repo:acme/api label:bug` or `team-review-requested:acme/web`. Only open pull requests show up unless you add `is:closed` or `is:merged`."
+                        localized: "Each one is a tab in the panel, in this order. Drag to reorder. Write it like a GitHub search, for example `repo:acme/api label:bug` or `team-review-requested:acme/web`. Only open pull requests show up unless you add `is:closed` or `is:merged`. Alerts always follow your PRs and review requests, whatever tabs you keep."
                     )
                 )
             )

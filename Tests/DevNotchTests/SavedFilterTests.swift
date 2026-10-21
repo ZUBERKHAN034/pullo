@@ -26,9 +26,19 @@ struct SavedFilterTests {
         #expect(query == "is:pr archived:false is:open repo:acme/api sort:updated-desc")
     }
 
-    @Test func accountsSavedBeforeFiltersStillLoad() throws {
+    @Test func accountsSavedBeforeTabsGetTheDefaultOnes() throws {
         let json = #"[{ "login": "me", "avatarURL": null }]"#
         let accounts = try JSONDecoder().decode([Account].self, from: Data(json.utf8))
-        #expect(accounts.first?.filters == [])
+        #expect(accounts.first?.filters.map(\.preset) == [.mine, .review])
+    }
+
+    @Test func defaultTabsReuseTheBuiltInSearches() {
+        var mine = SavedFilter.builtIn(.mine)
+        #expect(mine.usesBuiltInSearch)
+        mine.name = "Mine"
+        #expect(mine.usesBuiltInSearch)
+        mine.query = "author:@me draft:false"
+        #expect(!mine.usesBuiltInSearch)
+        #expect(!SavedFilter(name: "Mine", query: "author:@me").usesBuiltInSearch)
     }
 }

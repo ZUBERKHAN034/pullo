@@ -35,7 +35,7 @@ struct GitHubClient {
     """
 
     func fetchSnapshot(account: String, filters: [SavedFilter] = []) async throws -> Snapshot {
-        let filters = filters.filter(\.isComplete)
+        let filters = filters.filter { $0.isComplete && !$0.usesBuiltInSearch }
         let aliases = Dictionary(uniqueKeysWithValues: filters.enumerated().map { ("f\($0.offset)", $0.element) })
         var request = request(for: URL(static: "https://api.github.com/graphql"))
         request.httpMethod = "POST"

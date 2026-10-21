@@ -1,9 +1,38 @@
 import Foundation
 
 struct SavedFilter: Identifiable, Codable, Equatable, Hashable {
+    enum Preset: String, Codable {
+        case mine, review
+
+        var query: String {
+            switch self {
+            case .mine: "author:@me"
+            case .review: "review-requested:@me"
+            }
+        }
+
+        var name: String {
+            switch self {
+            case .mine: String(localized: "My PRs")
+            case .review: String(localized: "To review")
+            }
+        }
+    }
+
     var id = UUID()
     var name: String
     var query: String
+    var preset: Preset?
+
+    static func builtIn(_ preset: Preset) -> SavedFilter {
+        SavedFilter(name: preset.name, query: preset.query, preset: preset)
+    }
+
+    static var defaults: [SavedFilter] { [.builtIn(.mine), .builtIn(.review)] }
+
+    var usesBuiltInSearch: Bool {
+        preset.map { query.trimmingCharacters(in: .whitespacesAndNewlines) == $0.query } ?? false
+    }
 
     var isComplete: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty && !query.trimmingCharacters(in: .whitespaces).isEmpty

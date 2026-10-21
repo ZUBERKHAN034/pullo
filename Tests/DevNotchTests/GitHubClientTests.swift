@@ -68,7 +68,7 @@ struct GitHubClientTests {
           "errors": [ { "message": "The listed repositories cannot be searched.", "path": ["f1"] } ] }
         """
         let (client, token) = client(body: body)
-        let snapshot = try await client.fetchSnapshot(account: "me", filters: [api, broken, unfinished])
+        let snapshot = try await client.fetchSnapshot(account: "me", filters: SavedFilter.defaults + [api, broken, unfinished])
         #expect(snapshot.filtered[api.id]?.map(\.id) == ["PR_1"])
         #expect(snapshot.filtered[broken.id]?.isEmpty == true)
         #expect(snapshot.filterErrors[broken.id] == "The listed repositories cannot be searched.")

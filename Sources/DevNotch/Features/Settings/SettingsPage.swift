@@ -12,7 +12,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .appearance: String(localized: "Appearance")
         case .alerts: String(localized: "Alerts")
         case .accounts: String(localized: "Accounts")
-        case .filters: String(localized: "Filters")
+        case .filters: String(localized: "Tabs")
         case .shortcuts: String(localized: "Shortcuts")
         case .updates: String(localized: "Updates")
         case .about: String(localized: "About")
@@ -25,7 +25,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .appearance: "paintbrush"
         case .alerts: "bell.badge"
         case .accounts: "person.2"
-        case .filters: "line.3.horizontal.decrease.circle"
+        case .filters: "rectangle.stack"
         case .shortcuts: "keyboard"
         case .updates: "arrow.down.circle"
         case .about: "info.circle"
