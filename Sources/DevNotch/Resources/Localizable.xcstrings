@@ -391,6 +391,22 @@
         }
       }
     },
+    "Actions": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions"
+          }
+        }
+      }
+    },
     "Add": {
       "localizations": {
         "es": {
@@ -1143,6 +1159,22 @@
         }
       }
     },
+    "Deploys": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Despliegues"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deploys"
+          }
+        }
+      }
+    },
     "DevNotch": {
       "shouldTranslate": false
     },
@@ -1302,6 +1334,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Editar…"
+          }
+        }
+      }
+    },
+    "Everyone": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos"
           }
         }
       }
@@ -1696,6 +1744,22 @@
         }
       }
     },
+    "Mine": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mías"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minhas"
+          }
+        }
+      }
+    },
     "Move through PRs": {
       "localizations": {
         "es": {
@@ -1948,6 +2012,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum resultado"
+          }
+        }
+      }
+    },
+    "No runs yet": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no hay ejecuciones"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma execução ainda"
           }
         }
       }
@@ -2236,6 +2316,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ver no GitHub"
+          }
+        }
+      }
+    },
+    "Pull requests": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull requests"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull requests"
           }
         }
       }
@@ -2784,6 +2880,22 @@
         }
       }
     },
+    "Switch between pull requests and Actions": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar entre pull requests y Actions"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternar entre pull requests e Actions"
+          }
+        }
+      }
+    },
     "Switch tabs": {
       "localizations": {
         "es": {
@@ -3100,6 +3212,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enquanto você estava em Foco"
+          }
+        }
+      }
+    },
+    "Workflow runs from your repositories will show up here.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las ejecuciones de workflows de tus repositorios aparecerán aquí."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As execuções de workflow dos seus repositórios vão aparecer aqui."
           }
         }
       }

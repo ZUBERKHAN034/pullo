@@ -27,6 +27,8 @@ struct KeyCommandTests {
         #expect(command(kVK_ANSI_F, "f", command: true) == .search)
         #expect(command(kVK_ANSI_Q, "q", command: true) == .quit)
         #expect(command(kVK_ANSI_2, "2", command: true) == .selectAccount(2))
+        #expect(command(kVK_LeftArrow, "", command: true) == .show(.pullRequests))
+        #expect(command(kVK_RightArrow, "", command: true) == .show(.actions))
         #expect(command(kVK_ANSI_Comma, ",", command: true) == nil)
     }
 

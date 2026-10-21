@@ -16,6 +16,7 @@ struct ShortcutsPage: View {
                 row("Open the selected PR", "↩")
                 row("Switch tabs", String(localized: "⇥  or  ← →"))
                 row("Search PRs", "⌘F")
+                row("Switch between pull requests and Actions", "⌘← ⌘→")
                 row("Copy the branch name", "C")
                 row("Mark as read", "R")
                 row("Switch account", "⌘1 – ⌘9")

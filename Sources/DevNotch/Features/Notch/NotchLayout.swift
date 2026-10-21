@@ -1,6 +1,8 @@
 import AppKit
 
 struct NotchLayout {
+    static let switcherSpace: CGFloat = 56
+
     let geometry: NotchGeometry
     var closedWings: CGFloat = 0
 
@@ -39,7 +41,13 @@ struct NotchLayout {
         case .peek:
             return rect.insetBy(dx: 0, dy: -2)
         case .open:
-            return rect.insetBy(dx: -16, dy: -16)
+            let withSwitcher = NSRect(
+                x: rect.minX,
+                y: rect.minY - Self.switcherSpace,
+                width: rect.width,
+                height: rect.height + Self.switcherSpace
+            )
+            return withSwitcher.insetBy(dx: -16, dy: -16)
         }
     }
 }

@@ -1,0 +1,46 @@
+import SwiftUI
+
+struct AreaSwitcher: View {
+    @Environment(NotchInteraction.self) private var notch
+    @Namespace private var selection
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(PanelArea.allCases, id: \.self) { area in
+                button(for: area)
+            }
+        }
+        .padding(3)
+        .background(Capsule().fill(Color.black))
+        .overlay(Capsule().strokeBorder(Color.hairline))
+        .compositingGroup()
+        .shadow(color: .black.opacity(0.4), radius: 10, y: 4)
+    }
+
+    private func button(for area: PanelArea) -> some View {
+        let selected = notch.area == area
+        return Button {
+            notch.show(area)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: area.symbol)
+                    .font(.system(size: 11, weight: .semibold))
+                Text(area.title)
+                    .font(.panel(.label, .semibold))
+            }
+            .foregroundStyle(selected ? Color.white : .textTertiary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background {
+                if selected {
+                    Capsule()
+                        .fill(.surfaceStrong)
+                        .matchedGeometryEffect(id: "area", in: selection)
+                }
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+}
