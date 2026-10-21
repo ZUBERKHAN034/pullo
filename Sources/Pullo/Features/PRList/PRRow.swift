@@ -83,6 +83,13 @@ struct PRRow: View {
     }
 
     private var subtitle: some View {
+        HStack(spacing: 5) {
+            AccountMark(login: pr.account)
+            subtitleText
+        }
+    }
+
+    private var subtitleText: some View {
         Group {
             if isUnread {
                 Text(changes.map(\.label).joined(separator: " · ")).foregroundColor(.textStrong)

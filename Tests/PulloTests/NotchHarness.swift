@@ -8,10 +8,10 @@ enum NotchBehavior {}
 private struct StubSource: PRSource {
     let snapshots: [String: Snapshot]
 
-    func snapshot(for account: Account) async throws -> Snapshot {
+    func snapshot(for account: Account, filters: [SavedFilter]) async throws -> Snapshot {
         guard var snapshot = snapshots[account.login] else { throw GitHubError.noToken }
         let all = snapshot.mine + snapshot.reviewRequests
-        for filter in account.filters {
+        for filter in filters {
             snapshot.filtered[filter.id] = all.filter { filter.query.contains($0.repo) }
         }
         return snapshot

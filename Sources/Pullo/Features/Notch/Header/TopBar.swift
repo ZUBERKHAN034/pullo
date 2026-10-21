@@ -13,7 +13,7 @@ struct TopBar: View {
             }
             if notch.state == .open {
                 HStack(spacing: 0) {
-                    AccountSwitcher()
+                    AccountStack()
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Color.clear.frame(width: notchSize.width)
                     HeaderActions()

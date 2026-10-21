@@ -115,7 +115,7 @@ import Foundation
             snapshots = DemoData.snapshots(at: moment)
         }
 
-        func snapshot(for account: Account) async throws -> Snapshot {
+        func snapshot(for account: Account, filters: [SavedFilter]) async throws -> Snapshot {
             if let delay = firstFetchDelay {
                 try await Task.sleep(for: delay)
                 firstFetchDelay = nil

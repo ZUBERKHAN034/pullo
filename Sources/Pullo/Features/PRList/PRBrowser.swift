@@ -16,9 +16,8 @@ struct PRBrowser: View {
                         .transition(.opacity)
                 }
             }
-            if let login = list.currentLogin, store.snapshots[login] != nil, let problem = store.errors[login],
-               problem.isWorthShowing(at: .now) {
-                ErrorBanner(problem: problem, updated: store.updatedAt[login]) {
+            if list.isLoaded, let (login, problem) = list.problem(worthShowingAt: .now) {
+                ErrorBanner(problem: problem, account: list.showsAccounts ? login : nil, updated: store.updatedAt[login]) {
                     if problem.opensAccounts {
                         notch.onOpenSettings?(.accounts)
                     } else {
@@ -35,11 +34,9 @@ struct PRBrowser: View {
 
     @ViewBuilder
     private var content: some View {
-        let login = list.currentLogin ?? ""
-        let loaded = store.snapshots[login] != nil
-        if !loaded, let problem = store.errors[login] {
+        if !list.isLoaded, let (_, problem) = list.problem() {
             ProblemMessage(problem: problem) { await store.refresh() }
-        } else if !loaded {
+        } else if !list.isLoaded {
             LoadingView()
         } else if list.isSearching {
             searchResults
@@ -52,13 +49,13 @@ struct PRBrowser: View {
             ) {
                 notch.onOpenSettings?(.tabs)
             }
-            .id("\(login)|\(list.tab)")
+            .id(list.tab)
         } else if list.visiblePRs.isEmpty {
             emptyTab
-                .id("\(login)|\(list.tab)")
+                .id(list.tab)
         } else {
             PRList(sections: tabSections)
-                .id("\(login)|\(list.tab)")
+                .id(list.tab)
         }
     }
 
@@ -91,7 +88,7 @@ struct PRBrowser: View {
         if list.searchQuery.trimmingCharacters(in: .whitespaces).isEmpty {
             MessageView(
                 symbol: "magnifyingglass",
-                title: String(localized: "Search @\(list.currentLogin ?? "")'s PRs"),
+                title: String(localized: "Search pull requests"),
                 detail: String(localized: "Title, repo, #number, branch or author. Searches every tab.")
             )
         } else if results.isEmpty {

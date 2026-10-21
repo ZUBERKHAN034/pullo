@@ -3,12 +3,12 @@ import Carbon.HIToolbox
 enum KeyCommand: Equatable {
     case quit, search, close
     case moveUp, moveDown, open
-    case switchTab, previousTab, selectAccount(Int), copyBranch, markRead
+    case switchTab, previousTab, selectTab(Int), copyBranch, markRead
     case show(PanelArea)
 
     var worksEverywhere: Bool {
         switch self {
-        case .quit, .close, .selectAccount, .show: true
+        case .quit, .close, .selectTab, .show: true
         default: false
         }
     }
@@ -25,7 +25,7 @@ enum KeyCommand: Equatable {
             case "f": self = .search
             default:
                 guard !searching, let number = Int(characters), (1...9).contains(number) else { return nil }
-                self = .selectAccount(number)
+                self = .selectTab(number)
             }
             return
         }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct RunTab: Identifiable, Codable, Equatable, Hashable {
+struct RunTab: AccountScoped, Codable, Hashable {
     enum Preset: String, Codable, CaseIterable {
         case mine, everyone, deploys
     }
@@ -45,6 +45,7 @@ struct RunTab: Identifiable, Codable, Equatable, Hashable {
     var branch = ""
     var event: Event = .any
     var status: Status = .all
+    var account: String?
 
     var isComplete: Bool {
         !name.trimmed.isEmpty && (startedBy != .user || !user.trimmed.isEmpty)
@@ -105,6 +106,7 @@ extension RunTab {
         branch = try container.decodeIfPresent(String.self, forKey: .branch) ?? ""
         event = (try? container.decodeIfPresent(Event.self, forKey: .event)) ?? .any
         status = (try? container.decodeIfPresent(Status.self, forKey: .status)) ?? .all
+        account = try container.decodeIfPresent(String.self, forKey: .account)
     }
 }
 

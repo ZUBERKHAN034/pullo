@@ -4,6 +4,10 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Changed
+- With more than one account, everything now shows up together: pull requests and runs from all your accounts are in the same tabs, each with the account's avatar, so there's no account to switch anymore. Tabs are shared by every account, and a tab can stick to one account if you want (Settings → Tabs → Account). Tabs you had per account are kept: the ones every account had become one, and the rest stay tied to their account.
+- ⌘1 to ⌘9 now jump to a tab, on both the Pull requests and Actions sides.
+
 ## [0.8.1] - 2026-10-21
 
 ### Fixed

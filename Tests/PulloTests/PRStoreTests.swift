@@ -15,7 +15,7 @@ private actor FakeSource: PRSource {
     func set(outcomes: [PROutcome]) { self.outcomes = outcomes }
     func fail(_ login: String, with error: GitHubError?) { failures[login] = error }
 
-    func snapshot(for account: Account) async throws -> Snapshot {
+    func snapshot(for account: Account, filters: [SavedFilter]) async throws -> Snapshot {
         if let failure = failures[account.login] { throw failure }
         guard let snapshot = snapshots[account.login] else { throw GitHubError.noToken }
         return snapshot

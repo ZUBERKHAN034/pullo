@@ -19,7 +19,7 @@ struct ShortcutsPage: View {
                 row("Switch between pull requests and Actions", "⌘← ⌘→")
                 row("Copy the branch name", "C")
                 row("Mark as read", "R")
-                row("Switch account", "⌘1 – ⌘9")
+                row("Go to a tab", "⌘1 – ⌘9")
                 row("Clear the search, or close", "esc")
                 row("Quit Pullo", "⌘Q")
             }

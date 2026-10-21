@@ -1,6 +1,6 @@
 import Foundation
 
-struct SavedFilter: Identifiable, Codable, Equatable, Hashable {
+struct SavedFilter: AccountScoped, Codable, Hashable {
     enum Preset: String, Codable {
         case mine, review
 
@@ -23,6 +23,7 @@ struct SavedFilter: Identifiable, Codable, Equatable, Hashable {
     var name: String
     var query: String
     var preset: Preset?
+    var account: String?
 
     static func builtIn(_ preset: Preset) -> SavedFilter {
         SavedFilter(name: preset.name, query: preset.query, preset: preset)
