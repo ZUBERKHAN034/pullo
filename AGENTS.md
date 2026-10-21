@@ -17,8 +17,7 @@
 - The stable `X.Y.Z` release lists everything since the previous stable release, betas included.
 
 ## Website
-- `site/` is the product page at https://pullo.jrdan.dev, a Cloudflare Worker with static assets. Deploy it with `npx wrangler deploy` from `site/`.
-- The Worker also serves `/appcast.xml`, passed through from the GitHub Pages feed, so the release workflow stays the same.
+- The product page at https://pullo.jrdan.dev lives in the private repo `jordan-cod/pullo-site`, which also serves `/appcast.xml`, passed through from the GitHub Pages feed.
 
 ## Code
 - No comments in code, except `// MARK:`.
