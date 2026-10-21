@@ -16,8 +16,15 @@ struct PRBrowser: View {
                         .transition(.opacity)
                 }
             }
-            if let login = list.currentLogin, store.snapshots[login] != nil, store.errors[login] != nil {
-                ErrorBanner(message: String(localized: "Couldn't refresh @\(login)")) { notch.onOpenSettings?(.accounts) }
+            if let login = list.currentLogin, store.snapshots[login] != nil, let problem = store.errors[login],
+               problem.isWorthShowing(at: .now) {
+                ErrorBanner(problem: problem, updated: store.updatedAt[login]) {
+                    if problem.opensAccounts {
+                        notch.onOpenSettings?(.accounts)
+                    } else {
+                        Task { await store.refresh() }
+                    }
+                }
             }
             content
             if list.keyboardMode {
@@ -30,10 +37,8 @@ struct PRBrowser: View {
     private var content: some View {
         let login = list.currentLogin ?? ""
         let loaded = store.snapshots[login] != nil
-        if !loaded, let error = store.errors[login] {
-            MessageView(symbol: "key.slash", title: String(localized: "Can't reach GitHub"), detail: error) {
-                Task { await store.refresh() }
-            }
+        if !loaded, let problem = store.errors[login] {
+            ProblemMessage(problem: problem) { await store.refresh() }
         } else if !loaded {
             LoadingView()
         } else if list.isSearching {

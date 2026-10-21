@@ -31,7 +31,7 @@ final class ActionsModel {
 
     var isLoaded: Bool { store.isLoaded(list.currentLogin) }
 
-    var error: String? { list.currentLogin.flatMap { store.errors[$0] } }
+    var problem: RefreshProblem? { list.currentLogin.flatMap { store.errors[$0] } }
 
     func runs(in tab: RunTab?) -> [WorkflowRun] {
         guard let login = list.currentLogin, let tab else { return [] }

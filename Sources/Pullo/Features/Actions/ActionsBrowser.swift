@@ -30,16 +30,23 @@ struct ActionsBrowser: View {
                     notch.onOpenSettings?(.tabs)
                 }
             }
+            if actions.isLoaded, let problem = actions.problem, problem.isWorthShowing(at: .now) {
+                ErrorBanner(problem: problem, updated: nil) {
+                    if problem.opensAccounts {
+                        notch.onOpenSettings?(.accounts)
+                    } else {
+                        Task { await actions.store.refresh() }
+                    }
+                }
+            }
             content
         }
     }
 
     @ViewBuilder
     private var content: some View {
-        if !actions.isLoaded, let error = actions.error {
-            MessageView(symbol: "key.slash", title: String(localized: "Can't reach GitHub"), detail: error) {
-                Task { await actions.store.refresh() }
-            }
+        if !actions.isLoaded, let problem = actions.problem {
+            ProblemMessage(problem: problem) { await actions.store.refresh() }
         } else if !actions.isLoaded {
             MessageView(
                 symbol: "bolt.horizontal.circle",

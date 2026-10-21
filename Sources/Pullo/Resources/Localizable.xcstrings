@@ -113,6 +113,22 @@
         }
       }
     },
+    "%@ · updated %@ ago": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · actualizado hace %2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · atualizado há %2$@"
+          }
+        }
+      }
+    },
     "%lld": {
       "shouldTranslate": false
     },
@@ -919,6 +935,22 @@
         }
       }
     },
+    "Can't sign in to GitHub": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede iniciar sesión en GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível entrar no GitHub"
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "es": {
@@ -1363,22 +1395,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não deu pra rodar os jobs de novo"
-          }
-        }
-      }
-    },
-    "Couldn't refresh @%@": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo actualizar @%@"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não foi possível atualizar @%@"
           }
         }
       }
@@ -1853,6 +1869,38 @@
         }
       }
     },
+    "GitHub is having trouble right now (error %lld).": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub tiene problemas en este momento (error %lld)."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub está com problemas agora (erro %lld)."
+          }
+        }
+      }
+    },
+    "GitHub isn't responding": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub no responde"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub não está respondendo"
+          }
+        }
+      }
+    },
     "GitHub rejected the gh token. Run `gh auth refresh`.": {
       "localizations": {
         "es": {
@@ -1885,6 +1933,22 @@
         }
       }
     },
+    "GitHub took too long to answer.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub tardó demasiado en responder."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub demorou demais para responder."
+          }
+        }
+      }
+    },
     "GitHub user": {
       "localizations": {
         "es": {
@@ -1897,6 +1961,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Usuário do GitHub"
+          }
+        }
+      }
+    },
+    "GitHub's request limit for this account was reached. It resets at %@.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se alcanzó el límite de solicitudes de GitHub para esta cuenta. Se restablece a las %@."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O limite de requisições do GitHub para esta conta foi atingido. Ele volta às %@."
+          }
+        }
+      }
+    },
+    "GitHub's request limit for this account was reached. Pullo tries again in a few minutes.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se alcanzó el límite de solicitudes de GitHub para esta cuenta. Pullo vuelve a intentarlo en unos minutos."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O limite de requisições do GitHub para esta conta foi atingido. O Pullo tenta de novo em alguns minutos."
+          }
+        }
+      }
+    },
+    "GitHub's request limit was reached": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se alcanzó el límite de solicitudes de GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limite de requisições do GitHub atingido"
           }
         }
       }
@@ -2601,6 +2713,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nada para revisar"
+          }
+        }
+      }
+    },
+    "Open Accounts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Cuentas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Contas"
           }
         }
       }
@@ -4352,6 +4480,22 @@
         }
       }
     },
+    "You're offline": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estás sin conexión"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Você está offline"
+          }
+        }
+      }
+    },
     "Your GitHub pull requests in the notch.": {
       "localizations": {
         "es": {
@@ -4364,6 +4508,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Seus pull requests do GitHub no notch."
+          }
+        }
+      }
+    },
+    "Your Mac isn't connected to the internet.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu Mac no está conectado a internet."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seu Mac não está conectado à internet."
           }
         }
       }

@@ -11,7 +11,7 @@ final class RunStore {
     static let discoveryInterval: TimeInterval = 300
 
     private(set) var runs: [String: [WorkflowRun]] = [:]
-    private(set) var errors: [String: String] = [:]
+    private(set) var errors: [String: RefreshProblem] = [:]
     private(set) var jobs: [Int: [WorkflowJob]] = [:]
     private(set) var jobErrors: [Int: String] = [:]
 
@@ -71,20 +71,33 @@ final class RunStore {
 
     private func refresh(_ account: Account) async {
         let login = account.login
+        var failure: Error?
         do {
             try await discoverIfDue(account)
-            errors[login] = nil
         } catch {
             Logger.store.error("Finding repos for @\(login, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
-            errors[login] = error.localizedDescription
-            if runs[login] == nil { return }
+            failure = error
+            if runs[login] == nil {
+                errors[login] = RefreshProblem(error, at: now(), after: errors[login])
+                return
+            }
         }
         let watched = repos[login] ?? []
+        var succeeded = false
         for repo in watched where isDue(repo, login: login) {
-            await fetch(repo, for: account)
+            if let error = await fetch(repo, for: account) {
+                failure = error
+            } else {
+                succeeded = true
+            }
             publish(watched, for: login)
         }
         publish(watched, for: login)
+        if succeeded {
+            errors[login] = nil
+        } else if let failure {
+            errors[login] = RefreshProblem(failure, at: now(), after: errors[login])
+        }
     }
 
     private func publish(_ watched: [String], for login: String) {
@@ -117,8 +130,10 @@ final class RunStore {
         return now().timeIntervalSince(last) >= (active ? Self.activeInterval : Self.idleInterval)
     }
 
-    private func fetch(_ repo: String, for account: Account) async {
+    @discardableResult
+    private func fetch(_ repo: String, for account: Account) async -> Error? {
         let key = key(repo, account.login)
+        defer { fetchedAt[key] = now() }
         do {
             var fetched = try await source.runs(in: repo, for: account)
             for index in fetched.indices where fetched[index].state == .running || fetched[index].id == watchedRun {
@@ -130,10 +145,11 @@ final class RunStore {
             byRepo[key] = fetched
             let finished = Self.finished(from: previous, to: fetched, login: account.login)
             if !finished.isEmpty { onRunsFinished?(finished) }
+            return nil
         } catch {
             Logger.store.error("Loading runs of \(repo, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            return error
         }
-        fetchedAt[key] = now()
     }
 
     // MARK: - Run detail

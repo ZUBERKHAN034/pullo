@@ -5,6 +5,7 @@ import Testing
 private actor FakeSource: PRSource {
     var snapshots: [String: Snapshot]
     var outcomes: [PROutcome] = []
+    var failures: [String: GitHubError] = [:]
 
     init(_ snapshots: [String: Snapshot]) {
         self.snapshots = snapshots
@@ -12,8 +13,10 @@ private actor FakeSource: PRSource {
 
     func set(_ login: String, _ snapshot: Snapshot) { snapshots[login] = snapshot }
     func set(outcomes: [PROutcome]) { self.outcomes = outcomes }
+    func fail(_ login: String, with error: GitHubError?) { failures[login] = error }
 
     func snapshot(for account: Account) async throws -> Snapshot {
+        if let failure = failures[account.login] { throw failure }
         guard let snapshot = snapshots[account.login] else { throw GitHubError.noToken }
         return snapshot
     }
@@ -65,6 +68,40 @@ struct PRStoreTests {
         await store.refresh()
         #expect(store.snapshots["work"] != nil)
         #expect(store.errors["gone"] != nil)
+    }
+
+    @Test func aHiccupStaysQuietUntilItLasts() async {
+        let defaults = makeDefaults(accounts: ["me"])
+        let source = FakeSource(["me": Snapshot(mine: [], reviewRequests: [])])
+        var now = Date(timeIntervalSince1970: 1000)
+        let store = PRStore(accounts: AccountStore(defaults: defaults), tracker: ReadTracker(defaults: defaults), source: source) { now }
+        await store.refresh()
+        await source.fail("me", with: .server(502))
+        now += 60
+        await store.refresh()
+        #expect(store.errors["me"]?.kind == .unavailable)
+        #expect(store.errors["me"]?.isWorthShowing(at: now) == false)
+        now += 60
+        await store.refresh()
+        #expect(store.errors["me"]?.isWorthShowing(at: now) == false)
+        now += 40
+        await store.refresh()
+        #expect(store.errors["me"]?.isWorthShowing(at: now) == true)
+        #expect(store.updatedAt["me"] == Date(timeIntervalSince1970: 1000))
+        #expect(store.snapshots["me"] != nil)
+        await source.fail("me", with: nil)
+        await store.refresh()
+        #expect(store.errors["me"] == nil)
+    }
+
+    @Test func signInProblemsShowRightAway() async {
+        let defaults = makeDefaults(accounts: ["me"])
+        let source = FakeSource(["me": Snapshot(mine: [], reviewRequests: [])])
+        let store = PRStore(accounts: AccountStore(defaults: defaults), tracker: ReadTracker(defaults: defaults), source: source)
+        await source.fail("me", with: .unauthorized)
+        await store.refresh()
+        #expect(store.errors["me"]?.opensAccounts == true)
+        #expect(store.errors["me"]?.isWorthShowing(at: .now) == true)
     }
 
     @Test func aPRThatLeavesTheListAlertsWhetherItWasMergedOrClosed() async {

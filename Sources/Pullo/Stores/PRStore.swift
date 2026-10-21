@@ -7,7 +7,8 @@ import OSLog
 final class PRStore {
     private(set) var snapshots: [String: Snapshot] = [:]
     private(set) var lastUpdated: Date?
-    private(set) var errors: [String: String] = [:]
+    private(set) var errors: [String: RefreshProblem] = [:]
+    private(set) var updatedAt: [String: Date] = [:]
     private(set) var isLoading = false
 
     @ObservationIgnored var onEvents: (([PREvent]) -> Void)?
@@ -15,13 +16,15 @@ final class PRStore {
     private let accounts: AccountStore
     private let tracker: ReadTracker
     private let source: PRSource
+    private let now: () -> Date
     @ObservationIgnored private var pollTask: Task<Void, Never>?
     @ObservationIgnored private var refreshQueued = false
 
-    init(accounts: AccountStore, tracker: ReadTracker, source: PRSource) {
+    init(accounts: AccountStore, tracker: ReadTracker, source: PRSource, now: @escaping () -> Date = Date.init) {
         self.accounts = accounts
         self.tracker = tracker
         self.source = source
+        self.now = now
     }
 
     func mine(for login: String?) -> [PullRequest] {
@@ -102,17 +105,19 @@ final class PRStore {
                 snapshots[login] = snapshot
                 tracker.sync(account: login, prs: snapshot.mine + snapshot.reviewRequests)
                 errors[login] = nil
+                updatedAt[login] = now()
             case .failure(let error):
                 Logger.store.error("Refreshing @\(login, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
-                errors[login] = error.localizedDescription
+                errors[login] = RefreshProblem(error, at: now(), after: errors[login])
             }
         }
 
         let logins = Set(current.map(\.login))
         snapshots = snapshots.filter { logins.contains($0.key) }
         errors = errors.filter { logins.contains($0.key) }
+        updatedAt = updatedAt.filter { logins.contains($0.key) }
 
-        lastUpdated = snapshots.isEmpty ? nil : Date()
+        lastUpdated = snapshots.isEmpty ? nil : now()
 
         var seen = Set<String>()
         let unique = events.filter { seen.insert("\($0.pr.id)|\($0.kind)").inserted }

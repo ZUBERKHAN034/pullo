@@ -29,7 +29,13 @@ struct WorkflowRunTests {
 
     private func client(status: Int = 200, body: String) -> (GitHubClient, String) {
         let token = UUID().uuidString
-        return (GitHubClient(token: token, session: StubURLProtocol.session(token: token, status: status, body: body)), token)
+        return (
+            GitHubClient(token: token, session: StubURLProtocol.session(token: token, status: status, body: body), retryDelays: [
+                .zero,
+                .zero,
+            ]),
+            token
+        )
     }
 
     @Test func readsRunsFromTheRESTAPI() async throws {
