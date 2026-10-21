@@ -7,6 +7,11 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Added
 - A new Actions side in the panel shows your GitHub Actions runs: what's running, waiting for approval or just finished, with job progress. Switch to it with the pill under the open notch, or ⌘← and ⌘→. It looks at the repositories you pushed to recently and the ones with your open pull requests, and filters by Mine, Everyone or Deploys.
 
+## [0.8.0-beta.1] - 2026-10-21
+
+### Added
+- A new Actions side in the panel shows your GitHub Actions runs: what's running, waiting for approval or just finished, with job progress. Switch to it with the pill under the open notch, or ⌘← and ⌘→. It looks at the repositories you pushed to recently and the ones with your open pull requests, and filters by Mine, Everyone or Deploys.
+
 ## [0.7.0] - 2026-10-21
 
 ### Added
@@ -141,6 +146,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...HEAD
+[0.8.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...v0.8.0-beta.1
 [0.7.0]: https://github.com/jordan-cod/devnotch/compare/v0.6.2...v0.7.0
 [0.7.0-beta.3]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.2...v0.7.0-beta.3
 [0.7.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.1...v0.7.0-beta.2
