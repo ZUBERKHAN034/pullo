@@ -11,6 +11,15 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - The quick search in the panel (⌘F) is now called Search, and it looks through every tab.
 - The left arrow goes to the previous tab, and Tab or the right arrow to the next one.
 
+## [0.7.0-beta.1] - 2026-10-20
+
+### Added
+- Choose the panel's tabs for each account in Settings → Tabs. My PRs and To review are now regular tabs you can rename, edit, reorder or remove, and you can add your own, written like a GitHub search (for example `repo:acme/api label:bug`). Alerts keep following your PRs and review requests, whatever tabs you keep.
+
+### Changed
+- The quick search in the panel (⌘F) is now called Search, and it looks through every tab.
+- The left arrow goes to the previous tab, and Tab or the right arrow to the next one.
+
 ## [0.6.0] - 2026-10-20
 
 ### Added
@@ -100,6 +109,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...HEAD
+[0.7.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...v0.7.0-beta.1
 [0.6.0]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0
 [0.6.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.0-beta.1...v0.6.0-beta.2
 [0.6.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0-beta.1
