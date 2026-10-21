@@ -10,6 +10,7 @@ final class AppDependencies {
     let store: PRStore
     let list: PRListModel
     let notch: NotchInteraction
+    let actions = ActionsModel()
     let updater: Updater?
     let system: any SystemActions = LiveSystemActions()
 
@@ -42,6 +43,7 @@ final class AppDependencies {
             .environment(accounts)
             .environment(tracker)
             .environment(settings)
+            .environment(actions)
             .environment(\.system, system)
     }
 

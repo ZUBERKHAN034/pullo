@@ -4,9 +4,22 @@ enum KeyCommand: Equatable {
     case quit, search, close
     case moveUp, moveDown, open
     case switchTab, previousTab, selectAccount(Int), copyBranch, markRead
+    case show(PanelArea)
+
+    var worksEverywhere: Bool {
+        switch self {
+        case .quit, .close, .selectAccount, .show: true
+        default: false
+        }
+    }
 
     init?(keyCode: Int, characters: String, command: Bool, searching: Bool) {
         if command {
+            switch keyCode {
+            case kVK_LeftArrow: self = .show(.pullRequests); return
+            case kVK_RightArrow: self = .show(.actions); return
+            default: break
+            }
             switch characters {
             case "q": self = .quit
             case "f": self = .search

@@ -11,6 +11,9 @@ struct ExpandedView: View {
             if accounts.accounts.isEmpty {
                 OnboardingView()
                     .transition(.reveal(delay: 0.05))
+            } else if notch.area == .actions {
+                ActionsBrowser()
+                    .transition(.opacity)
             } else {
                 PRBrowser()
                     .transition(.reveal(delay: 0.05))

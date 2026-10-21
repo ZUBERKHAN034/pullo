@@ -2,6 +2,7 @@ import SwiftUI
 
 struct NotchRootView: View {
     @Environment(NotchInteraction.self) private var notch
+    @Environment(AccountStore.self) private var accounts
 
     var body: some View {
         let state = notch.state
@@ -9,6 +10,19 @@ struct NotchRootView: View {
         let radii = notch.layout.radii(for: state)
         let shape = NotchShape(topRadius: radii.top, bottomRadius: radii.bottom)
 
+        VStack(spacing: 12) {
+            panel(state: state, size: size, radii: radii, shape: shape)
+            if state == .open, !accounts.accounts.isEmpty {
+                AreaSwitcher()
+                    .transition(.opacity.combined(with: .offset(y: -10)))
+            }
+        }
+        .opacity(state == .closed && !notch.geometry.hasNotch ? 0 : 1)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .animation(Motion.peek, value: notch.liveCI)
+    }
+
+    private func panel(state: NotchState, size: CGSize, radii: (top: CGFloat, bottom: CGFloat), shape: NotchShape) -> some View {
         VStack(spacing: 0) {
             TopBar()
             if state == .peek, let alert = notch.peekAlert {
@@ -27,8 +41,5 @@ struct NotchRootView: View {
         .clipShape(shape)
         .compositingGroup()
         .shadow(color: .black.opacity(state == .closed ? 0 : 0.55), radius: state == .open ? 26 : 14, y: 8)
-        .opacity(state == .closed && !notch.geometry.hasNotch ? 0 : 1)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .animation(Motion.peek, value: notch.liveCI)
     }
 }

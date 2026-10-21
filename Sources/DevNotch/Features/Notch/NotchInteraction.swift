@@ -10,6 +10,7 @@ final class NotchInteraction {
     }
 
     private(set) var peekAlert: NotchAlert?
+    private(set) var area: PanelArea = .pullRequests
     var geometry: NotchGeometry
 
     let list: PRListModel
@@ -151,6 +152,12 @@ final class NotchInteraction {
         waitingForPointerExit = pointerStaysOver
         list.reset()
         withAnimation(Motion.close) { state = .closed }
+    }
+
+    func show(_ area: PanelArea) {
+        guard area != self.area else { return }
+        if list.isSearching { list.stopSearch() }
+        withAnimation(Motion.navigate) { self.area = area }
     }
 
     // MARK: - Alerts
@@ -315,6 +322,7 @@ final class NotchInteraction {
     }
 
     func perform(_ command: KeyCommand) -> Bool {
+        if area == .actions, !command.worksEverywhere { return false }
         switch command {
         case .quit: system.quit()
         case .search: list.startSearch()
@@ -324,6 +332,7 @@ final class NotchInteraction {
         case .switchTab: list.selectTab(by: 1)
         case .previousTab: list.selectTab(by: -1)
         case .selectAccount(let number): return list.selectAccount(number: number)
+        case .show(let area): show(area)
         case .open, .copyBranch, .markRead:
             guard let pr = list.selectedPR else { return false }
             switch command {
