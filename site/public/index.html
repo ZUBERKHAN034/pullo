@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pullo · Your pull requests and GitHub Actions, right in the notch</title>
+  <meta name="description" content="Pullo is a free, open source Mac app that puts your GitHub pull requests and Actions in the notch. CI results, approvals and review requests slide out the moment they happen.">
+  <meta name="theme-color" content="#050507">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pullo.jrdan.dev/">
+  <meta property="og:title" content="Pullo">
+  <meta property="og:description" content="Your pull requests and GitHub Actions, right in the notch.">
+  <meta property="og:image" content="https://pullo.jrdan.dev/media/prs.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Pullo updates" href="/appcast.xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/">
+      <img src="/media/icon.png" alt="" width="28" height="28">
+      <span>Pullo</span>
+    </a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="https://github.com/jordan-cod/pullo/blob/main/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/jordan-cod/pullo" aria-label="Pullo on GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="corona" aria-hidden="true"></div>
+      <img class="hero-icon" src="/media/icon.png" alt="Pullo icon" width="132" height="132">
+      <h1>Your pull requests,<br>right in the notch.</h1>
+      <p class="lede">CI results, approvals and review requests slide out of the notch the moment they happen. Your GitHub Actions are one hover away.</p>
+      <div class="cta">
+        <a class="download" href="https://github.com/jordan-cod/pullo/releases/latest/download/Pullo.dmg">
+          <svg viewBox="0 0 384 512" width="15" height="18" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          Download for macOS
+        </a>
+        <p class="meta"><span data-version>Free and open source</span> · macOS 14 or later · Apple silicon</p>
+      </div>
+      <figure class="shot hero-shot">
+        <img src="/media/prs.jpg" alt="Pullo open under the notch, listing pull requests" width="2200" height="840">
+      </figure>
+    </section>
+
+    <section class="feature" id="features">
+      <div class="copy">
+        <p class="kicker">Alerts</p>
+        <h2>Know the moment something changes.</h2>
+        <p>When CI finishes, someone approves or asks for changes, or you're asked to review, the notch drops down to tell you. Then it gets out of the way.</p>
+      </div>
+      <figure class="shot small">
+        <img src="/media/alert.png" alt="An approval alert dropping from the notch" width="1000" height="300" loading="lazy">
+      </figure>
+    </section>
+
+    <section class="feature">
+      <div class="copy">
+        <p class="kicker">Actions</p>
+        <h2>Keep an eye on your runs.</h2>
+        <p>See what's running, what's waiting for approval and what just failed, across every repository you work on. Your deploys are one click away.</p>
+      </div>
+      <figure class="shot">
+        <img src="/media/actions.jpg" alt="GitHub Actions runs in Pullo" width="2200" height="840" loading="lazy">
+      </figure>
+    </section>
+
+    <section class="feature">
+      <div class="copy">
+        <p class="kicker">Run details</p>
+        <h2>Every job, every step.</h2>
+        <p>Open a run to follow each step live. Re-run what failed, cancel what's stuck, or jump straight to the log on GitHub.</p>
+      </div>
+      <figure class="shot">
+        <img src="/media/run.jpg" alt="A deploy run with its jobs and steps" width="2200" height="840" loading="lazy">
+      </figure>
+    </section>
+
+    <section class="grid">
+      <h2>Made to fit how you work.</h2>
+      <div class="cards">
+        <article>
+          <h3>Your own tabs</h3>
+          <p>Write them like a GitHub search: <code>repo:acme/api label:bug</code>. Make tabs for runs too, like production deploys.</p>
+        </article>
+        <article>
+          <h3>All your accounts</h3>
+          <p>Work and personal, side by side in the same list, each with its avatar.</p>
+        </article>
+        <article>
+          <h3>Liquid Glass</h3>
+          <p>Glass that follows your Mac, or a solid panel if you prefer.</p>
+        </article>
+        <article>
+          <h3>Keyboard first</h3>
+          <p><kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>P</kbd> from any app, then arrows, Return and <kbd>⌘</kbd> <kbd>F</kbd> for everything else.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="start">
+      <h2>Up and running in a minute.</h2>
+      <ol>
+        <li><span>1</span><div><strong>Download Pullo</strong> and drag it to Applications.</div></li>
+        <li><span>2</span><div><strong>Log in with the GitHub CLI</strong><code>brew install gh &amp;&amp; gh auth login</code></div></li>
+        <li><span>3</span><div><strong>Hover over the notch.</strong> That's it.</div></li>
+      </ol>
+    </section>
+
+    <section class="private">
+      <h2>Private by design.</h2>
+      <p>Pullo talks to the GitHub API straight from your Mac. It borrows the token from <code>gh</code> when it needs it and never stores it. There's no sign-up, and it only changes something on GitHub when you ask, like re-running a job.</p>
+    </section>
+
+    <section class="final">
+      <img src="/media/icon.png" alt="" width="72" height="72" loading="lazy">
+      <h2>Try Pullo.</h2>
+      <a class="download" href="https://github.com/jordan-cod/pullo/releases/latest/download/Pullo.dmg">Download for macOS</a>
+      <p class="meta">Updates install by themselves. No notch? It sits at the top of the menu bar.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Made by <a href="https://github.com/jordan-cod">Gabriel Jordan</a> · <a href="https://github.com/jordan-cod/pullo">Source on GitHub</a> · <a href="https://github.com/jordan-cod/pullo/blob/main/LICENSE">MIT License</a></p>
+  </footer>
+
+  <script>
+    fetch("/appcast.xml")
+      .then((response) => response.text())
+      .then((text) => {
+        const feed = new DOMParser().parseFromString(text, "application/xml");
+        const stable = [...feed.querySelectorAll("item")].find((item) => !item.getElementsByTagName("sparkle:channel").length);
+        const version = stable?.getElementsByTagName("sparkle:shortVersionString")[0]?.textContent;
+        if (version) document.querySelector("[data-version]").textContent = `Version ${version} · Free and open source`;
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>
