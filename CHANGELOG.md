@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-21
+
 ### Changed
 - With more than one account, everything now shows up together: pull requests and runs from all your accounts are in the same tabs, each with the account's avatar, so there's no account to switch anymore. Tabs are shared by every account, and a tab can stick to one account if you want (Settings → Tabs → Account). Tabs you had per account are kept: the ones every account had become one, and the rest stay tied to their account.
 - ⌘1 to ⌘9 now jump to a tab, on both the Pull requests and Actions sides.
@@ -230,6 +232,7 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/pullo/compare/v0.8.0...HEAD
+[0.9.0]: https://github.com/jordan-cod/pullo/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/jordan-cod/pullo/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/jordan-cod/pullo/compare/v0.7.0...v0.8.0
 [0.8.0-beta.5]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.4...v0.8.0-beta.5
