@@ -8,6 +8,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - The glass panel stays dark and readable when your Mac uses Light mode.
 
 ### Added
+- Ready-made searches to start a tab from, like Ready to merge, Failing checks or Mentions me, in Settings → Tabs → Add tab and in the tab editor.
 - Choose the panel's tabs for each account in Settings → Tabs. My PRs and To review are now regular tabs you can rename, edit, reorder or remove, and you can add your own, written like a GitHub search (for example `repo:acme/api label:bug`). Alerts keep following your PRs and review requests, whatever tabs you keep.
 
 ### Changed

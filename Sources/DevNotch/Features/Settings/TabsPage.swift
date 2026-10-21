@@ -75,7 +75,15 @@ struct TabsPage: View {
                 accounts.setFilters(reordered, for: login)
             }
             HStack {
-                Button("Add tab…") { editing = SavedFilter(name: "", query: "") }
+                Menu("Add tab") {
+                    Button("Blank…") { editing = SavedFilter(name: "", query: "") }
+                    Section("Examples") {
+                        ForEach(SavedFilter.examples, id: \.query) { example in
+                            Button(example.name) { editing = example }
+                        }
+                    }
+                }
+                .fixedSize()
                 Spacer()
                 if !missingPresets.isEmpty {
                     Button("Restore default tabs") {
@@ -125,6 +133,19 @@ private struct TabEditor: View {
                             )
                         )
                         Spacer()
+                        Menu("Examples") {
+                            ForEach(SavedFilter.examples, id: \.query) { example in
+                                Button {
+                                    if filter.name.allSatisfy(\.isWhitespace) { filter.name = example.name }
+                                    filter.query = example.query
+                                } label: {
+                                    Text(example.name)
+                                    Text(verbatim: example.query)
+                                }
+                            }
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
                         Button("Preview on GitHub") { filter.webURL.map(system.open) }
                             .disabled(filter.query.allSatisfy(\.isWhitespace))
                     }

@@ -295,6 +295,22 @@
         }
       }
     },
+    "A label in a repo": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una etiqueta en un repo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma label num repo"
+          }
+        }
+      }
+    },
     "A reviewer requested changes": {
       "localizations": {
         "es": {
@@ -439,18 +455,18 @@
         }
       }
     },
-    "Add tab…": {
+    "Add tab": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Agregar pestaña…"
+            "value": "Agregar pestaña"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adicionar aba…"
+            "value": "Adicionar aba"
           }
         }
       }
@@ -595,6 +611,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "As betas trazem novidades antes e podem ter bugs. Ao desligar, você fica com a beta atual até sair uma versão estável mais nova."
+          }
+        }
+      }
+    },
+    "Blank…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En blanco…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em branco…"
           }
         }
       }
@@ -1242,6 +1274,38 @@
         }
       }
     },
+    "Examples": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejemplos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exemplos"
+          }
+        }
+      }
+    },
+    "Failing checks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks fallando"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks falhando"
+          }
+        }
+      }
+    },
     "Finder": {
       "shouldTranslate": false
     },
@@ -1472,6 +1536,22 @@
         }
       }
     },
+    "Involves me": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me involucran"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me envolvem"
+          }
+        }
+      }
+    },
     "Its PRs leave the notch. You can add it back from the GitHub CLI any time.": {
       "localizations": {
         "es": {
@@ -1568,6 +1648,22 @@
         }
       }
     },
+    "Mentions me": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me mencionan"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me mencionam"
+          }
+        }
+      }
+    },
     "Move through PRs": {
       "localizations": {
         "es": {
@@ -1596,6 +1692,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Meus PRs"
+          }
+        }
+      }
+    },
+    "My drafts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mis borradores"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meus rascunhos"
           }
         }
       }
@@ -2144,6 +2256,22 @@
         }
       }
     },
+    "Recently merged": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fusionados recientemente"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mergeados recentemente"
+          }
+        }
+      }
+    },
     "Refresh": {
       "localizations": {
         "es": {
@@ -2316,6 +2444,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Revisão pedida ao seu time"
+          }
+        }
+      }
+    },
+    "Reviewed by me": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisados por mí"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisados por mim"
           }
         }
       }
@@ -2812,6 +2956,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pelo time"
+          }
+        }
+      }
+    },
+    "Waiting for review": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando revisión"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando review"
           }
         }
       }
