@@ -8,10 +8,18 @@ struct PRTabsBar: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            ForEach(PRTab.allCases, id: \.self) { tab in
-                tabButton(tab)
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(list.tabs, id: \.self) { tab in
+                            tabButton(tab).id(tab)
+                        }
+                    }
+                }
+                .onChange(of: list.tab) { _, tab in
+                    withAnimation(Motion.navigate) { proxy.scrollTo(tab) }
+                }
             }
-            Spacer()
             SearchTrigger(action: list.startSearch)
             if unreadCount(in: list.tab) > 0 {
                 IconButton(symbol: "envelope.open", help: String(localized: "Mark all as read"), action: list.markAllRead)
@@ -27,7 +35,8 @@ struct PRTabsBar: View {
             list.selectTab(tab)
         } label: {
             HStack(spacing: 6) {
-                Text(tab.title)
+                Text(list.title(of: tab))
+                    .lineLimit(1)
                 count(for: tab, selected: selected)
             }
             .font(.panel(.label, .semibold))

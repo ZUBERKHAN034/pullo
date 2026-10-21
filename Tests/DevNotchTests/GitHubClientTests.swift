@@ -59,6 +59,45 @@ struct GitHubClientTests {
         #expect(snapshot.reviewRequests.isEmpty)
     }
 
+    @Test func eachFilterIsItsOwnSearch() async throws {
+        let api = SavedFilter(name: "API", query: "repo:acme/api")
+        let broken = SavedFilter(name: "Broken", query: "repo:nobody/nothing")
+        let unfinished = SavedFilter(name: "", query: "repo:acme/web")
+        let body = """
+        { "data": { "mine": { "nodes": [] }, "review": { "nodes": [] }, "f0": { "nodes": [\(prNode)] }, "f1": null },
+          "errors": [ { "message": "The listed repositories cannot be searched.", "path": ["f1"] } ] }
+        """
+        let (client, token) = client(body: body)
+        let snapshot = try await client.fetchSnapshot(account: "me", filters: SavedFilter.defaults + [api, broken, unfinished])
+        #expect(snapshot.filtered[api.id]?.map(\.id) == ["PR_1"])
+        #expect(snapshot.filtered[broken.id]?.isEmpty == true)
+        #expect(snapshot.filterErrors[broken.id] == "The listed repositories cannot be searched.")
+        #expect(snapshot.filtered[unfinished.id] == nil)
+
+        let request = try #require(StubURLProtocol.lastRequest(token: token))
+        let sent = try #require(try JSONSerialization.jsonObject(with: sentBody(of: request)) as? [String: Any])
+        let variables = try #require(sent["variables"] as? [String: String])
+        #expect(variables["f0"] == api.searchQuery)
+        #expect(variables["f1"] == broken.searchQuery)
+        #expect(variables["f2"] == nil)
+        #expect((sent["query"] as? String)?.contains("f1: search(query: $f1") == true)
+    }
+
+    private func sentBody(of request: URLRequest) -> Data {
+        if let body = request.httpBody { return body }
+        guard let stream = request.httpBodyStream else { return Data() }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        while stream.hasBytesAvailable {
+            let read = stream.read(&buffer, maxLength: buffer.count)
+            guard read > 0 else { break }
+            data.append(buffer, count: read)
+        }
+        return data
+    }
+
     @Test func graphQLErrorsWithoutDataAreReported() async {
         let body = #"{ "data": null, "errors": [ { "message": "first" }, { "message": "second" } ] }"#
         let (client, _) = client(body: body)

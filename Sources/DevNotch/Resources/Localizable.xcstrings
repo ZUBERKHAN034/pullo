@@ -327,6 +327,22 @@
         }
       }
     },
+    "Account": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuenta"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conta"
+          }
+        }
+      }
+    },
     "Account connected": {
       "localizations": {
         "es": {
@@ -391,6 +407,22 @@
         }
       }
     },
+    "Add an account first.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primero agrega una cuenta."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicione uma conta primeiro."
+          }
+        }
+      }
+    },
     "Add from GitHub CLI": {
       "localizations": {
         "es": {
@@ -403,6 +435,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adicionar do GitHub CLI"
+          }
+        }
+      }
+    },
+    "Add tab…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar pestaña…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar aba…"
           }
         }
       }
@@ -551,6 +599,22 @@
         }
       }
     },
+    "Bugs in the API": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugs en la API"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugs na API"
+          }
+        }
+      }
+    },
     "CI failed": {
       "localizations": {
         "es": {
@@ -611,6 +675,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não foi possível acessar o GitHub"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
           }
         }
       }
@@ -791,18 +871,18 @@
         }
       }
     },
-    "Clear the filter, or close": {
+    "Clear the search, or close": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Borrar el filtro o cerrar"
+            "value": "Borrar la búsqueda o cerrar"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Limpar o filtro ou fechar"
+            "value": "Limpar a busca ou fechar"
           }
         }
       }
@@ -1114,50 +1194,50 @@
         }
       }
     },
-    "Filter": {
+    "Each one is a tab in the panel, in this order. Drag to reorder. Write it like a GitHub search, for example `repo:acme/api label:bug` or `team-review-requested:acme/web`. Only open pull requests show up unless you add `is:closed` or `is:merged`. Alerts always follow your PRs and review requests, whatever tabs you keep.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filtrar"
+            "value": "Cada una es una pestaña del panel, en este orden. Arrastra para reordenar. Escríbela como una búsqueda de GitHub, por ejemplo `repo:acme/api label:bug` o `team-review-requested:acme/web`. Solo aparecen pull requests abiertos, a menos que agregues `is:closed` o `is:merged`. Las alertas siempre siguen tus PRs y solicitudes de revisión, sin importar qué pestañas conserves."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filtrar"
+            "value": "Cada uma é uma aba no painel, nesta ordem. Arraste para reordenar. Escreva como uma busca do GitHub, por exemplo `repo:acme/api label:bug` ou `team-review-requested:acme/web`. Só aparecem pull requests abertos, a não ser que você adicione `is:closed` ou `is:merged`. Os alertas sempre acompanham seus PRs e pedidos de review, não importa quais abas você mantenha."
           }
         }
       }
     },
-    "Filter PRs": {
+    "Edit tab": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filtrar PR"
+            "value": "Editar pestaña"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filtrar PRs"
+            "value": "Editar aba"
           }
         }
       }
     },
-    "Filter by title, repo, #number, branch or author": {
+    "Edit…": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filtra por título, repo, #número, rama o autor"
+            "value": "Editar…"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filtre por título, repo, #número, branch ou autor"
+            "value": "Editar…"
           }
         }
       }
@@ -1228,6 +1308,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Receber versões beta"
+          }
+        }
+      }
+    },
+    "GitHub couldn't run this search": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub no pudo ejecutar esta búsqueda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub não conseguiu rodar esta busca"
           }
         }
       }
@@ -1504,6 +1600,22 @@
         }
       }
     },
+    "Name": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nombre"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome"
+          }
+        }
+      }
+    },
     "New comment": {
       "localizations": {
         "es": {
@@ -1632,6 +1744,22 @@
         }
       }
     },
+    "No matching PRs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún PR coincide"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum PR encontrado"
+          }
+        }
+      }
+    },
     "No one is waiting on you.": {
       "localizations": {
         "es": {
@@ -1692,6 +1820,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum"
+          }
+        }
+      }
+    },
+    "Nothing open matches \"%@\" right now.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada abierto coincide con \"%@\" ahora."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada aberto corresponde a \"%@\" agora."
           }
         }
       }
@@ -1808,6 +1952,22 @@
         }
       }
     },
+    "Other": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outros"
+          }
+        }
+      }
+    },
     "PR approved": {
       "localizations": {
         "es": {
@@ -1900,6 +2060,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Testar"
+          }
+        }
+      }
+    },
+    "Preview on GitHub": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver en GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver no GitHub"
           }
         }
       }
@@ -2080,6 +2256,22 @@
         }
       }
     },
+    "Restore default tabs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar pestañas predeterminadas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar abas padrão"
+          }
+        }
+      }
+    },
     "Review requested from %@": {
       "localizations": {
         "es": {
@@ -2128,6 +2320,38 @@
         }
       }
     },
+    "Save": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar"
+          }
+        }
+      }
+    },
+    "Search": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar"
+          }
+        }
+      }
+    },
     "Search @%@'s PRs": {
       "localizations": {
         "es": {
@@ -2140,6 +2364,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buscar nos PRs de @%@"
+          }
+        }
+      }
+    },
+    "Search PRs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar PR"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar PRs"
+          }
+        }
+      }
+    },
+    "Search by title, repo, #number, branch or author": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca por título, repo, #número, rama o autor"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busque por título, repo, #número, branch ou autor"
+          }
+        }
+      }
+    },
+    "Search query": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Búsqueda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca"
+          }
+        }
+      }
+    },
+    "Search syntax": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sintaxis de búsqueda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sintaxe de busca"
           }
         }
       }
@@ -2304,18 +2592,50 @@
         }
       }
     },
-    "Switch between My PRs and To review": {
+    "Switch tabs": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cambiar entre Mis PR y Por revisar"
+            "value": "Cambiar de pestaña"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alternar entre Meus PRs e Para revisar"
+            "value": "Trocar de aba"
+          }
+        }
+      }
+    },
+    "Tabs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pestañas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abas"
+          }
+        }
+      }
+    },
+    "Tabs for @%@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pestañas de @%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abas de @%@"
           }
         }
       }
@@ -2352,18 +2672,18 @@
         }
       }
     },
-    "Title, repo, #number, branch or author. Searches both tabs.": {
+    "Title, repo, #number, branch or author. Searches every tab.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Título, repo, #número, rama o autor. Busca en ambas pestañas."
+            "value": "Título, repo, #número, rama o autor. Busca en todas las pestañas."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Título, repo, #número, branch ou autor. Busca nas duas abas."
+            "value": "Título, repo, #número, branch ou autor. Busca em todas as abas."
           }
         }
       }

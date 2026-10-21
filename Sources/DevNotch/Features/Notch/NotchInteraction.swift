@@ -318,7 +318,8 @@ final class NotchInteraction {
         case .close: if list.isSearching { list.stopSearch() } else { close() }
         case .moveUp: list.moveSelection(by: -1)
         case .moveDown: list.moveSelection(by: 1)
-        case .switchTab: list.selectTab(list.tab == .mine ? .review : .mine)
+        case .switchTab: list.selectTab(by: 1)
+        case .previousTab: list.selectTab(by: -1)
         case .selectAccount(let number): return list.selectAccount(number: number)
         case .open, .copyBranch, .markRead:
             guard let pr = list.selectedPR else { return false }

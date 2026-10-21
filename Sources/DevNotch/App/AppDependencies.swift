@@ -53,6 +53,10 @@ final class AppDependencies {
             system.requestFocusAccess()
             Task { await self.store.refresh() }
         }
+        accounts.onFiltersChanged = { [weak self] _ in
+            guard let self else { return }
+            Task { await self.store.refresh() }
+        }
         accounts.onAccountRemoved = { [weak self] account in
             guard let self else { return }
             tracker.forget(account: account.login)

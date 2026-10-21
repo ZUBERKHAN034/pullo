@@ -14,12 +14,12 @@ struct ShortcutsPage: View {
             Section("In the panel") {
                 row("Move through PRs", "↑ ↓")
                 row("Open the selected PR", "↩")
-                row("Switch between My PRs and To review", String(localized: "⇥  or  ← →"))
-                row("Filter PRs", "⌘F")
+                row("Switch tabs", String(localized: "⇥  or  ← →"))
+                row("Search PRs", "⌘F")
                 row("Copy the branch name", "C")
                 row("Mark as read", "R")
                 row("Switch account", "⌘1 – ⌘9")
-                row("Clear the filter, or close", "esc")
+                row("Clear the search, or close", "esc")
                 row("Quit DevNotch", "⌘Q")
             }
         }

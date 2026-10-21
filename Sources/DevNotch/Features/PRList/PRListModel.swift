@@ -4,7 +4,7 @@ import SwiftUI
 @MainActor
 @Observable
 final class PRListModel {
-    private(set) var tab: PRTab = .mine
+    private var chosenTab: PRTab?
     private(set) var selectedLogin: String?
     private(set) var selectedPRID: String?
     var keyboardMode = false
@@ -44,14 +44,60 @@ final class PRListModel {
         return accounts.accounts.first?.login
     }
 
+    var filters: [SavedFilter] {
+        currentLogin.map(accounts.filters(for:)) ?? []
+    }
+
+    var tabs: [PRTab] {
+        filters.map { .filter($0.id) }
+    }
+
+    var tab: PRTab {
+        let tabs = tabs
+        if let chosenTab, tabs.contains(chosenTab) { return chosenTab }
+        return tabs.first ?? .mine
+    }
+
+    func filter(of tab: PRTab) -> SavedFilter? {
+        guard case .filter(let id) = tab else { return nil }
+        return filters.first { $0.id == id }
+    }
+
+    func preset(of tab: PRTab) -> SavedFilter.Preset? {
+        switch tab {
+        case .mine: .mine
+        case .review: .review
+        case .filter: filter(of: tab)?.preset
+        }
+    }
+
+    func title(of tab: PRTab) -> String {
+        filter(of: tab)?.name ?? preset(of: tab)?.name ?? ""
+    }
+
+    func filterError(in tab: PRTab) -> String? {
+        guard case .filter(let id) = tab else { return nil }
+        return store.filterError(id, for: currentLogin)
+    }
+
     func prs(in tab: PRTab) -> [PullRequest] {
-        tab == .mine ? store.mine(for: currentLogin) : store.reviewRequests(for: currentLogin)
+        switch tab {
+        case .mine: store.mine(for: currentLogin)
+        case .review: store.reviewRequests(for: currentLogin)
+        case .filter(let id):
+            switch filter(of: tab) {
+            case let filter? where filter.usesBuiltInSearch:
+                filter.preset == .mine ? store.mine(for: currentLogin) : store.reviewRequests(for: currentLogin)
+            default:
+                store.filtered(id, for: currentLogin)
+            }
+        }
     }
 
     var visiblePRs: [PullRequest] {
         guard isSearching else { return prs(in: tab) }
         var seen = Set<String>()
-        return (prs(in: .mine) + prs(in: .review)).filter { $0.matches(searchQuery) && seen.insert($0.id).inserted }
+        return (tabs + [.mine, .review]).flatMap(prs(in:)).filter { $0.matches(searchQuery) && seen.insert($0.id).inserted }
     }
 
     var selectedPR: PullRequest? {
@@ -59,8 +105,14 @@ final class PRListModel {
     }
 
     func selectTab(_ tab: PRTab) {
-        withAnimation(Motion.navigate) { self.tab = tab }
+        withAnimation(Motion.navigate) { chosenTab = tab }
         resetSelection()
+    }
+
+    func selectTab(by offset: Int) {
+        let tabs = tabs
+        guard let index = tabs.firstIndex(of: tab) else { return }
+        selectTab(tabs[(index + offset + tabs.count) % tabs.count])
     }
 
     func selectAccount(_ login: String) {

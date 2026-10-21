@@ -4,6 +4,7 @@ struct MessageView: View {
     let symbol: String
     let title: String
     let detail: String
+    var actionTitle: LocalizedStringKey = "Try again"
     var retry: (() -> Void)?
 
     var body: some View {
@@ -20,7 +21,7 @@ struct MessageView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)
             if let retry {
-                Button("Try again", action: retry)
+                Button(actionTitle, action: retry)
                     .buttonStyle(.plain)
                     .font(.panel(.body, .semibold))
                     .foregroundStyle(.white)

@@ -38,17 +38,45 @@ struct PRBrowser: View {
             LoadingView()
         } else if list.isSearching {
             searchResults
-        } else if list.visiblePRs.isEmpty {
+        } else if let error = list.filterError(in: list.tab) {
             MessageView(
-                symbol: list.tab == .mine ? "tray" : "checkmark.circle",
-                title: list.tab == .mine ? String(localized: "No open PRs") : String(localized: "Nothing to review"),
-                detail: list
-                    .tab == .mine ? String(localized: "PRs you open will show up here.") : String(localized: "No one is waiting on you.")
-            )
+                symbol: "exclamationmark.triangle",
+                title: String(localized: "GitHub couldn't run this search"),
+                detail: error,
+                actionTitle: "Edit tab"
+            ) {
+                notch.onOpenSettings?(.tabs)
+            }
             .id("\(login)|\(list.tab)")
+        } else if list.visiblePRs.isEmpty {
+            emptyTab
+                .id("\(login)|\(list.tab)")
         } else {
             PRList(sections: tabSections)
                 .id("\(login)|\(list.tab)")
+        }
+    }
+
+    private var emptyTab: MessageView {
+        switch list.preset(of: list.tab) {
+        case .mine:
+            MessageView(
+                symbol: "tray",
+                title: String(localized: "No open PRs"),
+                detail: String(localized: "PRs you open will show up here.")
+            )
+        case .review:
+            MessageView(
+                symbol: "checkmark.circle",
+                title: String(localized: "Nothing to review"),
+                detail: String(localized: "No one is waiting on you.")
+            )
+        case nil:
+            MessageView(
+                symbol: "line.3.horizontal.decrease.circle",
+                title: String(localized: "No matching PRs"),
+                detail: String(localized: "Nothing open matches \"\(list.title(of: list.tab))\" right now.")
+            )
         }
     }
 
@@ -59,7 +87,7 @@ struct PRBrowser: View {
             MessageView(
                 symbol: "magnifyingglass",
                 title: String(localized: "Search @\(list.currentLogin ?? "")'s PRs"),
-                detail: String(localized: "Title, repo, #number, branch or author. Searches both tabs.")
+                detail: String(localized: "Title, repo, #number, branch or author. Searches every tab.")
             )
         } else if results.isEmpty {
             MessageView(
@@ -68,19 +96,24 @@ struct PRBrowser: View {
                 detail: String(localized: "No PR matches \"\(list.searchQuery)\".")
             )
         } else {
-            let mineIDs = Set(list.prs(in: .mine).map(\.id))
-            PRList(
-                sections: [
-                    PRSection(title: PRTab.mine.title, kind: .mine, prs: results.filter { mineIDs.contains($0.id) }),
-                    PRSection(title: PRTab.review.title, kind: .review, prs: results.filter { !mineIDs.contains($0.id) }),
-                ].filter { !$0.prs.isEmpty }
-            )
+            PRList(sections: searchSections(results))
         }
+    }
+
+    private func searchSections(_ results: [PullRequest]) -> [PRSection] {
+        var placed = Set<String>()
+        let sections = list.tabs.map { tab in
+            let ids = Set(list.prs(in: tab).map(\.id))
+            let prs = results.filter { ids.contains($0.id) && placed.insert($0.id).inserted }
+            return PRSection(title: list.title(of: tab), kind: tab, prs: prs)
+        }
+        let rest = results.filter { !placed.contains($0.id) }
+        return (sections + [PRSection(title: String(localized: "Other"), kind: nil, prs: rest)]).filter { !$0.prs.isEmpty }
     }
 
     private var tabSections: [PRSection] {
         let prs = list.visiblePRs
-        guard list.tab == .review else { return [PRSection(title: nil, kind: .mine, prs: prs)] }
+        guard list.preset(of: list.tab) == .review else { return [PRSection(title: nil, kind: list.tab, prs: prs)] }
         return [
             PRSection(title: String(localized: "For you"), kind: .review, prs: prs.filter(\.isDirectRequest)),
             PRSection(title: String(localized: "Via team"), kind: .review, prs: prs.filter { !$0.isDirectRequest }),

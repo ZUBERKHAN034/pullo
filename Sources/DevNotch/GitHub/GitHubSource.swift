@@ -4,7 +4,7 @@ struct GitHubSource: PRSource {
     let tokens: TokenProvider
 
     func snapshot(for account: Account) async throws -> Snapshot {
-        try await withClient(for: account) { try await $0.fetchSnapshot(account: account.login) }
+        try await withClient(for: account) { try await $0.fetchSnapshot(account: account.login, filters: account.filters) }
     }
 
     func outcomes(of ids: [String], for account: Account) async throws -> [PROutcome] {

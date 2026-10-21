@@ -13,6 +13,7 @@ final class AccountStore {
 
     @ObservationIgnored var onAccountAdded: ((Account) -> Void)?
     @ObservationIgnored var onAccountRemoved: ((Account) -> Void)?
+    @ObservationIgnored var onFiltersChanged: ((Account) -> Void)?
 
     private let defaults: UserDefaults
     private let cli: any GitHubCLI
@@ -43,6 +44,17 @@ final class AccountStore {
         onAccountRemoved?(account)
     }
 
+    func filters(for login: String) -> [SavedFilter] {
+        accounts.first { $0.login == login }?.filters ?? []
+    }
+
+    func setFilters(_ filters: [SavedFilter], for login: String) {
+        guard let index = accounts.firstIndex(where: { $0.login == login }), accounts[index].filters != filters else { return }
+        accounts[index].filters = filters
+        persist()
+        onFiltersChanged?(accounts[index])
+    }
+
     func reloadGHUsers() {
         let cli = cli
         Task { [weak self] in
@@ -69,7 +81,9 @@ final class AccountStore {
     }
 
     private func upsert(_ account: Account) {
+        var account = account
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {
+            account.filters = accounts[index].filters
             accounts[index] = account
         } else {
             accounts.append(account)
