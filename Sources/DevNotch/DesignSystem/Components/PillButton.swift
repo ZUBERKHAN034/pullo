@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PillButton: View {
+    @Environment(\.panelGlass) private var glass
     let title: String
     let symbol: String?
     var prominent = false
@@ -21,9 +22,12 @@ struct PillButton: View {
             .foregroundStyle(prominent ? .black : .textStrong)
             .padding(.horizontal, 13)
             .padding(.vertical, 7)
-            .background(
-                Capsule().fill(prominent ? .white.opacity(hovering ? 1 : 0.9) : hovering ? .surfaceStrong : .surface)
-            )
+            .background {
+                if !glass || prominent {
+                    Capsule().fill(prominent ? .white.opacity(hovering ? 1 : 0.9) : hovering ? .surfaceStrong : .surface)
+                }
+            }
+            .panelGlass(!prominent, in: Capsule())
             .scaleEffect(hovering ? 1.03 : 1)
             .contentShape(Capsule())
         }

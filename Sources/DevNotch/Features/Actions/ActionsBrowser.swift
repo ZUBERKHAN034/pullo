@@ -22,6 +22,7 @@ struct ActionsBrowser: View {
                 }
                 Spacer()
             }
+            .glassGroup(spacing: 4)
             content
         }
     }
@@ -96,11 +97,11 @@ struct ActionsBrowser: View {
             .padding(.vertical, 6)
             .background {
                 if selected {
-                    Capsule()
-                        .fill(.surface)
+                    SelectionCapsule()
                         .matchedGeometryEffect(id: "filter", in: selection)
                 }
             }
+            .panelGlass(selected, in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)

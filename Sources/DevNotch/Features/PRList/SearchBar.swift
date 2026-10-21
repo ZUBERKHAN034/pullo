@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SearchBar: View {
     @Environment(PRListModel.self) private var list
+    @Environment(\.panelGlass) private var glass
 
     var body: some View {
         HStack(spacing: 8) {
@@ -21,7 +22,12 @@ struct SearchBar: View {
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 6)
-        .background(Capsule().fill(.surfaceSubtle))
-        .overlay(Capsule().strokeBorder(.hairline, lineWidth: 1))
+        .background {
+            if !glass {
+                Capsule().fill(.surfaceSubtle)
+                    .overlay(Capsule().strokeBorder(.hairline, lineWidth: 1))
+            }
+        }
+        .panelGlass(in: Capsule(), interactive: false)
     }
 }

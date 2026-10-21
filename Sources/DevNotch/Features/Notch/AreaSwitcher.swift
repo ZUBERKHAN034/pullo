@@ -13,6 +13,7 @@ struct AreaSwitcher: View {
         }
         .padding(3)
         .background { SwitcherBackground() }
+        .panelGlass(in: Capsule())
     }
 
     private var running: Int { actions.activeCount(in: .mine) }
@@ -56,13 +57,10 @@ struct AreaSwitcher: View {
 }
 
 private struct SwitcherBackground: View {
-    @Environment(AppSettings.self) private var settings
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.panelGlass) private var glass
 
     var body: some View {
-        if settings.panelStyle.isGlass, PanelStyle.glassIsAvailable, !reduceTransparency, #available(macOS 26, *) {
-            Color.clear.glassEffect(.regular, in: Capsule())
-        } else {
+        if !glass {
             Capsule()
                 .fill(Color.black)
                 .overlay(Capsule().strokeBorder(Color.hairline))

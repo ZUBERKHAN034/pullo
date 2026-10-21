@@ -10,6 +10,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ### Changed
 - The closed notch now also shows workflow runs you started, like a deploy, with the workflow's name. The ring turns red as soon as a job fails, and the notch flashes the result when the run finishes.
+- With the Glass panel style, the tabs, filters, account, search, buttons, the Pull requests / Actions pill and the toasts use macOS Liquid Glass and react to the pointer, instead of flat shapes drawn by the app. The Solid style looks the same as before.
 
 ### Fixed
 - The pill under the open notch follows the panel style, so it's glass when the panel is, instead of always black.
