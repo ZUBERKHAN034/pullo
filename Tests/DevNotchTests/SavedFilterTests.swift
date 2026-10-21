@@ -50,4 +50,11 @@ struct SavedFilterTests {
         #expect(!mine.usesBuiltInSearch)
         #expect(!SavedFilter(name: "Mine", query: "author:@me").usesBuiltInSearch)
     }
+
+    @Test func examplesAreReadyToSave() {
+        let examples = SavedFilter.examples
+        #expect(examples.allSatisfy { $0.isComplete })
+        #expect(examples.allSatisfy { $0.preset == nil })
+        #expect(Set(examples.map(\.query)).count == examples.count)
+    }
 }
