@@ -24,7 +24,7 @@ Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI
 
 ## Installation
 
-1. Download the [disk image](https://github.com/jordan-cod/devnotch/releases/latest/download/Pullo.dmg) from the latest release.
+1. Download [`Pullo.dmg`](https://github.com/jordan-cod/pullo/releases/latest/download/Pullo.dmg) from the latest release.
 2. Open it and drag Pullo to your Applications folder.
 3. If you don't have the GitHub CLI yet, install it and log in:
 
