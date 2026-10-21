@@ -17,6 +17,15 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - Settings → Appearance shows a preview of each panel style, so you can see what you pick.
 - While checks run, the notch shows the PR number by default. In Settings → Appearance you can switch to the checks done, or both.
 
+## [0.7.0-beta.3] - 2026-10-21
+
+### Added
+- Ready-made searches to start a tab from, like Ready to merge, Failing checks or Mentions me, in Settings → Tabs → Add tab and in the tab editor.
+
+### Changed
+- Settings → Appearance shows a preview of each panel style, so you can see what you pick.
+- While checks run, the notch shows the PR number by default. In Settings → Appearance you can switch to the checks done, or both.
+
 ## [0.7.0-beta.2] - 2026-10-21
 
 ### Fixed
@@ -130,6 +139,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.6.2...HEAD
+[0.7.0-beta.3]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.2...v0.7.0-beta.3
 [0.7.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.1...v0.7.0-beta.2
 [0.6.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...v0.6.1
