@@ -11,7 +11,8 @@ extension WorkflowRun {
         state: State = .passed,
         actor: String = "me",
         createdAt: Date = Date(timeIntervalSince1970: 0),
-        pullRequest: Int? = nil
+        pullRequest: Int? = nil,
+        event: String = "push"
     ) -> WorkflowRun {
         WorkflowRun(
             id: id,
@@ -20,7 +21,7 @@ extension WorkflowRun {
             workflow: workflow,
             title: "Run \(id)",
             branch: branch,
-            event: "push",
+            event: event,
             state: state,
             url: URL(static: "https://github.com/acme/api/actions/runs/1"),
             actor: actor,

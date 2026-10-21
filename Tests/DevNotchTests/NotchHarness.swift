@@ -52,7 +52,7 @@ final class NotchHarness {
         list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system, clock: clock)
         var clockNow: () -> Date = { Date() }
         runs = RunStore(accounts: accounts, prs: store, source: runSource) { clockNow() }
-        actions = ActionsModel(store: runs, list: list)
+        actions = ActionsModel(store: runs, list: list, accounts: accounts)
         notch = NotchInteraction(
             list: list,
             runs: runs,
