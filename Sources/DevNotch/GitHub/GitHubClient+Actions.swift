@@ -109,9 +109,12 @@ private struct RunsPayload: Decodable {
 private struct JobsPayload: Decodable {
     struct Job: Decodable {
         struct Step: Decodable {
+            let number: Int?
             let name: String
             let status: String
             let conclusion: String?
+            let startedAt: Date?
+            let completedAt: Date?
         }
 
         let id: Int
@@ -132,8 +135,16 @@ private struct JobsPayload: Decodable {
                 url: htmlUrl,
                 startedAt: startedAt,
                 completedAt: state.isActive ? nil : completedAt,
-                failedStep: steps?.first { $0.conclusion == "failure" || $0.conclusion == "timed_out" }?.name,
-                currentStep: steps?.first { $0.status == "in_progress" }?.name
+                steps: (steps ?? []).enumerated().map { index, step in
+                    let state = WorkflowRun.state(status: step.status, conclusion: step.conclusion)
+                    return WorkflowStep(
+                        number: step.number ?? index + 1,
+                        name: step.name,
+                        state: state,
+                        startedAt: step.startedAt,
+                        completedAt: state.isActive ? nil : step.completedAt
+                    )
+                }
             )
         }
     }

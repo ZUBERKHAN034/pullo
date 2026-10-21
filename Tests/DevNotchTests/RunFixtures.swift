@@ -98,8 +98,7 @@ extension WorkflowJob {
             url: URL(static: "https://github.com/acme/api/actions/runs/1/job/1"),
             startedAt: Date(timeIntervalSince1970: 0),
             completedAt: state.isActive ? nil : Date(timeIntervalSince1970: 60),
-            failedStep: failedStep,
-            currentStep: nil
+            steps: failedStep.map { [WorkflowStep(number: 1, name: $0, state: .failed, startedAt: nil, completedAt: nil)] } ?? []
         )
     }
 }

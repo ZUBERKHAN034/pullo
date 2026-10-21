@@ -2016,6 +2016,22 @@
         }
       }
     },
+    "Hide the steps": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar los pasos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esconder os passos"
+          }
+        }
+      }
+    },
     "Hover here to connect GitHub": {
       "localizations": {
         "es": {
@@ -2732,6 +2748,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abrir o log do job"
+          }
+        }
+      }
+    },
+    "Open the log at this step": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir el log en este paso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir o log neste passo"
           }
         }
       }
@@ -3692,6 +3724,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar execuções onde"
+          }
+        }
+      }
+    },
+    "Show the steps": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar los pasos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar os passos"
           }
         }
       }
