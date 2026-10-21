@@ -3,8 +3,8 @@ import Foundation
 struct GitHubSource: PRSource {
     let tokens: TokenProvider
 
-    func snapshot(for account: Account) async throws -> Snapshot {
-        try await withClient(for: account) { try await $0.fetchSnapshot(account: account.login, filters: account.filters) }
+    func snapshot(for account: Account, filters: [SavedFilter]) async throws -> Snapshot {
+        try await withClient(for: account) { try await $0.fetchSnapshot(account: account.login, filters: filters) }
     }
 
     func outcomes(of ids: [String], for account: Account) async throws -> [PROutcome] {

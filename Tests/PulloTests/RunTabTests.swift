@@ -38,12 +38,19 @@ struct RunTabTests {
         #expect(RunTab(name: "Ana", startedBy: .user, user: "ana").isComplete)
     }
 
-    @Test func accountsSavedBeforeGetTheDefaultTabs() throws {
-        let old = #"{"login":"me","filters":[]}"#
-        let account = try JSONDecoder().decode(Account.self, from: Data(old.utf8))
-        #expect(account.runTabs.map(\.preset) == [.mine, .everyone, .deploys])
-        let saved = try JSONEncoder().encode(Account(login: "me", avatarURL: nil, runTabs: [RunTab(name: "Prod", branch: "main")]))
-        #expect(try JSONDecoder().decode(Account.self, from: saved).runTabs.first?.branch == "main")
+    @MainActor @Test func accountsSavedBeforeKeepTheirTabs() throws {
+        let scratch = ScratchDefaults()
+        let prod = RunTab(name: "Prod", branch: "main")
+        let old = try [
+            #"{"login":"me","filters":[]}"#,
+            #"{"login":"work","runTabs":\#(String(decoding: JSONEncoder().encode([prod]), as: UTF8.self))}"#,
+        ]
+        scratch.defaults.set(Data("[\(old.joined(separator: ","))]".utf8), for: .accounts)
+        let accounts = AccountStore(defaults: scratch.defaults)
+        #expect(accounts.accounts.map(\.login) == ["me", "work"])
+        #expect(accounts.runTabs.map(\.preset) == [.mine, .everyone, .deploys, nil])
+        #expect(accounts.runTabs.map(\.account) == ["me", "me", "me", "work"])
+        #expect(accounts.tabs.map(\.preset) == [.mine, .review])
     }
 }
 
@@ -59,11 +66,11 @@ extension NotchBehavior {
             let h = await NotchHarness(runSource: source)
             await h.runs.refresh()
             let failing = RunTab(name: "Failing on main", branch: "main", status: .failing)
-            h.accounts.setRunTabs([failing] + RunTab.defaults, for: "me")
+            h.accounts.setRunTabs([failing] + RunTab.defaults)
             #expect(h.actions.tabs.first?.name == "Failing on main")
             #expect(h.actions.recent.map(\.id) == [1])
             #expect(h.actions.myActiveCount == 1)
-            h.accounts.setRunTabs(RunTab.defaults, for: "me")
+            h.accounts.setRunTabs(RunTab.defaults)
             #expect(h.actions.tab?.preset == .mine)
         }
     }

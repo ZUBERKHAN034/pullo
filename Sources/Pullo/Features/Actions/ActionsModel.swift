@@ -25,17 +25,25 @@ final class ActionsModel {
         self.accounts = accounts
     }
 
-    var tabs: [RunTab] { list.currentLogin.map(accounts.runTabs(for:)) ?? [] }
+    var tabs: [RunTab] { accounts.runTabs }
 
     var tab: RunTab? { tabs.first { $0.id == chosenTabID } ?? tabs.first }
 
-    var isLoaded: Bool { store.isLoaded(list.currentLogin) }
+    var isLoaded: Bool { list.logins.contains { store.isLoaded($0) } }
 
-    var problem: RefreshProblem? { list.currentLogin.flatMap { store.errors[$0] } }
+    func problem(worthShowingAt now: Date? = nil) -> (login: String, problem: RefreshProblem)? {
+        RefreshProblem.first(in: store.errors, for: list.logins, worthShowingAt: now)
+    }
+
+    var allRuns: [WorkflowRun] {
+        var seen = Set<Int>()
+        return list.logins.flatMap(store.runs(for:)).filter { seen.insert($0.id).inserted }
+    }
 
     func runs(in tab: RunTab?) -> [WorkflowRun] {
-        guard let login = list.currentLogin, let tab else { return [] }
-        return store.runs(for: login).filter { tab.includes($0, login: login) }
+        guard let tab else { return [] }
+        return allRuns.filter { tab.applies(to: $0.account) && tab.includes($0, login: $0.account) }
+            .sorted { $0.createdAt > $1.createdAt }
     }
 
     var active: [WorkflowRun] { runs(in: tab).filter(\.state.isActive) }
@@ -49,19 +57,24 @@ final class ActionsModel {
     }
 
     var myActiveCount: Int {
-        guard let login = list.currentLogin else { return 0 }
-        return store.runs(for: login).filter { $0.state.isActive && $0.isStarted(by: login) }.count
+        allRuns.filter { $0.state.isActive && $0.isStarted(by: $0.account) }.count
     }
 
     func select(_ tab: RunTab) {
         withAnimation(Motion.navigate) { chosenTabID = tab.id }
     }
 
+    func selectTab(number: Int) -> Bool {
+        guard tabs.indices.contains(number - 1) else { return false }
+        select(tabs[number - 1])
+        return true
+    }
+
     // MARK: - Run detail
 
     var openedRun: WorkflowRun? {
         guard let openedRunID else { return nil }
-        return store.runs(for: list.currentLogin).first { $0.id == openedRunID }
+        return allRuns.first { $0.id == openedRunID }
     }
 
     var openedJobs: [WorkflowJob]? { openedRunID.flatMap { store.jobs[$0] } }

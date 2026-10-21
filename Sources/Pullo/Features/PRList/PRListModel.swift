@@ -5,7 +5,6 @@ import SwiftUI
 @Observable
 final class PRListModel {
     private var chosenTab: PRTab?
-    private(set) var selectedLogin: String?
     private(set) var selectedPRID: String?
     var keyboardMode = false
     private(set) var toast: String?
@@ -37,16 +36,17 @@ final class PRListModel {
         self.clock = clock
     }
 
-    var currentLogin: String? {
-        if let selectedLogin, accounts.accounts.contains(where: { $0.login == selectedLogin }) {
-            return selectedLogin
-        }
-        return accounts.accounts.first?.login
+    var logins: [String] { accounts.accounts.map(\.login) }
+
+    var isLoaded: Bool { logins.contains { store.snapshots[$0] != nil } }
+
+    var showsAccounts: Bool { logins.count > 1 }
+
+    func problem(worthShowingAt now: Date? = nil) -> (login: String, problem: RefreshProblem)? {
+        RefreshProblem.first(in: store.errors, for: logins, worthShowingAt: now)
     }
 
-    var filters: [SavedFilter] {
-        currentLogin.map(accounts.filters(for:)) ?? []
-    }
+    var filters: [SavedFilter] { accounts.tabs }
 
     var tabs: [PRTab] {
         filters.map { .filter($0.id) }
@@ -77,19 +77,37 @@ final class PRListModel {
 
     func filterError(in tab: PRTab) -> String? {
         guard case .filter(let id) = tab else { return nil }
-        return store.filterError(id, for: currentLogin)
+        return logins(for: tab).lazy.compactMap { self.store.filterError(id, for: $0) }.first
     }
 
     func prs(in tab: PRTab) -> [PullRequest] {
+        let lists = logins(for: tab).map { prs(in: tab, for: $0) }
+        guard lists.count(where: { !$0.isEmpty }) > 1 else { return lists.first { !$0.isEmpty } ?? [] }
+        var seen = Set<String>()
+        let merged = lists.joined().filter { seen.insert($0.id).inserted }
+        let builtIn = filter(of: tab).map { $0.usesBuiltInSearch ? $0.preset : nil } ?? preset(of: tab)
+        return switch builtIn {
+        case .mine: merged.sorted(by: PRStore.mineOrder)
+        case .review: merged.sorted(by: PRStore.reviewOrder)
+        default: merged.sorted { $0.updatedAt > $1.updatedAt }
+        }
+    }
+
+    private func logins(for tab: PRTab) -> [String] {
+        guard let filter = filter(of: tab) else { return logins }
+        return logins.filter(filter.applies(to:))
+    }
+
+    private func prs(in tab: PRTab, for login: String) -> [PullRequest] {
         switch tab {
-        case .mine: store.mine(for: currentLogin)
-        case .review: store.reviewRequests(for: currentLogin)
+        case .mine: store.mine(for: login)
+        case .review: store.reviewRequests(for: login)
         case .filter(let id):
             switch filter(of: tab) {
             case let filter? where filter.usesBuiltInSearch:
-                filter.preset == .mine ? store.mine(for: currentLogin) : store.reviewRequests(for: currentLogin)
+                filter.preset == .mine ? store.mine(for: login) : store.reviewRequests(for: login)
             default:
-                store.filtered(id, for: currentLogin)
+                store.filtered(id, for: login)
             }
         }
     }
@@ -115,14 +133,9 @@ final class PRListModel {
         selectTab(tabs[(index + offset + tabs.count) % tabs.count])
     }
 
-    func selectAccount(_ login: String) {
-        withAnimation(Motion.navigate) { selectedLogin = login }
-        resetSelection()
-    }
-
-    func selectAccount(number: Int) -> Bool {
-        guard accounts.accounts.indices.contains(number - 1) else { return false }
-        selectAccount(accounts.accounts[number - 1].login)
+    func selectTab(number: Int) -> Bool {
+        guard tabs.indices.contains(number - 1) else { return false }
+        selectTab(tabs[number - 1])
         return true
     }
 

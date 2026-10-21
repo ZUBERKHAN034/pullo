@@ -224,7 +224,6 @@ final class NotchInteraction {
     }
 
     func accountConnected(_ account: Account) {
-        list.selectAccount(account.login)
         enqueue(NotchAlert(
             symbol: "person.crop.circle.badge.checkmark",
             tint: .green,
@@ -358,7 +357,8 @@ final class NotchInteraction {
         case .moveDown: list.moveSelection(by: 1)
         case .switchTab: list.selectTab(by: 1)
         case .previousTab: list.selectTab(by: -1)
-        case .selectAccount(let number): return list.selectAccount(number: number)
+        case .selectTab(let number):
+            return area == .actions ? actions?.selectTab(number: number) ?? false : list.selectTab(number: number)
         case .show(let area): show(area)
         case .open, .copyBranch, .markRead:
             guard let pr = list.selectedPR else { return false }

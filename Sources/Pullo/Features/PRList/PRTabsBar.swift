@@ -59,7 +59,7 @@ struct PRTabsBar: View {
     private func count(for tab: PRTab, selected: Bool) -> some View {
         let total = list.prs(in: tab).count
         let unread = unreadCount(in: tab)
-        let loaded = store.snapshots[list.currentLogin ?? ""] != nil
+        let loaded = list.isLoaded
         return HStack(spacing: 4) {
             if unread > 0 {
                 UnreadDot(size: 5)

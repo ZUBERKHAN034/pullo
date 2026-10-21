@@ -59,8 +59,8 @@ extension NotchBehavior {
         @Test func tabsCycleThroughFiltersToo() async {
             let h = await openWithKeyboard()
             let filter = SavedFilter(name: "API", query: "repo:acme/acme-api")
-            let defaults = h.accounts.filters(for: "me")
-            h.accounts.setFilters(defaults + [filter], for: "me")
+            let defaults = h.accounts.tabs
+            h.accounts.setTabs(defaults + [filter])
             #expect(h.list.tabs.count == 3)
             _ = h.notch.perform(.previousTab)
             #expect(h.list.tab == .filter(filter.id))
@@ -68,13 +68,16 @@ extension NotchBehavior {
             #expect(h.list.tab == .filter(defaults[0].id))
         }
 
-        @Test func numbersPickAccountsThatExist() async {
+        @Test func numbersPickTabsThatExist() async {
             let h = await NotchHarness(accounts: ["work", "home"])
             h.notch.toggleFromKeyboard()
-            #expect(h.notch.perform(.selectAccount(2)))
-            #expect(h.list.currentLogin == "home")
-            #expect(!h.notch.perform(.selectAccount(3)))
-            #expect(h.list.currentLogin == "home")
+            #expect(h.notch.perform(.selectTab(2)))
+            #expect(h.list.preset(of: h.list.tab) == .review)
+            #expect(!h.notch.perform(.selectTab(3)))
+            #expect(h.list.preset(of: h.list.tab) == .review)
+            h.notch.show(.actions)
+            #expect(h.notch.perform(.selectTab(3)))
+            #expect(h.actions.tab?.preset == .deploys)
         }
 
         @Test func escapeLeavesSearchFirstThenCloses() async {

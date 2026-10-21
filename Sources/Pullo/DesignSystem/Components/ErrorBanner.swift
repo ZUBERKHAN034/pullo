@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ErrorBanner: View {
     let problem: RefreshProblem
+    var account: String?
     let updated: Date?
     let action: () -> Void
 
@@ -25,7 +26,7 @@ struct ErrorBanner: View {
     }
 
     private var message: String {
-        guard let updated else { return problem.title }
-        return String(localized: "\(problem.title) · updated \(updated.shortAge) ago")
+        let text = updated.map { String(localized: "\(problem.title) · updated \($0.shortAge) ago") } ?? problem.title
+        return account.map { "@\($0) · \(text)" } ?? text
     }
 }

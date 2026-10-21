@@ -132,6 +132,22 @@
     "%lld": {
       "shouldTranslate": false
     },
+    "%lld accounts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld cuentas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld contas"
+          }
+        }
+      }
+    },
     "%lld failed": {
       "localizations": {
         "es": {
@@ -471,18 +487,18 @@
         }
       }
     },
-    "Actions tabs for @%@": {
+    "Actions tabs": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pestañas de Actions de @%@"
+            "value": "Pestañas de Actions"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abas do Actions de @%@"
+            "value": "Abas de Actions"
           }
         }
       }
@@ -515,22 +531,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adicionar @%@"
-          }
-        }
-      }
-    },
-    "Add an account first.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primero agrega una cuenta."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adicione uma conta primeiro."
           }
         }
       }
@@ -627,6 +627,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Todos"
+          }
+        }
+      }
+    },
+    "All accounts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las cuentas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as contas"
           }
         }
       }
@@ -2061,6 +2077,22 @@
         }
       }
     },
+    "Go to a tab": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ir a una pestaña"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ir para uma aba"
+          }
+        }
+      }
+    },
     "Hide the steps": {
       "localizations": {
         "es": {
@@ -3085,18 +3117,18 @@
         }
       }
     },
-    "Pull request tabs for @%@": {
+    "Pull request tabs": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pestañas de pull requests de @%@"
+            "value": "Pestañas de pull requests"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abas de pull requests de @%@"
+            "value": "Abas de pull requests"
           }
         }
       }
@@ -3696,22 +3728,6 @@
         }
       }
     },
-    "Search @%@'s PRs": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar en los PR de @%@"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar nos PRs de @%@"
-          }
-        }
-      }
-    },
     "Search PRs": {
       "localizations": {
         "es": {
@@ -3740,6 +3756,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Busque por título, repo, #número, branch ou autor"
+          }
+        }
+      }
+    },
+    "Search pull requests": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar pull requests"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar pull requests"
           }
         }
       }
@@ -4028,22 +4060,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Estilo"
-          }
-        }
-      }
-    },
-    "Switch account": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cambiar de cuenta"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trocar de conta"
           }
         }
       }

@@ -79,9 +79,11 @@ final class PRStore {
     private func refreshAllAccounts() async {
         let current = accounts.accounts
         let source = source
+        let tabs = Dictionary(uniqueKeysWithValues: current.map { ($0.login, accounts.filters(for: $0.login)) })
         let results = await withTaskGroup(of: (String, Result<Snapshot, Error>).self) { group in
             for account in current {
-                group.addTask { await Self.fetch(account, from: source) }
+                let filters = tabs[account.login] ?? []
+                group.addTask { await Self.fetch(account, filters: filters, from: source) }
             }
             var collected: [(String, Result<Snapshot, Error>)] = []
             while let result = await group.next() { collected.append(result) }
@@ -138,9 +140,13 @@ final class PRStore {
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }
     }
 
-    private nonisolated static func fetch(_ account: Account, from source: PRSource) async -> (String, Result<Snapshot, Error>) {
+    private nonisolated static func fetch(
+        _ account: Account,
+        filters: [SavedFilter],
+        from source: PRSource
+    ) async -> (String, Result<Snapshot, Error>) {
         do {
-            return try await (account.login, .success(source.snapshot(for: account)))
+            return try await (account.login, .success(source.snapshot(for: account, filters: filters)))
         } catch {
             return (account.login, .failure(error))
         }
@@ -153,11 +159,11 @@ final class PRStore {
         return 2
     }
 
-    private static func reviewOrder(_ a: PullRequest, _ b: PullRequest) -> Bool {
+    static func reviewOrder(_ a: PullRequest, _ b: PullRequest) -> Bool {
         a.isDirectRequest != b.isDirectRequest ? a.isDirectRequest : a.createdAt < b.createdAt
     }
 
-    private static func mineOrder(_ a: PullRequest, _ b: PullRequest) -> Bool {
+    static func mineOrder(_ a: PullRequest, _ b: PullRequest) -> Bool {
         let (ra, rb) = (rank(a), rank(b))
         return ra != rb ? ra < rb : a.updatedAt > b.updatedAt
     }

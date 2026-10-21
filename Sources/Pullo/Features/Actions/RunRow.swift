@@ -20,10 +20,13 @@ struct RunRow: View {
                         .foregroundStyle(.textTertiary)
                 }
                 .lineLimit(1)
-                Text(details.joined(separator: " · "))
-                    .font(.panel(.small))
-                    .foregroundStyle(detailColor)
-                    .lineLimit(1)
+                HStack(spacing: 5) {
+                    AccountMark(login: run.account)
+                    Text(details.joined(separator: " · "))
+                        .font(.panel(.small))
+                        .foregroundStyle(detailColor)
+                        .lineLimit(1)
+                }
             }
             Spacer(minLength: 8)
             Text(time)

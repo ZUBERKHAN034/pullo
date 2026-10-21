@@ -1,7 +1,7 @@
 import Foundation
 
 enum DefaultsKey: String {
-    case accounts
+    case accounts, tabs, runTabs
     case mutedCategories, mutedAccounts, haptics, sound, categorySounds, panelStyle, liveCI, liveCILabel
     case readBaselines, readKnownAccounts
     case betaUpdates

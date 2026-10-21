@@ -35,10 +35,10 @@ struct SavedFilterTests {
         #expect(query == "is:pr archived:false is:open repo:acme/api sort:updated-desc")
     }
 
-    @Test func accountsSavedBeforeTabsGetTheDefaultOnes() throws {
-        let json = #"[{ "login": "me", "avatarURL": null }]"#
-        let accounts = try JSONDecoder().decode([Account].self, from: Data(json.utf8))
-        #expect(accounts.first?.filters.map(\.preset) == [.mine, .review])
+    @MainActor @Test func accountsSavedBeforeTabsGetTheDefaultOnes() {
+        let scratch = ScratchDefaults()
+        scratch.defaults.set(Data(#"[{ "login": "me", "avatarURL": null }]"#.utf8), for: .accounts)
+        #expect(AccountStore(defaults: scratch.defaults).tabs.map(\.preset) == [.mine, .review])
     }
 
     @Test func defaultTabsReuseTheBuiltInSearches() {

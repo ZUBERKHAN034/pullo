@@ -64,7 +64,7 @@ final class AppDependencies {
                 await self.runs.refresh()
             }
         }
-        accounts.onFiltersChanged = { [weak self] _ in
+        accounts.onTabsChanged = { [weak self] in
             guard let self else { return }
             Task { await self.store.refresh() }
         }

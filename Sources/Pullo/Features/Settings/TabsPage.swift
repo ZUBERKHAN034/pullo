@@ -3,60 +3,45 @@ import SwiftUI
 
 struct TabsPage: View {
     @Environment(AccountStore.self) private var accounts
-    @State private var chosenLogin: String?
     @State private var editing: SavedFilter?
     @State private var editingRunTab: RunTab?
 
-    private var login: String? {
-        if let chosenLogin, accounts.accounts.contains(where: { $0.login == chosenLogin }) { return chosenLogin }
-        return accounts.accounts.first?.login
-    }
-
     var body: some View {
         Form {
-            if let login {
-                if accounts.accounts.count > 1 {
-                    Section {
-                        Picker("Account", selection: Binding(get: { login }, set: { chosenLogin = $0 })) {
-                            ForEach(accounts.accounts) { Text(verbatim: "@\($0.login)").tag($0.login) }
-                        }
-                    }
-                }
-                tabsSection(for: login)
-                runTabsSection(for: login)
-            } else {
-                Text("Add an account first.").foregroundStyle(.secondary)
-            }
+            tabsSection
+            runTabsSection
         }
         .sheet(item: $editing) { filter in
             TabEditor(filter: filter) { saved in
-                guard let login else { return }
-                var filters = accounts.filters(for: login)
+                var filters = accounts.tabs
                 if let index = filters.firstIndex(where: { $0.id == saved.id }) {
                     filters[index] = saved
                 } else {
                     filters.append(saved)
                 }
-                accounts.setFilters(filters, for: login)
+                accounts.setTabs(filters)
             }
         }
         .sheet(item: $editingRunTab) { tab in
-            if let login {
-                RunTabEditor(tab: tab, login: login) { saved in
-                    var tabs = accounts.runTabs(for: login)
-                    if let index = tabs.firstIndex(where: { $0.id == saved.id }) {
-                        tabs[index] = saved
-                    } else {
-                        tabs.append(saved)
-                    }
-                    accounts.setRunTabs(tabs, for: login)
+            RunTabEditor(tab: tab) { saved in
+                var tabs = accounts.runTabs
+                if let index = tabs.firstIndex(where: { $0.id == saved.id }) {
+                    tabs[index] = saved
+                } else {
+                    tabs.append(saved)
                 }
+                accounts.setRunTabs(tabs)
             }
         }
     }
 
-    private func runTabsSection(for login: String) -> some View {
-        let tabs = accounts.runTabs(for: login)
+    private func scoped(_ text: String, to account: String?) -> String {
+        guard accounts.accounts.count > 1, let account else { return text }
+        return "@\(account) · \(text)"
+    }
+
+    private var runTabsSection: some View {
+        let tabs = accounts.runTabs
         let missingPresets = RunTab.Preset.allCases.filter { preset in !tabs.contains { $0.preset == preset } }
         return Section {
             ForEach(tabs) { tab in
@@ -64,7 +49,7 @@ struct TabsPage: View {
                     HStack(spacing: 6) {
                         Button("Edit…") { editingRunTab = tab }
                         Button {
-                            accounts.setRunTabs(tabs.filter { $0.id != tab.id }, for: login)
+                            accounts.setRunTabs(tabs.filter { $0.id != tab.id })
                         } label: {
                             Image(systemName: "trash")
                         }
@@ -79,7 +64,7 @@ struct TabsPage: View {
                             .accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(tab.name)
-                            Text(tab.summary).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                            Text(scoped(tab.summary, to: tab.account)).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                         }
                     }
                 }
@@ -87,7 +72,7 @@ struct TabsPage: View {
             .onMove { from, to in
                 var reordered = tabs
                 reordered.move(fromOffsets: from, toOffset: to)
-                accounts.setRunTabs(reordered, for: login)
+                accounts.setRunTabs(reordered)
             }
             HStack {
                 Menu("Add tab") {
@@ -102,19 +87,19 @@ struct TabsPage: View {
                 Spacer()
                 if !missingPresets.isEmpty {
                     Button("Restore default tabs") {
-                        accounts.setRunTabs(missingPresets.map(RunTab.builtIn) + tabs, for: login)
+                        accounts.setRunTabs(missingPresets.map(RunTab.builtIn) + tabs)
                     }
                 }
             }
         } header: {
-            Text("Actions tabs for @\(login)")
+            Text("Actions tabs")
         } footer: {
             Text("Each one is a tab on the Actions side of the panel, in this order. Drag to reorder.")
         }
     }
 
-    private func tabsSection(for login: String) -> some View {
-        let filters = accounts.filters(for: login)
+    private var tabsSection: some View {
+        let filters = accounts.tabs
         let missingPresets = ([.mine, .review] as [SavedFilter.Preset]).filter { preset in !filters.contains { $0.preset == preset } }
         return Section {
             ForEach(filters) { filter in
@@ -122,7 +107,7 @@ struct TabsPage: View {
                     HStack(spacing: 6) {
                         Button("Edit…") { editing = filter }
                         Button {
-                            accounts.setFilters(filters.filter { $0.id != filter.id }, for: login)
+                            accounts.setTabs(filters.filter { $0.id != filter.id })
                         } label: {
                             Image(systemName: "trash")
                         }
@@ -137,7 +122,8 @@ struct TabsPage: View {
                             .accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(filter.name)
-                            Text(filter.query).font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1)
+                            Text(scoped(filter.query, to: filter.account)).font(.caption.monospaced()).foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -145,7 +131,7 @@ struct TabsPage: View {
             .onMove { from, to in
                 var reordered = filters
                 reordered.move(fromOffsets: from, toOffset: to)
-                accounts.setFilters(reordered, for: login)
+                accounts.setTabs(reordered)
             }
             HStack {
                 Menu("Add tab") {
@@ -160,12 +146,12 @@ struct TabsPage: View {
                 Spacer()
                 if !missingPresets.isEmpty {
                     Button("Restore default tabs") {
-                        accounts.setFilters(missingPresets.map { SavedFilter.builtIn($0) } + filters, for: login)
+                        accounts.setTabs(missingPresets.map { SavedFilter.builtIn($0) } + filters)
                     }
                 }
             }
         } header: {
-            Text("Pull request tabs for @\(login)")
+            Text("Pull request tabs")
         } footer: {
             Text(
                 .init(
@@ -189,6 +175,7 @@ private struct TabEditor: View {
             Form {
                 Section {
                     TextField("Name", text: $filter.name, prompt: Text("Bugs in the API"))
+                    AccountPicker(account: $filter.account)
                 }
                 Section {
                     TextField("Search query", text: $filter.query, prompt: Text(verbatim: "repo:acme/api label:bug"), axis: .vertical)
@@ -247,10 +234,9 @@ struct RunTabEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ActionsModel.self) private var actions
     @State var tab: RunTab
-    let login: String
     let onSave: (RunTab) -> Void
 
-    private var seen: [WorkflowRun] { actions.store.runs(for: login) }
+    private var seen: [WorkflowRun] { actions.allRuns.filter { tab.applies(to: $0.account) } }
 
     private var repos: [String] {
         var known = Set<String>()
@@ -262,6 +248,7 @@ struct RunTabEditor: View {
             Form {
                 Section {
                     TextField("Name", text: $tab.name, prompt: Text("Production deploys"))
+                    AccountPicker(account: $tab.account)
                 }
                 Section {
                     Picker("Started by", selection: $tab.startedBy) {
@@ -306,7 +293,7 @@ struct RunTabEditor: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("For the branch, end with * to match the start, like release/*.")
                         Text(
-                            "Matches \(seen.filter { tab.includes($0, login: login) }.count) of the \(seen.count) runs Pullo sees right now."
+                            "Matches \(seen.filter { tab.includes($0, login: $0.account) }.count) of the \(seen.count) runs Pullo sees right now."
                         )
                     }
                     .font(.caption)
@@ -327,5 +314,19 @@ struct RunTabEditor: View {
             .padding([.horizontal, .bottom], 20)
         }
         .frame(width: 460)
+    }
+}
+
+private struct AccountPicker: View {
+    @Environment(AccountStore.self) private var accounts
+    @Binding var account: String?
+
+    var body: some View {
+        if accounts.accounts.count > 1 || account != nil {
+            Picker("Account", selection: $account) {
+                Text("All accounts").tag(String?.none)
+                ForEach(accounts.accounts) { Text(verbatim: "@\($0.login)").tag(String?.some($0.login)) }
+            }
+        }
     }
 }

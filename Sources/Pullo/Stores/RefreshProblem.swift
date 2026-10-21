@@ -33,6 +33,16 @@ struct RefreshProblem: Equatable {
 
     var opensAccounts: Bool { kind == .signIn }
 
+    static func first(
+        in errors: [String: RefreshProblem],
+        for logins: [String],
+        worthShowingAt now: Date? = nil
+    ) -> (login: String, problem: RefreshProblem)? {
+        logins.lazy
+            .compactMap { login in errors[login].map { (login: login, problem: $0) } }
+            .first { found in now.map { found.problem.isWorthShowing(at: $0) } ?? true }
+    }
+
     var symbol: String {
         switch kind {
         case .offline: "wifi.slash"

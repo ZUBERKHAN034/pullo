@@ -1,3 +1,4 @@
+import Foundation
 @testable import Pullo
 import Testing
 
@@ -20,7 +21,7 @@ extension NotchBehavior {
                 mine: [.make(id: "PR_1", repo: "acme/acme-api"), .make(id: "PR_2", repo: "acme/web")],
                 review: [.make(id: "PR_3", repo: "acme/acme-api", author: "ana")]
             )
-            h.accounts.setFilters([api], for: "me")
+            h.accounts.setTabs([api])
             await h.store.refresh()
             #expect(h.list.title(of: h.list.tab) == "API")
             #expect(h.list.visiblePRs.map(\.id) == ["PR_1", "PR_3"])
@@ -28,9 +29,9 @@ extension NotchBehavior {
 
         @Test func editingADefaultTabTurnsItIntoASearch() async {
             let h = await NotchHarness(mine: [.make(id: "PR_1", repo: "acme/acme-api"), .make(id: "PR_2", repo: "acme/web")])
-            var mine = h.accounts.filters(for: "me")[0]
+            var mine = h.accounts.tabs[0]
             mine.query = "author:@me repo:acme/acme-api"
-            h.accounts.setFilters([mine], for: "me")
+            h.accounts.setTabs([mine])
             await h.store.refresh()
             #expect(!mine.usesBuiltInSearch)
             #expect(h.list.visiblePRs.map(\.id) == ["PR_1"])
@@ -43,21 +44,68 @@ extension NotchBehavior {
             #expect(PRTab.review.rowKind(for: .make(author: "me")) == .review)
         }
 
-        @Test func eachAccountHasItsOwnTabs() async {
-            let h = await NotchHarness(accounts: ["me", "work"])
-            h.accounts.setFilters(h.accounts.filters(for: "me") + [api], for: "me")
-            h.list.selectTab(.filter(api.id))
-            h.list.selectAccount("work")
+        @Test func everyAccountShowsUpInTheSameTab() async {
+            let h = await NotchHarness(
+                accounts: ["me", "work"],
+                mine: [
+                    .make(id: "PR_1", account: "me", updatedAt: Date(timeIntervalSince1970: 1)),
+                    .make(id: "PR_2", account: "work", updatedAt: Date(timeIntervalSince1970: 2)),
+                ]
+            )
             #expect(h.list.tabs.count == 2)
-            #expect(h.list.tab == h.list.tabs[0])
+            #expect(h.list.visiblePRs.map(\.id) == ["PR_2", "PR_1"])
+        }
+
+        @Test func aTabCanStickToOneAccount() async {
+            let h = await NotchHarness(
+                accounts: ["me", "work"],
+                mine: [.make(id: "PR_1", account: "me", repo: "acme/acme-api"), .make(id: "PR_2", account: "work", repo: "acme/acme-api")]
+            )
+            var workAPI = api
+            workAPI.account = "work"
+            h.accounts.setTabs([workAPI])
+            await h.store.refresh()
+            #expect(h.accounts.filters(for: "me").isEmpty)
+            #expect(h.list.visiblePRs.map(\.id) == ["PR_2"])
+        }
+
+        @Test func aPRBothAccountsSeeShowsUpOnce() async {
+            let h = await NotchHarness(
+                accounts: ["me", "work"],
+                review: [.make(id: "PR_1", account: "me", author: "ana"), .make(id: "PR_1", account: "work", author: "ana")]
+            )
+            h.list.selectTab(by: 1)
+            #expect(h.list.visiblePRs.map { $0.account } == ["me"])
+        }
+
+        @Test func tabsSavedPerAccountBecomeOneList() {
+            let shared = SavedFilter(name: "API", query: "repo:acme/api")
+            let bugs = SavedFilter(name: "Bugs", query: "label:bug")
+            var sameAPI = shared
+            sameAPI.id = UUID()
+            let merged = SavedFilter.merging([
+                ("me", SavedFilter.defaults + [shared, bugs]),
+                ("work", SavedFilter.defaults + [sameAPI]),
+            ])
+            #expect(merged.map(\.name) == ["My PRs", "To review", "API", "Bugs"])
+            #expect(merged.map(\.account) == [nil, nil, nil, "me"])
+        }
+
+        @Test func removingAnAccountDropsItsOwnTabs() async throws {
+            let h = await NotchHarness(accounts: ["me", "work"])
+            var workAPI = api
+            workAPI.account = "work"
+            h.accounts.setTabs(h.accounts.tabs + [workAPI])
+            try h.accounts.remove(#require(h.accounts.accounts.last))
+            #expect(h.accounts.tabs.count == 2)
         }
 
         @Test func removingTheOpenTabFallsBackToTheFirst() async {
             let h = await NotchHarness()
-            let defaults = h.accounts.filters(for: "me")
-            h.accounts.setFilters(defaults + [api], for: "me")
+            let defaults = h.accounts.tabs
+            h.accounts.setTabs(defaults + [api])
             h.list.selectTab(.filter(api.id))
-            h.accounts.setFilters(defaults, for: "me")
+            h.accounts.setTabs(defaults)
             #expect(h.list.tab == .filter(defaults[0].id))
         }
 
@@ -66,7 +114,7 @@ extension NotchBehavior {
                 mine: [.make(id: "PR_1", title: "fix: login")],
                 review: [.make(id: "PR_2", title: "fix: logout", author: "ana")]
             )
-            h.accounts.setFilters([api], for: "me")
+            h.accounts.setTabs([api])
             h.list.startSearch()
             h.list.searchQuery = "fix"
             #expect(Set(h.list.visiblePRs.map(\.id)) == ["PR_1", "PR_2"])
@@ -74,12 +122,12 @@ extension NotchBehavior {
 
         @Test func changingTabsAsksForAFreshLoad() async {
             let h = await NotchHarness()
-            var changed: [String] = []
-            h.accounts.onFiltersChanged = { changed.append($0.login) }
-            h.accounts.setFilters([api], for: "me")
-            h.accounts.setFilters([api], for: "me")
-            #expect(changed == ["me"])
-            #expect(AccountStore(defaults: h.defaults).filters(for: "me") == [api])
+            var changes = 0
+            h.accounts.onTabsChanged = { changes += 1 }
+            h.accounts.setTabs([api])
+            h.accounts.setTabs([api])
+            #expect(changes == 1)
+            #expect(AccountStore(defaults: h.defaults).tabs == [api])
         }
     }
 }
