@@ -26,7 +26,7 @@ final class AppDependencies {
         store = PRStore(accounts: accounts, tracker: tracker, source: demo?.source ?? GitHubSource(tokens: tokens))
         list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system)
         runs = RunStore(accounts: accounts, prs: store, source: demo == nil ? GitHubRunSource(tokens: tokens) : NoRuns())
-        actions = ActionsModel(store: runs, list: list)
+        actions = ActionsModel(store: runs, list: list, accounts: accounts)
         notch = NotchInteraction(
             list: list,
             runs: runs,

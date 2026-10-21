@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ActionsBrowser: View {
     @Environment(ActionsModel.self) private var actions
+    @Environment(NotchInteraction.self) private var notch
     @Namespace private var selection
 
     var body: some View {
@@ -17,12 +18,18 @@ struct ActionsBrowser: View {
     private var browser: some View {
         VStack(spacing: 10) {
             HStack(spacing: 4) {
-                ForEach(RunFilter.allCases, id: \.self) { filter in
-                    filterButton(filter)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(actions.tabs) { tab in
+                            tabButton(tab)
+                        }
+                    }
+                    .glassGroup(spacing: 4)
                 }
-                Spacer()
+                IconButton(symbol: "slider.horizontal.3", help: String(localized: "Edit the Actions tabs"), floating: true) {
+                    notch.onOpenSettings?(.tabs)
+                }
             }
-            .glassGroup(spacing: 4)
             content
         }
     }
@@ -41,7 +48,7 @@ struct ActionsBrowser: View {
             )
         } else if actions.active.isEmpty, actions.recent.isEmpty {
             MessageView(symbol: "bolt.horizontal.circle", title: String(localized: "No runs here"), detail: emptyDetail)
-                .id(actions.filter)
+                .id(actions.tab?.id)
         } else {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 2) {
@@ -50,7 +57,7 @@ struct ActionsBrowser: View {
                 }
             }
             .scrollIndicators(.never)
-            .id(actions.filter)
+            .id(actions.tab?.id)
         }
     }
 
@@ -67,21 +74,23 @@ struct ActionsBrowser: View {
     }
 
     private var emptyDetail: String {
-        switch actions.filter {
+        switch actions.tab?.preset {
         case .mine: String(localized: "Workflow runs you start in the repositories you work on show up here.")
         case .everyone: String(localized: "Workflow runs from the repositories you work on show up here.")
         case .deploys: String(localized: "Runs of workflows with “deploy” in their name show up here.")
+        case nil: String(localized: "Runs that match this tab, in the repositories you work on, show up here.")
         }
     }
 
-    private func filterButton(_ filter: RunFilter) -> some View {
-        let selected = actions.filter == filter
-        let active = actions.activeCount(in: filter)
+    private func tabButton(_ tab: RunTab) -> some View {
+        let selected = actions.tab?.id == tab.id
+        let active = actions.activeCount(in: tab)
         return Button {
-            actions.select(filter)
+            actions.select(tab)
         } label: {
             HStack(spacing: 6) {
-                Text(filter.title)
+                Text(tab.name)
+                    .lineLimit(1)
                 if active > 0 {
                     HStack(spacing: 3) {
                         StatusIcon(status: .ciRunning, size: 10)

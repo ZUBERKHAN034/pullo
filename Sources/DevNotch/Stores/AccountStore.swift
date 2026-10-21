@@ -55,6 +55,16 @@ final class AccountStore {
         onFiltersChanged?(accounts[index])
     }
 
+    func runTabs(for login: String) -> [RunTab] {
+        accounts.first { $0.login == login }?.runTabs ?? []
+    }
+
+    func setRunTabs(_ tabs: [RunTab], for login: String) {
+        guard let index = accounts.firstIndex(where: { $0.login == login }), accounts[index].runTabs != tabs else { return }
+        accounts[index].runTabs = tabs
+        persist()
+    }
+
     func reloadGHUsers() {
         let cli = cli
         Task { [weak self] in
@@ -84,6 +94,7 @@ final class AccountStore {
         var account = account
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {
             account.filters = accounts[index].filters
+            account.runTabs = accounts[index].runTabs
             accounts[index] = account
         } else {
             accounts.append(account)

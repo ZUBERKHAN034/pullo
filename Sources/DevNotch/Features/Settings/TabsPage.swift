@@ -5,6 +5,7 @@ struct TabsPage: View {
     @Environment(AccountStore.self) private var accounts
     @State private var chosenLogin: String?
     @State private var editing: SavedFilter?
+    @State private var editingRunTab: RunTab?
 
     private var login: String? {
         if let chosenLogin, accounts.accounts.contains(where: { $0.login == chosenLogin }) { return chosenLogin }
@@ -22,6 +23,7 @@ struct TabsPage: View {
                     }
                 }
                 tabsSection(for: login)
+                runTabsSection(for: login)
             } else {
                 Text("Add an account first.").foregroundStyle(.secondary)
             }
@@ -37,6 +39,77 @@ struct TabsPage: View {
                 }
                 accounts.setFilters(filters, for: login)
             }
+        }
+        .sheet(item: $editingRunTab) { tab in
+            if let login {
+                RunTabEditor(tab: tab, login: login) { saved in
+                    var tabs = accounts.runTabs(for: login)
+                    if let index = tabs.firstIndex(where: { $0.id == saved.id }) {
+                        tabs[index] = saved
+                    } else {
+                        tabs.append(saved)
+                    }
+                    accounts.setRunTabs(tabs, for: login)
+                }
+            }
+        }
+    }
+
+    private func runTabsSection(for login: String) -> some View {
+        let tabs = accounts.runTabs(for: login)
+        let missingPresets = RunTab.Preset.allCases.filter { preset in !tabs.contains { $0.preset == preset } }
+        return Section {
+            ForEach(tabs) { tab in
+                LabeledContent {
+                    HStack(spacing: 6) {
+                        Button("Edit…") { editingRunTab = tab }
+                        Button {
+                            accounts.setRunTabs(tabs.filter { $0.id != tab.id }, for: login)
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .disabled(tabs.count == 1)
+                        .help(String(localized: "Remove"))
+                        .accessibilityLabel(String(localized: "Remove"))
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal")
+                            .foregroundStyle(.tertiary)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(tab.name)
+                            Text(tab.summary).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        }
+                    }
+                }
+            }
+            .onMove { from, to in
+                var reordered = tabs
+                reordered.move(fromOffsets: from, toOffset: to)
+                accounts.setRunTabs(reordered, for: login)
+            }
+            HStack {
+                Menu("Add tab") {
+                    Button("Blank…") { editingRunTab = RunTab(name: "") }
+                    Section("Examples") {
+                        ForEach(RunTab.examples) { example in
+                            Button(example.name) { editingRunTab = example }
+                        }
+                    }
+                }
+                .fixedSize()
+                Spacer()
+                if !missingPresets.isEmpty {
+                    Button("Restore default tabs") {
+                        accounts.setRunTabs(missingPresets.map(RunTab.builtIn) + tabs, for: login)
+                    }
+                }
+            }
+        } header: {
+            Text("Actions tabs for @\(login)")
+        } footer: {
+            Text("Each one is a tab on the Actions side of the panel, in this order. Drag to reorder.")
         }
     }
 
@@ -92,7 +165,7 @@ struct TabsPage: View {
                 }
             }
         } header: {
-            Text("Tabs for @\(login)")
+            Text("Pull request tabs for @\(login)")
         } footer: {
             Text(
                 .init(
@@ -163,6 +236,93 @@ private struct TabEditor: View {
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(!filter.isComplete)
+            }
+            .padding([.horizontal, .bottom], 20)
+        }
+        .frame(width: 460)
+    }
+}
+
+struct RunTabEditor: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(ActionsModel.self) private var actions
+    @State var tab: RunTab
+    let login: String
+    let onSave: (RunTab) -> Void
+
+    private var seen: [WorkflowRun] { actions.store.runs(for: login) }
+
+    private var repos: [String] {
+        var known = Set<String>()
+        return seen.map(\.repo).filter { known.insert($0.lowercased()).inserted }.sorted()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Form {
+                Section {
+                    TextField("Name", text: $tab.name, prompt: Text("Production deploys"))
+                }
+                Section {
+                    Picker("Started by", selection: $tab.startedBy) {
+                        ForEach(RunTab.Starter.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    if tab.startedBy == .user {
+                        TextField("GitHub user", text: $tab.user, prompt: Text(verbatim: "octocat"))
+                    }
+                    LabeledContent("Repository") {
+                        HStack(spacing: 4) {
+                            TextField("Repository", text: $tab.repo, prompt: Text("Any"))
+                                .labelsHidden()
+                            Menu {
+                                Button("Any") { tab.repo = "" }
+                                if !repos.isEmpty {
+                                    Section("Watched by DevNotch") {
+                                        ForEach(repos, id: \.self) { repo in
+                                            Button { tab.repo = repo } label: { Text(verbatim: repo) }
+                                        }
+                                    }
+                                }
+                            } label: {
+                                Image(systemName: "chevron.up.chevron.down")
+                            }
+                            .menuStyle(.borderlessButton)
+                            .menuIndicator(.hidden)
+                            .fixedSize()
+                            .accessibilityLabel(String(localized: "Pick a repository"))
+                        }
+                    }
+                    TextField("Workflow name contains", text: $tab.workflow, prompt: Text("Any"))
+                    TextField("Branch", text: $tab.branch, prompt: Text("Any"))
+                    Picker("Event", selection: $tab.event) {
+                        ForEach(RunTab.Event.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    Picker("Status", selection: $tab.status) {
+                        ForEach(RunTab.Status.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                } header: {
+                    Text("Show runs where")
+                } footer: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("For the branch, end with * to match the start, like release/*.")
+                        Text(
+                            "Matches \(seen.filter { tab.includes($0, login: login) }.count) of the \(seen.count) runs DevNotch sees right now."
+                        )
+                    }
+                    .font(.caption)
+                }
+            }
+            .formStyle(.grouped)
+            HStack {
+                Spacer()
+                Button("Cancel", role: .cancel) { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                Button("Save") {
+                    onSave(tab)
+                    dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!tab.isComplete)
             }
             .padding([.horizontal, .bottom], 20)
         }

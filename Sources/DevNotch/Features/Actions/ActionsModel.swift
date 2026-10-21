@@ -11,39 +11,50 @@ final class ActionsModel {
         case rerunFailedJobs, cancel
     }
 
-    private(set) var filter: RunFilter = .mine
+    private var chosenTabID: RunTab.ID?
     private(set) var openedRunID: Int?
     private(set) var running: Command?
 
     let store: RunStore
     private let list: PRListModel
+    private let accounts: AccountStore
 
-    init(store: RunStore, list: PRListModel) {
+    init(store: RunStore, list: PRListModel, accounts: AccountStore) {
         self.store = store
         self.list = list
+        self.accounts = accounts
     }
+
+    var tabs: [RunTab] { list.currentLogin.map(accounts.runTabs(for:)) ?? [] }
+
+    var tab: RunTab? { tabs.first { $0.id == chosenTabID } ?? tabs.first }
 
     var isLoaded: Bool { store.isLoaded(list.currentLogin) }
 
     var error: String? { list.currentLogin.flatMap { store.errors[$0] } }
 
-    func runs(in filter: RunFilter) -> [WorkflowRun] {
-        guard let login = list.currentLogin else { return [] }
-        return store.runs(for: login).filter { filter.includes($0, login: login) }
+    func runs(in tab: RunTab?) -> [WorkflowRun] {
+        guard let login = list.currentLogin, let tab else { return [] }
+        return store.runs(for: login).filter { tab.includes($0, login: login) }
     }
 
-    var active: [WorkflowRun] { runs(in: filter).filter(\.state.isActive) }
+    var active: [WorkflowRun] { runs(in: tab).filter(\.state.isActive) }
 
     var recent: [WorkflowRun] {
-        Array(runs(in: filter).filter { !$0.state.isActive }.sorted { $0.updatedAt > $1.updatedAt }.prefix(Self.recentLimit))
+        Array(runs(in: tab).filter { !$0.state.isActive }.sorted { $0.updatedAt > $1.updatedAt }.prefix(Self.recentLimit))
     }
 
-    func activeCount(in filter: RunFilter) -> Int {
-        runs(in: filter).filter(\.state.isActive).count
+    func activeCount(in tab: RunTab) -> Int {
+        runs(in: tab).filter(\.state.isActive).count
     }
 
-    func select(_ filter: RunFilter) {
-        withAnimation(Motion.navigate) { self.filter = filter }
+    var myActiveCount: Int {
+        guard let login = list.currentLogin else { return 0 }
+        return store.runs(for: login).filter { $0.state.isActive && $0.isStarted(by: login) }.count
+    }
+
+    func select(_ tab: RunTab) {
+        withAnimation(Motion.navigate) { chosenTabID = tab.id }
     }
 
     // MARK: - Run detail

@@ -61,12 +61,12 @@ extension NotchBehavior {
             ]])
             let h = await NotchHarness(runSource: source)
             await h.runs.refresh()
-            #expect(h.actions.filter == .mine)
+            #expect(h.actions.tab?.preset == .mine)
             #expect(h.actions.active.map(\.id) == [1])
             #expect(h.actions.recent.map(\.id) == [4])
-            #expect(h.actions.activeCount(in: .everyone) == 2)
-            #expect(h.actions.runs(in: .deploys).map(\.id) == [3])
-            h.actions.select(.everyone)
+            #expect(h.actions.activeCount(in: .builtIn(.everyone)) == 2)
+            #expect(h.actions.runs(in: .builtIn(.deploys)).map(\.id) == [3])
+            h.actions.select(h.actions.tabs[1])
             #expect(Set(h.actions.active.map(\.id)) == [1, 2])
         }
     }

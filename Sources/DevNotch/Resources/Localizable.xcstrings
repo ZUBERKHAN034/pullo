@@ -455,6 +455,22 @@
         }
       }
     },
+    "Actions tabs for @%@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pestañas de Actions de @%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abas do Actions de @%@"
+          }
+        }
+      }
+    },
     "Add": {
       "localizations": {
         "es": {
@@ -583,6 +599,22 @@
         }
       }
     },
+    "All": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos"
+          }
+        }
+      }
+    },
     "All marked as read": {
       "localizations": {
         "es": {
@@ -595,6 +627,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tudo marcado como lido"
+          }
+        }
+      }
+    },
+    "Any": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cualquiera"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qualquer"
+          }
+        }
+      }
+    },
+    "Anyone": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cualquiera"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qualquer pessoa"
           }
         }
       }
@@ -739,6 +803,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ambos"
+          }
+        }
+      }
+    },
+    "Branch": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rama"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Branch"
           }
         }
       }
@@ -1498,6 +1578,22 @@
         }
       }
     },
+    "Each one is a tab on the Actions side of the panel, in this order. Drag to reorder.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada una es una pestaña en el lado de Actions del panel, en este orden. Arrastra para reordenar."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada uma é uma aba no lado Actions do painel, nessa ordem. Arraste pra reordenar."
+          }
+        }
+      }
+    },
     "Edit tab": {
       "localizations": {
         "es": {
@@ -1514,6 +1610,22 @@
         }
       }
     },
+    "Edit the Actions tabs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar las pestañas de Actions"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar as abas do Actions"
+          }
+        }
+      }
+    },
     "Edit…": {
       "localizations": {
         "es": {
@@ -1526,6 +1638,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Editar…"
+          }
+        }
+      }
+    },
+    "Event": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evento"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evento"
+          }
+        }
+      }
+    },
+    "Every run": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las ejecuciones"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as execuções"
           }
         }
       }
@@ -1594,6 +1738,22 @@
         }
       }
     },
+    "Failing": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fallando"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falhando"
+          }
+        }
+      }
+    },
     "Failing checks": {
       "localizations": {
         "es": {
@@ -1606,6 +1766,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Checks falhando"
+          }
+        }
+      }
+    },
+    "Failing on main": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fallando en main"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falhando na main"
           }
         }
       }
@@ -1625,6 +1801,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buscando pedidos de revisão…"
+          }
+        }
+      }
+    },
+    "For the branch, end with * to match the start, like release/*.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para la rama, termina con * para buscar por el inicio, como release/*."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na branch, termine com * pra buscar pelo começo, tipo release/*."
           }
         }
       }
@@ -1756,6 +1948,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "O GitHub retornou o erro %lld."
+          }
+        }
+      }
+    },
+    "GitHub user": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usuario de GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usuário do GitHub"
           }
         }
       }
@@ -1952,6 +2160,38 @@
         }
       }
     },
+    "Manual": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual"
+          }
+        }
+      }
+    },
+    "Manual runs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuciones manuales"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Execuções manuais"
+          }
+        }
+      }
+    },
     "Mark all as read": {
       "localizations": {
         "es": {
@@ -1996,6 +2236,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Marcar como lido · r"
+          }
+        }
+      }
+    },
+    "Matches %lld of the %lld runs DevNotch sees right now.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coincide con %1$lld de las %2$lld ejecuciones que DevNotch ve ahora."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bate com %1$lld das %2$lld execuções que o DevNotch vê agora."
+          }
+        }
+      }
+    },
+    "Me": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eu"
           }
         }
       }
@@ -2076,6 +2348,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Meus rascunhos"
+          }
+        }
+      }
+    },
+    "My failing runs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mis ejecuciones fallando"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minhas execuções falhando"
           }
         }
       }
@@ -2608,6 +2896,22 @@
         }
       }
     },
+    "Pick a repository": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir un repositorio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolher um repositório"
+          }
+        }
+      }
+    },
     "Preview": {
       "localizations": {
         "es": {
@@ -2640,6 +2944,70 @@
         }
       }
     },
+    "Production deploys": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deploys de producción"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deploys de produção"
+          }
+        }
+      }
+    },
+    "Pull request": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull request"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull request"
+          }
+        }
+      }
+    },
+    "Pull request checks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks de pull requests"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks de pull requests"
+          }
+        }
+      }
+    },
+    "Pull request tabs for @%@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pestañas de pull requests de @%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abas de pull requests de @%@"
+          }
+        }
+      }
+    },
     "Pull requests": {
       "localizations": {
         "es": {
@@ -2652,6 +3020,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pull requests"
+          }
+        }
+      }
+    },
+    "Push": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push"
           }
         }
       }
@@ -2848,6 +3232,22 @@
         }
       }
     },
+    "Release branches": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ramas de release"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Branches de release"
+          }
+        }
+      }
+    },
     "Remove": {
       "localizations": {
         "es": {
@@ -2908,6 +3308,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reportar um problema"
+          }
+        }
+      }
+    },
+    "Repository": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repositorio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repositório"
           }
         }
       }
@@ -3008,6 +3424,22 @@
         }
       }
     },
+    "Running or waiting": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En ejecución o esperando"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rodando ou esperando"
+          }
+        }
+      }
+    },
     "Runs": {
       "localizations": {
         "es": {
@@ -3040,6 +3472,22 @@
         }
       }
     },
+    "Runs that match this tab, in the repositories you work on, show up here.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las ejecuciones que coinciden con esta pestaña, en los repositorios en los que trabajas, aparecen aquí."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As execuções que batem com essa aba, nos repositórios em que você trabalha, aparecem aqui."
+          }
+        }
+      }
+    },
     "Save": {
       "localizations": {
         "es": {
@@ -3052,6 +3500,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Salvar"
+          }
+        }
+      }
+    },
+    "Scheduled": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programadas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agendadas"
           }
         }
       }
@@ -3216,6 +3680,22 @@
         }
       }
     },
+    "Show runs where": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar ejecuciones donde"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar execuções onde"
+          }
+        }
+      }
+    },
     "Skipped": {
       "localizations": {
         "es": {
@@ -3244,6 +3724,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sólido"
+          }
+        }
+      }
+    },
+    "Someone else": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otra persona"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outra pessoa"
           }
         }
       }
@@ -3292,6 +3788,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Código-fonte no GitHub"
+          }
+        }
+      }
+    },
+    "Started by": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciada por"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciada por"
+          }
+        }
+      }
+    },
+    "Started by me": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciadas por mí"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciadas por mim"
+          }
+        }
+      }
+    },
+    "Status": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
           }
         }
       }
@@ -3372,22 +3916,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abas"
-          }
-        }
-      }
-    },
-    "Tabs for @%@": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pestañas de @%@"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abas de @%@"
           }
         }
       }
@@ -3648,6 +4176,22 @@
         }
       }
     },
+    "Watched by DevNotch": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vigilados por DevNotch"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acompanhados pelo DevNotch"
+          }
+        }
+      }
+    },
     "Welcome to DevNotch": {
       "localizations": {
         "es": {
@@ -3696,6 +4240,22 @@
         }
       }
     },
+    "Workflow name contains": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre del workflow contiene"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome do workflow contém"
+          }
+        }
+      }
+    },
     "Workflow runs from the repositories you work on show up here.": {
       "localizations": {
         "es": {
@@ -3724,6 +4284,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aqui aparecem as execuções de workflow que você inicia nos repositórios em que trabalha."
+          }
+        }
+      }
+    },
+    "Workflow “%@”": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workflow “%@”"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workflow “%@”"
           }
         }
       }

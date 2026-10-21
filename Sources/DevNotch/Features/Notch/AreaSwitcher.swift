@@ -16,7 +16,7 @@ struct AreaSwitcher: View {
         .panelGlass(in: Capsule())
     }
 
-    private var running: Int { actions.activeCount(in: .mine) }
+    private var running: Int { actions.myActiveCount }
 
     private func button(for area: PanelArea) -> some View {
         let selected = notch.area == area
