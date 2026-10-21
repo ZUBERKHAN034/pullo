@@ -9,6 +9,7 @@ final class NotchPanel: NSPanel {
             backing: .buffered,
             defer: false
         )
+        appearance = NSAppearance(named: .darkAqua)
         isOpaque = false
         backgroundColor = .clear
         hasShadow = false
