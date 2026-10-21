@@ -12,8 +12,11 @@ final class RunStore {
 
     private(set) var runs: [String: [WorkflowRun]] = [:]
     private(set) var errors: [String: String] = [:]
+    private(set) var jobs: [Int: [WorkflowJob]] = [:]
+    private(set) var jobErrors: [Int: String] = [:]
 
     @ObservationIgnored var onRunsFinished: (([WorkflowRun]) -> Void)?
+    @ObservationIgnored var watchedRun: Int?
 
     private let accounts: AccountStore
     private let prs: PRStore
@@ -62,6 +65,8 @@ final class RunStore {
         let logins = Set(current.map(\.login))
         runs = runs.filter { logins.contains($0.key) }
         errors = errors.filter { logins.contains($0.key) }
+        let known = Set(runs.values.flatMap { $0.map(\.id) })
+        if jobs.keys.contains(where: { !known.contains($0) }) { jobs = jobs.filter { known.contains($0.key) } }
     }
 
     private func refresh(_ account: Account) async {
@@ -116,8 +121,10 @@ final class RunStore {
         let key = key(repo, account.login)
         do {
             var fetched = try await source.runs(in: repo, for: account)
-            for index in fetched.indices where fetched[index].state == .running {
-                fetched[index].jobs = try? await source.jobs(of: fetched[index], for: account)
+            for index in fetched.indices where fetched[index].state == .running || fetched[index].id == watchedRun {
+                guard let list = try? await source.jobs(of: fetched[index], for: account) else { continue }
+                if fetched[index].state == .running { fetched[index].jobs = JobProgress(jobs: list) }
+                store(list, for: fetched[index].id)
             }
             let previous = byRepo[key] ?? []
             byRepo[key] = fetched
@@ -127,6 +134,44 @@ final class RunStore {
             Logger.store.error("Loading runs of \(repo, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
         }
         fetchedAt[key] = now()
+    }
+
+    // MARK: - Run detail
+
+    func loadJobs(of run: WorkflowRun) async {
+        guard let account = account(for: run) else { return }
+        do {
+            try await store(source.jobs(of: run, for: account), for: run.id)
+            jobErrors[run.id] = nil
+        } catch {
+            Logger.store.error("Loading jobs of run \(run.id) failed: \(error.localizedDescription, privacy: .public)")
+            jobErrors[run.id] = error.localizedDescription
+        }
+    }
+
+    func rerunFailedJobs(of run: WorkflowRun) async throws {
+        guard let account = account(for: run) else { return }
+        try await source.rerunFailedJobs(of: run, for: account)
+        await refetch(run)
+    }
+
+    func cancel(_ run: WorkflowRun) async throws {
+        guard let account = account(for: run) else { return }
+        try await source.cancel(run, for: account)
+        await refetch(run)
+    }
+
+    private func refetch(_ run: WorkflowRun) async {
+        fetchedAt[key(run.repo, run.account)] = nil
+        await refresh()
+    }
+
+    private func account(for run: WorkflowRun) -> Account? {
+        accounts.accounts.first { $0.login == run.account }
+    }
+
+    private func store(_ list: [WorkflowJob], for run: Int) {
+        if jobs[run] != list { jobs[run] = list }
     }
 
     private static func finished(from previous: [WorkflowRun], to current: [WorkflowRun], login: String) -> [WorkflowRun] {

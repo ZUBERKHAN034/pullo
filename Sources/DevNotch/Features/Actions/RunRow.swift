@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RunRow: View {
-    @Environment(NotchInteraction.self) private var notch
+    @Environment(ActionsModel.self) private var actions
     let run: WorkflowRun
 
     @State private var hovering = false
@@ -40,12 +40,12 @@ struct RunRow: View {
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
-        .onTapGesture { notch.openInBrowser(run.url) }
+        .onTapGesture { actions.open(run) }
         .onDrag { run.dragItem }
         .hint(run.title, edge: .leading)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
-        .accessibilityAction { notch.openInBrowser(run.url) }
+        .accessibilityAction { actions.open(run) }
     }
 
     private var details: [String] {

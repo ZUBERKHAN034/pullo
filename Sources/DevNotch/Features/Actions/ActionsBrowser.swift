@@ -5,6 +5,16 @@ struct ActionsBrowser: View {
     @Namespace private var selection
 
     var body: some View {
+        if let run = actions.openedRun {
+            RunDetail(run: run)
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
+        } else {
+            browser
+                .transition(.opacity.combined(with: .move(edge: .leading)))
+        }
+    }
+
+    private var browser: some View {
         VStack(spacing: 10) {
             HStack(spacing: 4) {
                 ForEach(RunFilter.allCases, id: \.self) { filter in

@@ -132,6 +132,22 @@
         }
       }
     },
+    "%lld jobs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld jobs"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld jobs"
+          }
+        }
+      }
+    },
     "%lld lines added, %lld removed, %lld files": {
       "localizations": {
         "es": {
@@ -647,6 +663,38 @@
         }
       }
     },
+    "Asking GitHub what this run is doing.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preguntando a GitHub qué está haciendo esta ejecución."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perguntando ao GitHub o que essa execução está fazendo."
+          }
+        }
+      }
+    },
+    "Back to the runs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver a las ejecuciones"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voltar para as execuções"
+          }
+        }
+      }
+    },
     "Betas bring new features earlier and may have bugs. Turning this off keeps the beta you have until a newer stable version is out.": {
       "localizations": {
         "es": {
@@ -759,6 +807,22 @@
         }
       }
     },
+    "Can't load the jobs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pueden cargar los jobs"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não deu pra carregar os jobs"
+          }
+        }
+      }
+    },
     "Can't reach GitHub": {
       "localizations": {
         "es": {
@@ -791,6 +855,22 @@
         }
       }
     },
+    "Cancel run?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cancelar?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar?"
+          }
+        }
+      }
+    },
     "Cancelled": {
       "localizations": {
         "es": {
@@ -803,6 +883,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cancelada"
+          }
+        }
+      }
+    },
+    "Cancelling the run": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelando la ejecución"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelando a execução"
           }
         }
       }
@@ -1159,6 +1255,38 @@
         }
       }
     },
+    "Couldn't cancel the run": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo cancelar la ejecución"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não deu pra cancelar a execução"
+          }
+        }
+      }
+    },
+    "Couldn't re-run the jobs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron volver a ejecutar los jobs"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não deu pra rodar os jobs de novo"
+          }
+        }
+      }
+    },
     "Couldn't refresh @%@": {
       "localizations": {
         "es": {
@@ -1450,6 +1578,22 @@
         }
       }
     },
+    "Failed at %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falló en %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falhou em %@"
+          }
+        }
+      }
+    },
     "Failing checks": {
       "localizations": {
         "es": {
@@ -1564,6 +1708,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "O GitHub não informou quais checks falharam."
+          }
+        }
+      }
+    },
+    "GitHub hasn't started any job for this run.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub todavía no inició ningún job en esta ejecución."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub ainda não iniciou nenhum job nessa execução."
           }
         }
       }
@@ -1740,6 +1900,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Licença"
+          }
+        }
+      }
+    },
+    "Loading the jobs…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cargando los jobs…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carregando os jobs…"
           }
         }
       }
@@ -2032,6 +2208,22 @@
         }
       }
     },
+    "No jobs yet": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no hay jobs"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum job ainda"
+          }
+        }
+      }
+    },
     "No link for this check": {
       "localizations": {
         "es": {
@@ -2192,6 +2384,22 @@
         }
       }
     },
+    "Open on GitHub": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir en GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir no GitHub"
+          }
+        }
+      }
+    },
     "Open or close the panel": {
       "localizations": {
         "es": {
@@ -2220,6 +2428,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abrir o log do check"
+          }
+        }
+      }
+    },
+    "Open the job log": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir el log del job"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir o log do job"
           }
         }
       }
@@ -2476,6 +2700,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sair do DevNotch"
+          }
+        }
+      }
+    },
+    "Re-run failed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar fallidos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rodar falhos de novo"
+          }
+        }
+      }
+    },
+    "Re-running the failed jobs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volviendo a ejecutar los jobs fallidos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rodando os jobs que falharam de novo"
           }
         }
       }
@@ -2748,6 +3004,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rodando"
+          }
+        }
+      }
+    },
+    "Runs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuciones"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Execuções"
           }
         }
       }
@@ -3628,6 +3900,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "buscar"
+          }
+        }
+      }
+    },
+    "started %@ ago": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "empezó hace %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "começou há %@"
           }
         }
       }

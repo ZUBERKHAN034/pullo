@@ -1,4 +1,5 @@
 import Observation
+import OSLog
 import SwiftUI
 
 @MainActor
@@ -6,7 +7,13 @@ import SwiftUI
 final class ActionsModel {
     static let recentLimit = 15
 
+    enum Command: Equatable {
+        case rerunFailedJobs, cancel
+    }
+
     private(set) var filter: RunFilter = .mine
+    private(set) var openedRunID: Int?
+    private(set) var running: Command?
 
     let store: RunStore
     private let list: PRListModel
@@ -37,5 +44,52 @@ final class ActionsModel {
 
     func select(_ filter: RunFilter) {
         withAnimation(Motion.navigate) { self.filter = filter }
+    }
+
+    // MARK: - Run detail
+
+    var openedRun: WorkflowRun? {
+        guard let openedRunID else { return nil }
+        return store.runs(for: list.currentLogin).first { $0.id == openedRunID }
+    }
+
+    var openedJobs: [WorkflowJob]? { openedRunID.flatMap { store.jobs[$0] } }
+
+    var openedJobsError: String? { openedRunID.flatMap { store.jobErrors[$0] } }
+
+    func open(_ run: WorkflowRun) {
+        store.watchedRun = run.id
+        withAnimation(Motion.navigate) { openedRunID = run.id }
+        Task { await store.loadJobs(of: run) }
+    }
+
+    @discardableResult
+    func back() -> Bool {
+        guard openedRunID != nil else { return false }
+        store.watchedRun = nil
+        withAnimation(Motion.navigate) { openedRunID = nil }
+        return true
+    }
+
+    func perform(_ command: Command) async {
+        guard running == nil, let run = openedRun else { return }
+        running = command
+        defer { running = nil }
+        do {
+            switch command {
+            case .rerunFailedJobs:
+                try await store.rerunFailedJobs(of: run)
+                list.showToast(String(localized: "Re-running the failed jobs"))
+            case .cancel:
+                try await store.cancel(run)
+                list.showToast(String(localized: "Cancelling the run"))
+            }
+        } catch {
+            Logger.store.error("Run command failed: \(error.localizedDescription, privacy: .public)")
+            switch command {
+            case .rerunFailedJobs: list.showToast(String(localized: "Couldn't re-run the jobs"))
+            case .cancel: list.showToast(String(localized: "Couldn't cancel the run"))
+            }
+        }
     }
 }
