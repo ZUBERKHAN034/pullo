@@ -68,6 +68,7 @@ final class NotchHarness {
         )
         clockNow = { [unowned self] in now }
         runs.onRunsFinished = { [unowned notch] in notch.runsFinished($0) }
+        notch.actions = actions
         await store.refresh()
     }
 

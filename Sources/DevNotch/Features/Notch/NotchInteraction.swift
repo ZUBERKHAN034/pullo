@@ -22,6 +22,7 @@ final class NotchInteraction {
 
     @ObservationIgnored var onStateChange: ((NotchState) -> Void)?
     @ObservationIgnored var onOpenSettings: ((SettingsPage?) -> Void)?
+    @ObservationIgnored var actions: ActionsModel?
 
     @ObservationIgnored private var alerts = AlertQueue()
     @ObservationIgnored private var peekTask: Task<Void, Never>?
@@ -350,7 +351,9 @@ final class NotchInteraction {
         switch command {
         case .quit: system.quit()
         case .search: list.startSearch()
-        case .close: if list.isSearching { list.stopSearch() } else { close() }
+        case .close:
+            if area == .actions, actions?.back() == true { break }
+            if list.isSearching { list.stopSearch() } else { close() }
         case .moveUp: list.moveSelection(by: -1)
         case .moveDown: list.moveSelection(by: 1)
         case .switchTab: list.selectTab(by: 1)

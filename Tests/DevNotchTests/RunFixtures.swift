@@ -39,6 +39,9 @@ actor StubRunSource: RunSource {
     private(set) var runRequests: [String] = []
     private(set) var jobRequests: [Int] = []
     private var failsDiscovery: Bool
+    private var jobLists: [Int: [WorkflowJob]] = [:]
+    private var failsCommands = false
+    private(set) var commands: [String] = []
 
     init(pushed: [String] = [], runs: [String: [WorkflowRun]] = [:], failsDiscovery: Bool = false) {
         self.pushed = pushed
@@ -58,8 +61,44 @@ actor StubRunSource: RunSource {
         return byRepo[repo] ?? []
     }
 
-    func jobs(of run: WorkflowRun, for account: Account) async throws -> JobProgress {
+    func jobs(of run: WorkflowRun, for account: Account) async throws -> [WorkflowJob] {
         jobRequests.append(run.id)
-        return JobProgress(done: 2, total: 5, failed: 0, current: "test")
+        if let list = jobLists[run.id] { return list }
+        return [
+            .make(id: 1, name: "lint", state: .passed),
+            .make(id: 2, name: "build", state: .passed),
+            .make(id: 3, name: "test", state: .running),
+            .make(id: 4, name: "deploy", state: .queued),
+            .make(id: 5, name: "notify", state: .queued),
+        ]
+    }
+
+    func setJobs(_ list: [WorkflowJob], of run: Int) { jobLists[run] = list }
+
+    func failCommands() { failsCommands = true }
+
+    func rerunFailedJobs(of run: WorkflowRun, for account: Account) async throws {
+        if failsCommands { throw GitHubError.http(403) }
+        commands.append("rerun \(run.id)")
+    }
+
+    func cancel(_ run: WorkflowRun, for account: Account) async throws {
+        if failsCommands { throw GitHubError.http(403) }
+        commands.append("cancel \(run.id)")
+    }
+}
+
+extension WorkflowJob {
+    static func make(id: Int, name: String, state: WorkflowRun.State, failedStep: String? = nil) -> WorkflowJob {
+        WorkflowJob(
+            id: id,
+            name: name,
+            state: state,
+            url: URL(static: "https://github.com/acme/api/actions/runs/1/job/1"),
+            startedAt: Date(timeIntervalSince1970: 0),
+            completedAt: state.isActive ? nil : Date(timeIntervalSince1970: 60),
+            failedStep: failedStep,
+            currentStep: nil
+        )
     }
 }

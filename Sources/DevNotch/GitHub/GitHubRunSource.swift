@@ -8,7 +8,7 @@ actor GitHubRunSource: RunSource {
 
     private let tokens: TokenProvider
     private var runCache: [String: Cached<[WorkflowRun]>] = [:]
-    private var jobCache: [String: Cached<JobProgress>] = [:]
+    private var jobCache: [String: Cached<[WorkflowJob]>] = [:]
 
     init(tokens: TokenProvider) {
         self.tokens = tokens
@@ -30,16 +30,24 @@ actor GitHubRunSource: RunSource {
         }
     }
 
-    func jobs(of run: WorkflowRun, for account: Account) async throws -> JobProgress {
+    func jobs(of run: WorkflowRun, for account: Account) async throws -> [WorkflowJob] {
         let key = "\(account.login)|\(run.id)"
         let cached = jobCache[key]
         switch try await client(for: account).fetchJobs(in: run.repo, run: run.id, etag: cached?.etag) {
         case .notModified:
-            return cached?.value ?? JobProgress(done: 0, total: 0, failed: 0, current: nil)
+            return cached?.value ?? []
         case .fresh(let jobs, let etag):
             jobCache[key] = etag.map { Cached(etag: $0, value: jobs) }
             return jobs
         }
+    }
+
+    func rerunFailedJobs(of run: WorkflowRun, for account: Account) async throws {
+        try await client(for: account).rerunFailedJobs(in: run.repo, run: run.id)
+    }
+
+    func cancel(_ run: WorkflowRun, for account: Account) async throws {
+        try await client(for: account).cancelRun(in: run.repo, run: run.id)
     }
 
     private func client(for account: Account) async throws -> GitHubClient {

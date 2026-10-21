@@ -54,6 +54,7 @@ final class AppDependencies {
     private func connect() {
         store.onEvents = { [weak self] events in self?.notch.enqueue(events: events) }
         runs.onRunsFinished = { [weak self] finished in self?.notch.runsFinished(finished) }
+        notch.actions = actions
         accounts.onAccountAdded = { [weak self] account in
             guard let self else { return }
             notch.accountConnected(account)

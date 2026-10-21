@@ -28,18 +28,30 @@ extension GitHubClient {
         return .fresh(payload.workflowRuns.map { $0.run(account: account, repo: repo) }, etag: etag)
     }
 
-    func fetchJobs(in repo: String, run: Int, etag: String?) async throws -> Fetched<JobProgress> {
-        let url = URL(static: "https://api.github.com/repos").appending(path: repo).appending(path: "actions/runs/\(run)/jobs")
+    func fetchJobs(in repo: String, run: Int, etag: String?) async throws -> Fetched<[WorkflowJob]> {
+        let url = runURL(repo, run).appending(path: "jobs")
             .appending(queryItems: [URLQueryItem(name: "per_page", value: "100")])
         guard case .fresh(let data, let etag) = try await conditionalGet(url, etag: etag) else { return .notModified }
-        let jobs = try Self.restDecoder.decode(JobsPayload.self, from: data).jobs
-        let done = jobs.filter { $0.status == "completed" }
-        return .fresh(JobProgress(
-            done: done.count,
-            total: jobs.count,
-            failed: done.filter { $0.conclusion == "failure" || $0.conclusion == "timed_out" }.count,
-            current: jobs.first { $0.status == "in_progress" }?.name
-        ), etag: etag)
+        return try .fresh(Self.restDecoder.decode(JobsPayload.self, from: data).jobs.map(\.job), etag: etag)
+    }
+
+    func rerunFailedJobs(in repo: String, run: Int) async throws {
+        try await post(runURL(repo, run).appending(path: "rerun-failed-jobs"))
+    }
+
+    func cancelRun(in repo: String, run: Int) async throws {
+        try await post(runURL(repo, run).appending(path: "cancel"))
+    }
+
+    private func runURL(_ repo: String, _ run: Int) -> URL {
+        URL(static: "https://api.github.com/repos").appending(path: repo).appending(path: "actions/runs/\(run)")
+    }
+
+    private func post(_ url: URL) async throws {
+        var request = request(for: url)
+        request.httpMethod = "POST"
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        _ = try await send(request)
     }
 
     static let restDecoder: JSONDecoder = {
@@ -96,9 +108,34 @@ private struct RunsPayload: Decodable {
 
 private struct JobsPayload: Decodable {
     struct Job: Decodable {
+        struct Step: Decodable {
+            let name: String
+            let status: String
+            let conclusion: String?
+        }
+
+        let id: Int
         let name: String
         let status: String
         let conclusion: String?
+        let htmlUrl: URL?
+        let startedAt: Date?
+        let completedAt: Date?
+        let steps: [Step]?
+
+        var job: WorkflowJob {
+            let state = WorkflowRun.state(status: status, conclusion: conclusion)
+            return WorkflowJob(
+                id: id,
+                name: name,
+                state: state,
+                url: htmlUrl,
+                startedAt: startedAt,
+                completedAt: state.isActive ? nil : completedAt,
+                failedStep: steps?.first { $0.conclusion == "failure" || $0.conclusion == "timed_out" }?.name,
+                currentStep: steps?.first { $0.status == "in_progress" }?.name
+            )
+        }
     }
 
     let jobs: [Job]

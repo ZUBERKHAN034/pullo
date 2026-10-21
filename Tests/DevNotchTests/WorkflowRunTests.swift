@@ -68,16 +68,50 @@ struct WorkflowRunTests {
     @Test func countsJobsAndFindsTheOneRunning() async throws {
         let (client, _) = client(body: """
         { "total_count": 3, "jobs": [
-          { "name": "lint", "status": "completed", "conclusion": "success" },
-          { "name": "test", "status": "completed", "conclusion": "failure" },
-          { "name": "build", "status": "in_progress", "conclusion": null }
+          { "id": 1, "name": "lint", "status": "completed", "conclusion": "success" },
+          { "id": 2, "name": "test", "status": "completed", "conclusion": "failure",
+            "html_url": "https://github.com/acme/api/actions/runs/9/job/2",
+            "started_at": "2026-10-21T10:00:00Z", "completed_at": "2026-10-21T10:02:00Z",
+            "steps": [
+              { "name": "Set up job", "status": "completed", "conclusion": "success" },
+              { "name": "Run tests", "status": "completed", "conclusion": "failure" },
+              { "name": "Upload", "status": "completed", "conclusion": "skipped" }
+            ] },
+          { "id": 3, "name": "build", "status": "in_progress", "conclusion": null,
+            "steps": [ { "name": "Compile", "status": "in_progress", "conclusion": null } ] }
         ] }
         """)
         guard case .fresh(let jobs, _) = try await client.fetchJobs(in: "acme/api", run: 9, etag: nil) else {
             Issue.record("Expected fresh jobs")
             return
         }
-        #expect(jobs == JobProgress(done: 2, total: 3, failed: 1, current: "build"))
+        #expect(JobProgress(jobs: jobs) == JobProgress(done: 2, total: 3, failed: 1, current: "build"))
+        #expect(jobs[1].failedStep == "Run tests")
+        #expect(jobs[1].duration(now: .now) == 120)
+        #expect(jobs[2].currentStep == "Compile")
+    }
+
+    @Test func groupsMatrixJobsAndPutsFailuresFirst() {
+        let groups = JobGroup.grouping([
+            .make(id: 1, name: "lint", state: .passed),
+            .make(id: 2, name: "test (ubuntu, 18)", state: .passed),
+            .make(id: 3, name: "test (ubuntu, 20)", state: .failed),
+            .make(id: 4, name: "build", state: .running),
+        ])
+        #expect(groups.map(\.name) == ["test", "build", "lint"])
+        #expect(groups[0].isMatrix)
+        #expect(groups[0].jobs.map(\.id) == [3, 2])
+        #expect(groups[0].state == .failed)
+    }
+
+    @Test func postsTheRerunAndCancelCommands() async throws {
+        let (client, token) = client(status: 201, body: "{}")
+        try await client.rerunFailedJobs(in: "acme/api", run: 9)
+        let rerun = StubURLProtocol.lastRequest(token: token)
+        #expect(rerun?.httpMethod == "POST")
+        #expect(rerun?.url?.path() == "/repos/acme/api/actions/runs/9/rerun-failed-jobs")
+        try await client.cancelRun(in: "acme/api", run: 9)
+        #expect(StubURLProtocol.lastRequest(token: token)?.url?.path() == "/repos/acme/api/actions/runs/9/cancel")
     }
 
     @Test func readsReposFromRecentPushes() async throws {
