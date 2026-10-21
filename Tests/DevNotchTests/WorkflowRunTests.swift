@@ -73,9 +73,10 @@ struct WorkflowRunTests {
             "html_url": "https://github.com/acme/api/actions/runs/9/job/2",
             "started_at": "2026-10-21T10:00:00Z", "completed_at": "2026-10-21T10:02:00Z",
             "steps": [
-              { "name": "Set up job", "status": "completed", "conclusion": "success" },
-              { "name": "Run tests", "status": "completed", "conclusion": "failure" },
-              { "name": "Upload", "status": "completed", "conclusion": "skipped" }
+              { "number": 1, "name": "Set up job", "status": "completed", "conclusion": "success",
+                "started_at": "2026-10-21T10:00:00Z", "completed_at": "2026-10-21T10:00:05Z" },
+              { "number": 2, "name": "Run tests", "status": "completed", "conclusion": "failure" },
+              { "number": 3, "name": "Upload", "status": "completed", "conclusion": "skipped" }
             ] },
           { "id": 3, "name": "build", "status": "in_progress", "conclusion": null,
             "steps": [ { "name": "Compile", "status": "in_progress", "conclusion": null } ] }
@@ -89,6 +90,10 @@ struct WorkflowRunTests {
         #expect(jobs[1].failedStep == "Run tests")
         #expect(jobs[1].duration(now: .now) == 120)
         #expect(jobs[2].currentStep == "Compile")
+        #expect(jobs[1].steps.map(\.state) == [.passed, .failed, .skipped])
+        #expect(jobs[1].steps.first?.duration(now: .now) == 5)
+        #expect(jobs[1].steps.last?.duration(now: .now) == nil)
+        #expect(jobs[2].steps.first?.number == 1)
     }
 
     @Test func groupsMatrixJobsAndPutsFailuresFirst() {

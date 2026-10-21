@@ -204,15 +204,42 @@ private struct JobRow: View {
     let now: Date
     let title: String
 
+    @State private var toggled = false
+
+    private var hasSteps: Bool { !job.steps.isEmpty }
+
+    private var isExpanded: Bool { hasSteps && (job.state == .failed || job.state == .running) != toggled }
+
     var body: some View {
         Button {
-            if let url = job.url { notch.openInBrowser(url) }
+            if hasSteps {
+                withAnimation(Motion.navigate) { toggled.toggle() }
+            } else if let url = job.url {
+                notch.openInBrowser(url)
+            }
         } label: {
-            JobLine(state: job.state, name: title, detail: detail, trailing: duration, chevron: nil)
+            JobLine(
+                state: job.state,
+                name: title,
+                detail: isExpanded ? nil : detail,
+                trailing: duration,
+                chevron: hasSteps ? (isExpanded ? "chevron.down" : "chevron.right") : nil
+            )
         }
         .buttonStyle(.plain)
-        .disabled(job.url == nil)
-        .hint(String(localized: "Open the job log"))
+        .disabled(!hasSteps && job.url == nil)
+        .hint(hint)
+        if isExpanded {
+            ForEach(job.steps) { step in
+                StepRow(step: step, now: now, url: url(of: step))
+            }
+            .padding(.leading, 20)
+        }
+    }
+
+    private var hint: String {
+        if !hasSteps { return String(localized: "Open the job log") }
+        return isExpanded ? String(localized: "Hide the steps") : String(localized: "Show the steps")
     }
 
     private var detail: String? {
@@ -224,6 +251,61 @@ private struct JobRow: View {
     private var duration: String? {
         guard job.state != .skipped else { return nil }
         return job.duration(now: now).map(RunRow.duration)
+    }
+
+    private func url(of step: WorkflowStep) -> URL? {
+        guard let url = job.url else { return nil }
+        return URL(string: url.absoluteString + "#step:\(step.number):1")
+    }
+}
+
+private struct StepRow: View {
+    @Environment(NotchInteraction.self) private var notch
+    let step: WorkflowStep
+    let now: Date
+    let url: URL?
+
+    @State private var hovering = false
+
+    var body: some View {
+        Button {
+            if let url { notch.openInBrowser(url) }
+        } label: {
+            HStack(spacing: 8) {
+                JobStatusIcon(state: step.state, size: 10)
+                Text(step.name)
+                    .font(.panel(.small, step.state == .running || step.state == .failed ? .semibold : .regular))
+                    .foregroundStyle(color)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                if let duration = step.duration(now: now) {
+                    Text(RunRow.duration(duration))
+                        .font(.panel(.small).monospacedDigit())
+                        .foregroundStyle(.textTertiary)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(hovering ? Color.surfaceSubtle : .clear)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(url == nil)
+        .hint(String(localized: "Open the log at this step"))
+        .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
+    }
+
+    private var color: Color {
+        switch step.state {
+        case .failed: Color.red.opacity(0.9)
+        case .running: .textStrong
+        case .skipped, .cancelled, .queued: .textTertiary
+        default: .textSecondary
+        }
     }
 }
 
@@ -276,11 +358,12 @@ private struct JobLine: View {
 
 private struct JobStatusIcon: View {
     let state: WorkflowRun.State
+    var size: CGFloat = 12
 
     var body: some View {
         Group {
             switch state {
-            case .running: StatusIcon(status: .ciRunning, size: 12)
+            case .running: StatusIcon(status: .ciRunning, size: size)
             case .queued: symbol("circle.dashed", .textTertiary)
             case .waiting: symbol("pause.circle.fill", .orange)
             case .passed: symbol("checkmark.circle.fill", .green)
@@ -289,12 +372,12 @@ private struct JobStatusIcon: View {
             case .skipped: symbol("forward.circle", .textMuted)
             }
         }
-        .frame(width: 12, height: 12)
+        .frame(width: size, height: size)
     }
 
     private func symbol(_ name: String, _ color: Color) -> some View {
         Image(systemName: name)
-            .font(.system(size: 12, weight: .medium))
+            .font(.system(size: size, weight: .medium))
             .foregroundStyle(color)
     }
 }

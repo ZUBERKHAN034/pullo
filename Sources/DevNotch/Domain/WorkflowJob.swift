@@ -1,5 +1,20 @@
 import Foundation
 
+struct WorkflowStep: Identifiable, Equatable {
+    let number: Int
+    let name: String
+    let state: WorkflowRun.State
+    let startedAt: Date?
+    let completedAt: Date?
+
+    var id: Int { number }
+
+    func duration(now: Date) -> TimeInterval? {
+        guard let startedAt, state != .skipped, state != .queued else { return nil }
+        return (completedAt ?? now).timeIntervalSince(startedAt)
+    }
+}
+
 struct WorkflowJob: Identifiable, Equatable {
     let id: Int
     let name: String
@@ -7,8 +22,11 @@ struct WorkflowJob: Identifiable, Equatable {
     let url: URL?
     let startedAt: Date?
     let completedAt: Date?
-    let failedStep: String?
-    let currentStep: String?
+    let steps: [WorkflowStep]
+
+    var failedStep: String? { steps.first { $0.state == .failed }?.name }
+
+    var currentStep: String? { steps.first { $0.state == .running }?.name }
 
     var group: String {
         guard let open = name.range(of: " ("), name.hasSuffix(")") else { return name }
