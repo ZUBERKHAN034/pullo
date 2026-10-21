@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 concurrency:
   group: release
@@ -17,6 +18,7 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
   API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
   API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+  FEED_URL: https://jordan-cod.github.io/devnotch/appcast.xml
 
 jobs:
   release:
@@ -148,8 +150,7 @@ jobs:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           # Start from the published feed so earlier versions stay listed.
-          gh release download --pattern appcast.xml --dir "$RUNNER_TEMP/feed" || true
-          echo "STABLE_TAG=$(gh release view --json tagName -q .tagName 2>/dev/null)" >> "$GITHUB_ENV"
+          curl -sSfL "$FEED_URL" -o "$RUNNER_TEMP/feed/appcast.xml"
           # The tools ship with the resolved package, so they always match the framework inside the app.
           printf %s "$SPARKLE_PRIVATE_KEY" | "$RUNNER_TEMP/packages/artifacts/sparkle/Sparkle/bin/generate_appcast" --ed-key-file - \
             --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/v$VERSION/" \
@@ -165,7 +166,23 @@ jobs:
           gh release create "v$VERSION" ${CHANNEL:+--prerelease} \
             --title "DevNotch $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
             "$RUNNER_TEMP/DevNotch.dmg" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/feed/appcast.xml"
-          # Installed copies read the feed from the latest stable release, so a beta has to update that copy too.
-          if [ -n "$CHANNEL" ] && [ -n "$STABLE_TAG" ]; then
-            gh release upload "$STABLE_TAG" "$RUNNER_TEMP/feed/appcast.xml" --clobber
-          fi
+
+      - name: Publish the feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch -q origin gh-pages
+          git worktree add -q --detach "$RUNNER_TEMP/pages" origin/gh-pages
+          cp "$RUNNER_TEMP/feed/appcast.xml" "$RUNNER_TEMP/pages/appcast.xml"
+          cd "$RUNNER_TEMP/pages"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qam "Add $VERSION to the update feed"
+          git push -q origin HEAD:gh-pages
+          gh api -X POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent || true
+          for attempt in $(seq 60); do
+            curl -sfL "$FEED_URL?build=$BUILD&try=$attempt" | grep -q "<sparkle:version>$BUILD</sparkle:version>" && exit 0
+            sleep 10
+          done
+          echo "::error::$FEED_URL still doesn't list build $BUILD"
+          exit 1
