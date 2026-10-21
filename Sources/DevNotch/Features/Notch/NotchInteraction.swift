@@ -14,6 +14,7 @@ final class NotchInteraction {
     var geometry: NotchGeometry
 
     let list: PRListModel
+    private let runs: RunStore
     private let accounts: AccountStore
     private let settings: AppSettings
     private let system: any SystemActions
@@ -36,6 +37,7 @@ final class NotchInteraction {
 
     init(
         list: PRListModel,
+        runs: RunStore,
         accounts: AccountStore,
         settings: AppSettings,
         system: any SystemActions,
@@ -43,6 +45,7 @@ final class NotchInteraction {
         clock: any Clock<Duration> = ContinuousClock()
     ) {
         self.list = list
+        self.runs = runs
         self.accounts = accounts
         self.settings = settings
         self.system = system
@@ -59,8 +62,17 @@ final class NotchInteraction {
             return finishedCI
         }
         let logins = accounts.accounts.map(\.login).filter { !settings.mutedAccounts.contains($0) }
-        let running = list.store.runningCI(for: logins)
-        return running.first.map { LiveCI(pr: $0, othersRunning: running.count - 1, label: settings.liveCILabel) }
+        let prs = list.store.runningCI(for: logins)
+        let prKeys = Set(prs.map { "\($0.repo.lowercased())#\($0.number)" })
+        let ownRuns = logins.flatMap { login in
+            runs.runs(for: login).filter { $0.state == .running && $0.isStarted(by: login) }
+        }
+        .filter { run in run.pullRequest.map { !prKeys.contains("\(run.repo.lowercased())#\($0)") } ?? true }
+        let candidates = prs.map { (LiveCI(pr: $0), $0.updatedAt) } + ownRuns.map { (LiveCI(run: $0), $0.startedAt) }
+        guard var live = candidates.max(by: { $0.1 < $1.1 })?.0 else { return nil }
+        live.othersRunning = candidates.count - 1
+        live.label = settings.liveCILabel
+        return live
     }
 
     // MARK: - Pointer
@@ -186,8 +198,20 @@ final class NotchInteraction {
             && !settings.mutedAccounts.contains(pr.account)
     }
 
+    func runsFinished(_ finished: [WorkflowRun]) {
+        let shown = finished.filter { !settings.mutedAccounts.contains($0.account) }
+        guard let run = shown.first(where: { $0.state == .failed }) ?? shown.first(where: { $0.state == .passed }),
+              state == .closed, finishedCITask == nil, geometry.hasNotch, settings.showsLiveCI
+        else { return }
+        flash(LiveCI(run: run, finished: run.state == .failed ? .failure : .success), then: [])
+    }
+
     private func showFinishedCI(_ pr: PullRequest, then alerts: [NotchAlert]) {
-        finishedCI = LiveCI(pr: pr, othersRunning: 0, finished: pr.ci)
+        flash(LiveCI(pr: pr, finished: pr.ci), then: alerts)
+    }
+
+    private func flash(_ live: LiveCI, then alerts: [NotchAlert]) {
+        finishedCI = live
         let clock = clock
         finishedCITask = Task { [weak self] in
             try? await clock.sleep(for: .seconds(2))

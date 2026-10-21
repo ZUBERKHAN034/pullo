@@ -50,8 +50,12 @@ final class NotchHarness {
         })
         store = PRStore(accounts: accounts, tracker: tracker, source: StubSource(snapshots: snapshots))
         list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system, clock: clock)
+        var clockNow: () -> Date = { Date() }
+        runs = RunStore(accounts: accounts, prs: store, source: runSource) { clockNow() }
+        actions = ActionsModel(store: runs, list: list)
         notch = NotchInteraction(
             list: list,
+            runs: runs,
             accounts: accounts,
             settings: settings,
             system: system,
@@ -62,10 +66,8 @@ final class NotchHarness {
             ),
             clock: clock
         )
-        var clockNow: () -> Date = { Date() }
-        runs = RunStore(accounts: accounts, prs: store, source: runSource) { clockNow() }
-        actions = ActionsModel(store: runs, list: list)
         clockNow = { [unowned self] in now }
+        runs.onRunsFinished = { [unowned notch] in notch.runsFinished($0) }
         await store.refresh()
     }
 

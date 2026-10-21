@@ -29,6 +29,7 @@ final class AppDependencies {
         actions = ActionsModel(store: runs, list: list)
         notch = NotchInteraction(
             list: list,
+            runs: runs,
             accounts: accounts,
             settings: settings,
             system: system,
@@ -52,6 +53,7 @@ final class AppDependencies {
 
     private func connect() {
         store.onEvents = { [weak self] events in self?.notch.enqueue(events: events) }
+        runs.onRunsFinished = { [weak self] finished in self?.notch.runsFinished(finished) }
         accounts.onAccountAdded = { [weak self] account in
             guard let self else { return }
             notch.accountConnected(account)

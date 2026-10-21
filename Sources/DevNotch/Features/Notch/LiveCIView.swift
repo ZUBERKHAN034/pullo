@@ -28,7 +28,7 @@ struct LiveCIView: View {
     private func label(_ text: String) -> some View {
         Text(verbatim: text)
             .font(.panel(.small, .semibold).monospacedDigit())
-            .foregroundStyle(.textStrong)
+            .foregroundStyle(live.failing ? Color.red : .textStrong)
             .contentTransition(.numericText())
     }
 
@@ -37,7 +37,7 @@ struct LiveCIView: View {
         switch live.finished {
         case .success: result("checkmark.circle.fill", .green)
         case .failure: result("xmark.circle.fill", .red)
-        default: ProgressRing(fraction: live.checks?.fraction ?? 0)
+        default: ProgressRing(fraction: live.checks?.fraction ?? 0, color: live.failing ? .red : .yellow)
         }
     }
 
@@ -66,7 +66,7 @@ struct LiveCIView: View {
 
     private var accessibilityText: String {
         let checks = live.checks.map { String(localized: "\($0.done) of \($0.total) checks done") } ?? ""
-        let title = live.pr.title
+        let title = live.title
         switch live.finished {
         case .success: return String(localized: "Checks passed on \(title)")
         case .failure: return String(localized: "Checks failed on \(title)")

@@ -1,14 +1,39 @@
 import Foundation
 
 struct LiveCI: Equatable {
-    let pr: PullRequest
-    let othersRunning: Int
+    static let maxNameLength = 14
+
+    let id: String
+    let name: String
+    let title: String
+    let checks: CheckProgress?
+    var failing = false
+    var othersRunning = 0
     var finished: CIState?
     var label: LiveCILabel = .number
 
-    var checks: CheckProgress? { pr.checks }
+    init(pr: PullRequest, othersRunning: Int = 0, finished: CIState? = nil, label: LiveCILabel = .number) {
+        id = pr.id
+        name = "#\(pr.number)"
+        title = pr.title
+        checks = pr.checks
+        self.othersRunning = othersRunning
+        self.finished = finished
+        self.label = label
+    }
 
-    var numberText: String { "#\(pr.number)" }
+    init(run: WorkflowRun, othersRunning: Int = 0, finished: CIState? = nil, label: LiveCILabel = .number) {
+        id = "run-\(run.id)"
+        name = run.pullRequest.map { "#\($0)" } ?? Self.shortened(run.workflow)
+        title = "\(run.workflow) · \(run.repoName)"
+        checks = run.jobs.flatMap { $0.total > 0 ? CheckProgress(done: $0.done, total: $0.total) : nil }
+        failing = (run.jobs?.failed ?? 0) > 0
+        self.othersRunning = othersRunning
+        self.finished = finished
+        self.label = label
+    }
+
+    var numberText: String { name }
     var checksText: String? { checks.map { "\($0.done)/\($0.total)" } }
     var othersText: String? { othersRunning > 0 ? "+\(othersRunning)" : nil }
 
@@ -23,6 +48,10 @@ struct LiveCI: Equatable {
     }
 
     private static func width(of text: String) -> CGFloat { CGFloat(text.count) * 7 }
+
+    private static func shortened(_ name: String) -> String {
+        name.count > maxNameLength ? String(name.prefix(maxNameLength - 1)) + "…" : name
+    }
 }
 
 enum LiveCILabel: String, CaseIterable {

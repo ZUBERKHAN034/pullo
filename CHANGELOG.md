@@ -7,6 +7,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Added
 - A new Actions side in the panel shows your GitHub Actions runs: what's running, waiting for approval or just finished, with job progress. Switch to it with the pill under the open notch, or ⌘← and ⌘→. It looks at the repositories you pushed to recently and the ones with your open pull requests, and filters by Mine, Everyone or Deploys.
 
+### Changed
+- The closed notch now also shows workflow runs you started, like a deploy, with the workflow's name. The ring turns red as soon as a job fails, and the notch flashes the result when the run finishes.
+
 ## [0.8.0-beta.1] - 2026-10-21
 
 ### Added

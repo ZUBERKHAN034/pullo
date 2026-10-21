@@ -10,7 +10,8 @@ extension WorkflowRun {
         branch: String = "main",
         state: State = .passed,
         actor: String = "me",
-        createdAt: Date = Date(timeIntervalSince1970: 0)
+        createdAt: Date = Date(timeIntervalSince1970: 0),
+        pullRequest: Int? = nil
     ) -> WorkflowRun {
         WorkflowRun(
             id: id,
@@ -27,7 +28,7 @@ extension WorkflowRun {
             createdAt: createdAt,
             startedAt: createdAt,
             updatedAt: createdAt,
-            pullRequest: nil
+            pullRequest: pullRequest
         )
     }
 }
