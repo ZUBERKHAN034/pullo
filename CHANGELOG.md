@@ -11,6 +11,9 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Changed
 - The closed notch now also shows workflow runs you started, like a deploy, with the workflow's name. The ring turns red as soon as a job fails, and the notch flashes the result when the run finishes.
 
+### Fixed
+- The pill under the open notch follows the panel style, so it's glass when the panel is, instead of always black.
+
 ## [0.8.0-beta.1] - 2026-10-21
 
 ### Added
