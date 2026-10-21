@@ -28,7 +28,7 @@ struct AccountsPage: View {
             } header: {
                 Text("Connected")
             } footer: {
-                Text("DevNotch reads tokens from the GitHub CLI when it needs them and never stores them.")
+                Text("Pullo reads tokens from the GitHub CLI when it needs them and never stores them.")
             }
 
             Section("Add from GitHub CLI") {

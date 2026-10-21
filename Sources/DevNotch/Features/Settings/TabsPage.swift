@@ -277,7 +277,7 @@ struct RunTabEditor: View {
                             Menu {
                                 Button("Any") { tab.repo = "" }
                                 if !repos.isEmpty {
-                                    Section("Watched by DevNotch") {
+                                    Section("Watched by Pullo") {
                                         ForEach(repos, id: \.self) { repo in
                                             Button { tab.repo = repo } label: { Text(verbatim: repo) }
                                         }
@@ -306,7 +306,7 @@ struct RunTabEditor: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("For the branch, end with * to match the start, like release/*.")
                         Text(
-                            "Matches \(seen.filter { tab.includes($0, login: login) }.count) of the \(seen.count) runs DevNotch sees right now."
+                            "Matches \(seen.filter { tab.includes($0, login: login) }.count) of the \(seen.count) runs Pullo sees right now."
                         )
                     }
                     .font(.caption)

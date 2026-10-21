@@ -45,7 +45,7 @@ import SwiftUI
             let notch = CGPoint(x: screen.width / 2, y: model.geometry.notchSize.height / 2)
 
             let firstLoad = Task { await store.refresh() }
-            stage.model.titleCard = DemoCaption(title: "DevNotch", subtitle: "Your GitHub pull requests in the Mac notch.")
+            stage.model.titleCard = DemoCaption(title: "Pullo", subtitle: "Your GitHub pull requests in the Mac notch.")
             await wait(2.8)
             stage.model.titleCard = nil
             await wait(0.4)
@@ -134,7 +134,7 @@ import SwiftUI
 
             stage.model.caption = nil
             stage.model.titleCard = DemoCaption(
-                title: "DevNotch",
+                title: "Pullo",
                 subtitle: "Press \(Shortcut.togglePanel.symbols) to open it from any app."
             )
             cue("end-card")

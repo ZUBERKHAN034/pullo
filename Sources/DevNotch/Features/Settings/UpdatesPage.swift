@@ -16,7 +16,7 @@ struct UpdatesPage: View {
                         .disabled(!updater.canCheckForUpdates)
                 }
             } footer: {
-                Text("Updates are signed and notarized by Apple, and installed when you quit DevNotch.")
+                Text("Updates are signed and notarized by Apple, and installed when you quit Pullo.")
             }
             Section {
                 Toggle("Get beta versions", isOn: Binding(

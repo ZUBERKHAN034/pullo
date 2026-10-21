@@ -10,7 +10,7 @@ struct AboutPage: View {
                         .resizable()
                         .frame(width: 56, height: 56)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("DevNotch").font(.title3.weight(.semibold))
+                        Text("Pullo").font(.title3.weight(.semibold))
                         Text("Version \(Updater.version)").foregroundStyle(.secondary)
                         Text("Your GitHub pull requests in the notch.").foregroundStyle(.secondary)
                     }

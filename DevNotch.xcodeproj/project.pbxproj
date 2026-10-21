@@ -205,7 +205,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.jrdan.devnotch;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = DevNotch;
+				PRODUCT_NAME = Pullo;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
@@ -226,7 +227,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.jrdan.devnotch;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = DevNotch;
+				PRODUCT_NAME = Pullo;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;

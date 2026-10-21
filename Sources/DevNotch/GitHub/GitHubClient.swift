@@ -104,7 +104,7 @@ struct GitHubClient {
     func request(for url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("DevNotch", forHTTPHeaderField: "User-Agent")
+        request.setValue("Pullo", forHTTPHeaderField: "User-Agent")
         return request
     }
 

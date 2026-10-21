@@ -1,8 +1,11 @@
 # Changelog
 
-All notable changes to DevNotch are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org).
+All notable changes to Pullo are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
+
+### Changed
+- DevNotch is now called Pullo. Nothing else changes: your accounts, tabs and settings stay as they are, and updates keep coming the same way.
 
 ## [0.8.0-beta.5] - 2026-10-21
 

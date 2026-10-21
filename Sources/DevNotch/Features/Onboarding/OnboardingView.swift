@@ -19,7 +19,7 @@ struct OnboardingView: View {
                 Text("Connect with GitHub CLI")
                     .font(.panel(.display, .semibold))
                     .foregroundStyle(.white)
-                Text("DevNotch uses the accounts you're already logged into with `gh`. No token is stored.")
+                Text("Pullo uses the accounts you're already logged into with `gh`. No token is stored.")
                     .font(.panel(.body))
                     .foregroundStyle(.textTertiary)
             }

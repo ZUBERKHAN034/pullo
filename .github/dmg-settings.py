@@ -1,4 +1,4 @@
-# dmgbuild settings for the DevNotch disk image: the app next to an Applications shortcut, ready to drag.
+# dmgbuild settings for the Pullo disk image: the app next to an Applications shortcut, ready to drag.
 import os.path
 
 application = defines["app"]
