@@ -1,0 +1,56 @@
+name: Bug report
+description: Something in Pullo doesn't work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the notch
+        2. Go to Actions
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Pullo version
+      description: Settings › About.
+      placeholder: "0.9.0"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "macOS 26.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: notch
+    attributes:
+      label: Display
+      options:
+        - MacBook with a notch
+        - Mac or display without a notch
+        - Both, with an external display
+    validations:
+      required: true
+  - type: input
+    id: accounts
+    attributes:
+      label: How many GitHub accounts are logged in to gh?
+      placeholder: "2"
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or recording
+      description: Drag files here. Hide private repository names if you need to.
