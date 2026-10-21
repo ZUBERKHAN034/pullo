@@ -13,6 +13,8 @@ final class RunStore {
     private(set) var runs: [String: [WorkflowRun]] = [:]
     private(set) var errors: [String: String] = [:]
 
+    @ObservationIgnored var onRunsFinished: (([WorkflowRun]) -> Void)?
+
     private let accounts: AccountStore
     private let prs: PRStore
     private let source: RunSource
@@ -117,11 +119,21 @@ final class RunStore {
             for index in fetched.indices where fetched[index].state == .running {
                 fetched[index].jobs = try? await source.jobs(of: fetched[index], for: account)
             }
+            let previous = byRepo[key] ?? []
             byRepo[key] = fetched
+            let finished = Self.finished(from: previous, to: fetched, login: account.login)
+            if !finished.isEmpty { onRunsFinished?(finished) }
         } catch {
             Logger.store.error("Loading runs of \(repo, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
         }
         fetchedAt[key] = now()
+    }
+
+    private static func finished(from previous: [WorkflowRun], to current: [WorkflowRun], login: String) -> [WorkflowRun] {
+        let wasActive = Set(previous.filter { $0.state.isActive }.map(\.id))
+        return current.filter { run in
+            wasActive.contains(run.id) && !run.state.isActive && run.pullRequest == nil && run.isStarted(by: login)
+        }
     }
 
     private func key(_ repo: String, _ login: String) -> String { "\(login)|\(repo.lowercased())" }
