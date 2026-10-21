@@ -6,7 +6,7 @@ struct LiveCIView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            indicator
+            leading
                 .frame(maxWidth: .infinity)
             Color.clear.frame(width: notchWidth)
             counter
@@ -14,6 +14,22 @@ struct LiveCIView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
+    }
+
+    private var leading: some View {
+        HStack(spacing: 4) {
+            indicator
+            if live.showsNumberBeside {
+                label(live.numberText)
+            }
+        }
+    }
+
+    private func label(_ text: String) -> some View {
+        Text(verbatim: text)
+            .font(.panel(.small, .semibold).monospacedDigit())
+            .foregroundStyle(.textStrong)
+            .contentTransition(.numericText())
     }
 
     @ViewBuilder
@@ -34,14 +50,11 @@ struct LiveCIView: View {
 
     private var counter: some View {
         HStack(spacing: 4) {
-            if let checks = live.checks {
-                Text(verbatim: "\(checks.done)/\(checks.total)")
-                    .font(.panel(.small, .semibold).monospacedDigit())
-                    .foregroundStyle(.textStrong)
-                    .contentTransition(.numericText())
+            if let text = live.trailingText {
+                label(text)
             }
-            if live.othersRunning > 0 {
-                Text(verbatim: "+\(live.othersRunning)")
+            if let others = live.othersText {
+                Text(verbatim: others)
                     .font(.system(size: 10, weight: .bold).monospacedDigit())
                     .foregroundStyle(.textSecondary)
                     .padding(.horizontal, 4)

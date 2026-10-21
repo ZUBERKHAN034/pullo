@@ -13,6 +13,7 @@ final class AppSettings {
     var categorySounds: [AlertCategory: String] { didSet { save() } }
     var panelStyle: PanelStyle { didSet { save() } }
     var showsLiveCI: Bool { didSet { save() } }
+    var liveCILabel: LiveCILabel { didSet { save() } }
     private(set) var launchAtLogin: Bool
     private(set) var launchAtLoginFailure: String?
 
@@ -32,6 +33,7 @@ final class AppSettings {
         })
         panelStyle = (defaults.object(for: .panelStyle) as? String).flatMap(PanelStyle.init(rawValue:)) ?? .solid
         showsLiveCI = defaults.object(for: .liveCI) as? Bool ?? true
+        liveCILabel = (defaults.object(for: .liveCILabel) as? String).flatMap(LiveCILabel.init(rawValue:)) ?? .number
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
@@ -76,5 +78,6 @@ final class AppSettings {
         defaults.set(Dictionary(uniqueKeysWithValues: categorySounds.map { ($0.key.rawValue, $0.value) }), for: .categorySounds)
         defaults.set(panelStyle.rawValue, for: .panelStyle)
         defaults.set(showsLiveCI, for: .liveCI)
+        defaults.set(liveCILabel.rawValue, for: .liveCILabel)
     }
 }

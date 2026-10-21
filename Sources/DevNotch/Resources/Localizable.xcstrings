@@ -631,6 +631,22 @@
         }
       }
     },
+    "Both": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos"
+          }
+        }
+      }
+    },
     "Bugs in the API": {
       "localizations": {
         "es": {
@@ -819,6 +835,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Checks em andamento"
+          }
+        }
+      }
+    },
+    "Checks done": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks completados"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks concluídos"
           }
         }
       }
@@ -2144,6 +2176,22 @@
         }
       }
     },
+    "PR number": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Número del PR"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Número do PR"
+          }
+        }
+      }
+    },
     "PRs you open will show up here.": {
       "localizations": {
         "es": {
@@ -3024,18 +3072,18 @@
         }
       }
     },
-    "While checks run on your pull requests, the notch widens to show how many are done.": {
+    "While checks run on your pull requests, the notch widens to show their progress.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mientras se ejecutan los checks de tus pull requests, el notch se ensancha para mostrar cuántos terminaron."
+            "value": "Mientras se ejecutan los checks de tus pull requests, el notch se ensancha para mostrar su progreso."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enquanto os checks dos seus pull requests rodam, o notch se alarga para mostrar quantos já terminaram."
+            "value": "Enquanto os checks rodam nos seus pull requests, o notch se alarga para mostrar o progresso."
           }
         }
       }

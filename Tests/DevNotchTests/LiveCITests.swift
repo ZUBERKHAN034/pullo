@@ -43,6 +43,19 @@ extension NotchBehavior {
             #expect(h.notch.liveCI == nil)
         }
 
+        @Test func followsTheChosenLabel() async {
+            let h = await NotchHarness(mine: [Self.running("PR_1", minutesAgo: 1)])
+            #expect(h.notch.liveCI?.trailingText == "#\(h.notch.liveCI?.pr.number ?? 0)")
+            h.settings.liveCILabel = .checks
+            #expect(h.notch.liveCI?.trailingText == "3/5")
+            #expect(h.notch.liveCI?.showsNumberBeside == false)
+            let narrow = h.notch.layout.size(for: .closed).width
+            h.settings.liveCILabel = .both
+            #expect(h.notch.liveCI?.trailingText == "3/5")
+            #expect(h.notch.liveCI?.showsNumberBeside == true)
+            #expect(h.notch.layout.size(for: .closed).width > narrow)
+        }
+
         @Test func showsTheResultBeforeTheAlert() async {
             let h = await NotchHarness()
             let pr = PullRequest.make(ci: .failure, checks: CheckProgress(done: 5, total: 5))
