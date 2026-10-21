@@ -71,7 +71,7 @@ jobs:
       - name: Same dependencies for SwiftPM and Xcode
         run: |
           diff <(jq -S .pins Package.resolved) \
-            <(jq -S .pins DevNotch.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved) \
+            <(jq -S .pins Pullo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved) \
             || { echo "::error::Package.resolved and the Xcode project's Package.resolved pin different versions"; exit 1; }
 
   test:
@@ -98,6 +98,6 @@ jobs:
       - name: Build the app
         run: |
           xcodebuild build \
-            -project DevNotch.xcodeproj -scheme DevNotch -configuration Release \
+            -project Pullo.xcodeproj -scheme Pullo -configuration Release \
             -clonedSourcePackagesDirPath "$RUNNER_TEMP/packages" \
             CODE_SIGNING_ALLOWED=NO

@@ -2,18 +2,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "DevNotch",
+    name: "Pullo",
     platforms: [.macOS(.v14)],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.10.0"),
     ],
     targets: [
         .executableTarget(
-            name: "DevNotch",
+            name: "Pullo",
             dependencies: [.product(name: "Sparkle", package: "Sparkle")],
-            path: "Sources/DevNotch",
+            path: "Sources/Pullo",
             exclude: ["Resources/Localizable.xcstrings", "Resources/InfoPlist.xcstrings"]
         ),
-        .testTarget(name: "DevNotchTests", dependencies: ["DevNotch"], path: "Tests/DevNotchTests"),
+        .testTarget(name: "PulloTests", dependencies: ["Pullo"], path: "Tests/PulloTests"),
     ]
 )
