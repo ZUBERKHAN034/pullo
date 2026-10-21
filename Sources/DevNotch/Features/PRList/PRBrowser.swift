@@ -87,7 +87,7 @@ struct PRBrowser: View {
             MessageView(
                 symbol: "magnifyingglass",
                 title: String(localized: "Search @\(list.currentLogin ?? "")'s PRs"),
-                detail: String(localized: "Title, repo, #number, branch or author. Searches both tabs.")
+                detail: String(localized: "Title, repo, #number, branch or author. Searches every tab.")
             )
         } else if results.isEmpty {
             MessageView(

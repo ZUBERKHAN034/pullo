@@ -110,12 +110,12 @@ private struct FilterEditor: View {
                     TextField("Name", text: $filter.name, prompt: Text("Bugs in the API"))
                 }
                 Section {
-                    TextField("Search", text: $filter.query, prompt: Text(verbatim: "repo:acme/api label:bug"), axis: .vertical)
+                    TextField("Search query", text: $filter.query, prompt: Text(verbatim: "repo:acme/api label:bug"), axis: .vertical)
                         .labelsHidden()
                         .font(.body.monospaced())
                         .lineLimit(2...4)
                 } header: {
-                    Text("Search")
+                    Text("Search query")
                 } footer: {
                     HStack {
                         Link(

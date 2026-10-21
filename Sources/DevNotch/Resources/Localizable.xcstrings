@@ -871,18 +871,18 @@
         }
       }
     },
-    "Clear the filter, or close": {
+    "Clear the search, or close": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Borrar el filtro o cerrar"
+            "value": "Borrar la búsqueda o cerrar"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Limpar o filtro ou fechar"
+            "value": "Limpar a busca ou fechar"
           }
         }
       }
@@ -1238,54 +1238,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Editar…"
-          }
-        }
-      }
-    },
-    "Filter": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtrar"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtrar"
-          }
-        }
-      }
-    },
-    "Filter PRs": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtrar PR"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtrar PRs"
-          }
-        }
-      }
-    },
-    "Filter by title, repo, #number, branch or author": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtra por título, repo, #número, rama o autor"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtre por título, repo, #número, branch ou autor"
           }
         }
       }
@@ -2389,13 +2341,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Búsqueda"
+            "value": "Buscar"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Busca"
+            "value": "Buscar"
           }
         }
       }
@@ -2412,6 +2364,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buscar nos PRs de @%@"
+          }
+        }
+      }
+    },
+    "Search PRs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar PR"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar PRs"
+          }
+        }
+      }
+    },
+    "Search by title, repo, #number, branch or author": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca por título, repo, #número, rama o autor"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busque por título, repo, #número, branch ou autor"
+          }
+        }
+      }
+    },
+    "Search query": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Búsqueda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca"
           }
         }
       }
@@ -2672,18 +2672,18 @@
         }
       }
     },
-    "Title, repo, #number, branch or author. Searches both tabs.": {
+    "Title, repo, #number, branch or author. Searches every tab.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Título, repo, #número, rama o autor. Busca en ambas pestañas."
+            "value": "Título, repo, #número, rama o autor. Busca en todas las pestañas."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Título, repo, #número, branch ou autor. Busca nas duas abas."
+            "value": "Título, repo, #número, branch ou autor. Busca em todas as abas."
           }
         }
       }

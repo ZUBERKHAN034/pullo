@@ -9,7 +9,7 @@ struct SearchTrigger: View {
             HStack(spacing: 6) {
                 Image(systemName: "magnifyingglass")
                     .font(.panel(.caption, .semibold))
-                Text("Filter")
+                Text("Search")
                     .font(.panel(.body, .medium))
                 Spacer(minLength: 8)
                 Text("⌘F")
@@ -26,6 +26,6 @@ struct SearchTrigger: View {
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
-        .hint(String(localized: "Filter by title, repo, #number, branch or author"), edge: .leading)
+        .hint(String(localized: "Search by title, repo, #number, branch or author"), edge: .leading)
     }
 }
