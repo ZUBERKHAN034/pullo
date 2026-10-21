@@ -1,107 +1,83 @@
-# Pullo
+<p align="center">
+  <img src="docs/media/icon.png" width="128" alt="Pullo icon">
+</p>
 
-_Formerly DevNotch._
+<h1 align="center">Pullo</h1>
 
-Pullo is a macOS app that puts your GitHub pull requests in the notch. It lets you know when CI fails, when someone approves or comments, and when your review is requested.
+<p align="center">
+  <b>Your pull requests and GitHub Actions, right in the notch.</b>
+</p>
 
-<img src="docs/media/demo.gif" alt="Pullo showing an alert and the list of pull requests" width="720">
+<p align="center">
+  <a href="https://github.com/jordan-cod/pullo/releases/latest/download/Pullo.dmg"><img src="https://img.shields.io/badge/Download_for_macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS"></a>
+</p>
 
-Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI](https://cli.github.com). Available in English, Portuguese (Brazil) and Spanish.
+<p align="center">
+  <sub>Free and open source · macOS 14 or later · Apple silicon · English, Português, Español</sub>
+</p>
 
-## Features
+<p align="center">
+  <img src="docs/media/prs.png" width="880" alt="Pullo open under the notch, listing pull requests">
+</p>
 
-- Your pull requests and review requests in one list
-- Review requests split between direct and team requests
-- Alerts for CI, approvals, requested changes, comments and review requests
-- Unread marker on each pull request, with what changed
-- Failed checks with a link to the logs
-- Multiple GitHub accounts, each with its own list
-- Search by title, repo, number, branch or author
-- Global shortcut and keyboard navigation
-- Solid or Liquid Glass look on macOS 26 and later
-- Updates itself when a new version is out
-- Read-only: it doesn't approve, merge or store tokens
+## Know the moment something changes
 
-## Installation
+CI results, approvals, comments and review requests slide out of the notch, then get out of the way.
 
-1. Download [`Pullo.dmg`](https://github.com/jordan-cod/pullo/releases/latest/download/Pullo.dmg) from the latest release.
-2. Open it and drag Pullo to your Applications folder.
-3. If you don't have the GitHub CLI yet, install it and log in:
+<p align="center">
+  <img src="docs/media/alert.png" width="500" alt="An approval alert in the notch">
+</p>
 
-   ```sh
-   brew install gh
-   gh auth login
-   ```
+## Keep an eye on your Actions
 
-## Usage
+What's running, what's waiting for approval and what just failed, with your deploys one click away.
 
-1. Open Pullo and hover over the notch.
-2. Pick which `gh` accounts to add.
-3. Hover over the notch to see your pull requests, or press <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>P</kbd> from any app.
-4. Click a pull request to open it in your browser. Opening it marks it as read.
-5. Drag a pull request out of the panel to drop its link into Slack, an email or anywhere else.
-6. Click the gear to change alerts, the alert sound, trackpad feedback and "Open at login".
+<p align="center">
+  <img src="docs/media/actions.png" width="880" alt="GitHub Actions runs in Pullo">
+</p>
 
-| Shortcut | Action |
-|---|---|
-| <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>P</kbd> | Open or close the panel |
-| <kbd>⌘</kbd> <kbd>F</kbd> | Search |
-| <kbd>↑</kbd> <kbd>↓</kbd> | Move through the list |
-| <kbd>↩</kbd> | Open the pull request |
-| <kbd>C</kbd> | Copy the branch name |
-| <kbd>R</kbd> | Mark as read |
-| <kbd>⇥</kbd> | Switch tabs |
-| <kbd>⌘</kbd> <kbd>1</kbd>…<kbd>9</kbd> | Switch accounts |
-| <kbd>esc</kbd> | Close search or the panel |
+## Every job, every step
 
-## Screenshots
+Open a run to follow each step live. Re-run what failed, cancel what's stuck, or jump to the log on GitHub.
 
-#### Alerts that arrive together are grouped
+<p align="center">
+  <img src="docs/media/run.png" width="880" alt="A deploy run with its steps">
+</p>
 
-<img src="docs/media/screenshots/01-alerts.png" alt="Alert with 4 updates" width="470">
+## Made to fit how you work
 
-#### Your pull requests, with what changed since you last looked
+- **Your own tabs** for pull requests and runs, written like a GitHub search
+- **All your accounts**, each with its own list
+- **Liquid Glass** or Solid, to match your Mac
+- **<kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>P</kbd>** from any app, and the keyboard for everything else
 
-<img src="docs/media/screenshots/02-my-prs.png" alt="List of pull requests" width="630">
+## Get started
 
-#### Direct and team review requests
+1. Download [`Pullo.dmg`](https://github.com/jordan-cod/pullo/releases/latest/download/Pullo.dmg) and drag Pullo to Applications.
+2. Log in with the [GitHub CLI](https://cli.github.com): `brew install gh && gh auth login`
+3. Open Pullo and hover over the notch.
 
-<img src="docs/media/screenshots/03-to-review.png" alt="To review tab" width="630">
+## Private by design
 
-#### One list per account
+Pullo talks to the GitHub API straight from your Mac. It borrows the token from `gh` when it needs it and never stores it. There's no server and no sign-up, and it only changes something on GitHub when you ask, like re-running a job.
 
-<img src="docs/media/screenshots/04-accounts.png" alt="Personal account selected" width="630">
+<details>
+<summary><b>FAQ</b></summary>
 
-#### Search
+**Can I try new features early?**
+Turn on **Get beta versions** in Settings → Updates.
 
-<img src="docs/media/screenshots/05-search.png" alt="Searching for pay" width="630">
+**My Mac has no notch.**
+Pullo sits at the top center of the menu bar instead. Hover there.
 
-## FAQ
+**How do I add another account?**
+Run `gh auth login` with it, then add it in Settings → Accounts.
 
-### Can I try new features early?
+**I had DevNotch.**
+It's the same app, renamed. It updates to Pullo by itself, and your settings come along.
 
-Turn on **Get beta versions** in Settings → Updates. Betas may have bugs. If you turn it off again, you keep the beta you have until a newer stable version is out.
+</details>
 
-### Why does it need the GitHub CLI?
-
-So it never has to store a token. Pullo asks `gh` for a token on each refresh and keeps it in memory only. There's no server and no sign-up: the app talks to the GitHub API directly.
-
-### How do I add another account?
-
-Run `gh auth login` with the other account, then add it in Settings › Accounts.
-
-### Does it work with external displays or Macs without a notch?
-
-Pullo stays on your Mac's built-in screen, under the notch, even with other displays plugged in. On a Mac without a notch, or with the lid closed, it moves to the main display: hover over the top center of the menu bar.
-
-### How often does it refresh?
-
-Every minute, and right after your Mac wakes up. There's also a refresh button in the panel.
-
-### What counts as an update?
-
-Comments, reviews, changes to CI or the review decision, and new commits on other people's pull requests. Your own activity and bot activity don't count. Read state is stored only on your Mac.
-
-## License
-
-[MIT](LICENSE)
+<p align="center">
+  <sub><a href="CHANGELOG.md">Changelog</a> · <a href="LICENSE">MIT License</a></sub>
+</p>
