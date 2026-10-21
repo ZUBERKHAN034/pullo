@@ -65,7 +65,7 @@ struct PRList: View {
 
     private var entries: [Entry] {
         sections.flatMap { section -> [Entry] in
-            let rows = section.prs.map { Entry.row($0, section.kind) }
+            let rows = section.prs.map { Entry.row($0, section.kind.rowKind(for: $0)) }
             guard let title = section.title else { return rows }
             return [.header(title, section.prs.count)] + rows
         }

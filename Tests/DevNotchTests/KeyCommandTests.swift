@@ -13,6 +13,8 @@ struct KeyCommandTests {
         #expect(command(kVK_DownArrow) == .moveDown)
         #expect(command(kVK_Return) == .open)
         #expect(command(kVK_Tab) == .switchTab)
+        #expect(command(kVK_RightArrow) == .switchTab)
+        #expect(command(kVK_LeftArrow) == .previousTab)
     }
 
     @Test func letterShortcuts() {

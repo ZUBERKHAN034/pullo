@@ -32,6 +32,14 @@ final class PRStore {
         login.flatMap { snapshots[$0]?.reviewRequests } ?? []
     }
 
+    func filtered(_ filter: SavedFilter.ID, for login: String?) -> [PullRequest] {
+        login.flatMap { snapshots[$0]?.filtered[filter] } ?? []
+    }
+
+    func filterError(_ filter: SavedFilter.ID, for login: String?) -> String? {
+        login.flatMap { snapshots[$0]?.filterErrors[filter] }
+    }
+
     var pollInterval: Duration {
         snapshots.values.contains { $0.mine.contains { $0.ci == .pending } } ? .seconds(30) : .seconds(60)
     }
@@ -83,7 +91,9 @@ final class PRStore {
             case .success(let fetched):
                 let snapshot = Snapshot(
                     mine: fetched.mine.sorted(by: Self.mineOrder),
-                    reviewRequests: fetched.reviewRequests.sorted(by: Self.reviewOrder)
+                    reviewRequests: fetched.reviewRequests.sorted(by: Self.reviewOrder),
+                    filtered: fetched.filtered,
+                    filterErrors: fetched.filterErrors
                 )
                 if let previous = snapshots[login] {
                     events += PREvent.diff(old: previous, new: snapshot)

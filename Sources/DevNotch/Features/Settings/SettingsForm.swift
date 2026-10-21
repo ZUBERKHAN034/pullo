@@ -33,6 +33,7 @@ struct SettingsForm: View {
         case .appearance: AppearancePage()
         case .alerts: AlertsPage()
         case .accounts: AccountsPage()
+        case .filters: FiltersPage()
         case .shortcuts: ShortcutsPage()
         case .updates: if let updater { UpdatesPage(updater: updater) }
         case .about: AboutPage()

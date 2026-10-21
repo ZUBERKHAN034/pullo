@@ -5,11 +5,14 @@ struct GitHubClient {
     let token: String
     var session: URLSession = .shared
 
-    private static let query = """
-    query($mine: String!, $review: String!) {
-      mine: search(query: $mine, type: ISSUE, first: 40) { nodes { ...pr } }
-      review: search(query: $review, type: ISSUE, first: 40) { nodes { ...pr } }
+    static func query(filterCount: Int) -> String {
+        let aliases = (0..<filterCount).map { "f\($0)" }
+        let variables = (["mine", "review"] + aliases).map { "$\($0): String!" }.joined(separator: ", ")
+        let searches = (["mine", "review"] + aliases).map { "  \($0): search(query: $\($0), type: ISSUE, first: 40) { nodes { ...pr } }" }
+        return "query(\(variables)) {\n\(searches.joined(separator: "\n"))\n}\n" + fragment
     }
+
+    private static let fragment = """
     fragment pr on PullRequest {
       id number title url isDraft createdAt updatedAt reviewDecision mergeable headRefName
       additions deletions changedFiles
@@ -31,16 +34,18 @@ struct GitHubClient {
     }
     """
 
-    func fetchSnapshot(account: String) async throws -> Snapshot {
+    func fetchSnapshot(account: String, filters: [SavedFilter] = []) async throws -> Snapshot {
+        let filters = filters.filter(\.isComplete)
+        let aliases = Dictionary(uniqueKeysWithValues: filters.enumerated().map { ("f\($0.offset)", $0.element) })
         var request = request(for: URL(static: "https://api.github.com/graphql"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: [
-            "query": Self.query,
+            "query": Self.query(filterCount: filters.count),
             "variables": [
                 "mine": "is:pr is:open author:@me archived:false sort:updated-desc",
                 "review": "is:pr is:open review-requested:@me archived:false sort:updated-desc",
-            ],
+            ].merging(aliases.mapValues(\.searchQuery)) { $1 },
         ])
 
         let data = try await send(request)
@@ -53,9 +58,17 @@ struct GitHubClient {
         guard let payload = decoded.data else {
             throw GitHubError.api(decoded.errors?.map(\.message).joined(separator: "\n") ?? "Empty response from GitHub.")
         }
+        var filtered: [SavedFilter.ID: [PullRequest]] = [:]
+        var filterErrors: [SavedFilter.ID: String] = [:]
+        for (alias, filter) in aliases {
+            filtered[filter.id] = payload.filtered[alias]?.nodes.compactMap { $0.value?.pullRequest(account: account) } ?? []
+            if let error = decoded.errors?.first(where: { $0.alias == alias }) { filterErrors[filter.id] = error.message }
+        }
         return Snapshot(
             mine: payload.mine.nodes.compactMap { $0.value?.pullRequest(account: account) },
-            reviewRequests: payload.review.nodes.compactMap { $0.value?.pullRequest(account: account) }
+            reviewRequests: payload.review.nodes.compactMap { $0.value?.pullRequest(account: account) },
+            filtered: filtered,
+            filterErrors: filterErrors
         )
     }
 

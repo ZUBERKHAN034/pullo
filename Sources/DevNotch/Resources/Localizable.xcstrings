@@ -327,6 +327,22 @@
         }
       }
     },
+    "Account": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuenta"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conta"
+          }
+        }
+      }
+    },
     "Account connected": {
       "localizations": {
         "es": {
@@ -387,6 +403,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adicionar @%@"
+          }
+        }
+      }
+    },
+    "Add an account first.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primero agrega una cuenta."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicione uma conta primeiro."
+          }
+        }
+      }
+    },
+    "Add filter…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar filtro…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar filtro…"
           }
         }
       }
@@ -551,6 +599,22 @@
         }
       }
     },
+    "Bugs in the API": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugs en la API"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugs na API"
+          }
+        }
+      }
+    },
     "CI failed": {
       "localizations": {
         "es": {
@@ -611,6 +675,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não foi possível acessar o GitHub"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
           }
         }
       }
@@ -1098,6 +1178,22 @@
         }
       }
     },
+    "Each filter becomes a tab in the panel. Write it like a GitHub search, for example `repo:acme/api label:bug` or `team-review-requested:acme/web`. Only open pull requests show up unless you add `is:closed` or `is:merged`.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada filtro se convierte en una pestaña del panel. Escríbelo como una búsqueda de GitHub, por ejemplo `repo:acme/api label:bug` o `team-review-requested:acme/web`. Solo aparecen pull requests abiertos, a menos que agregues `is:closed` o `is:merged`."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada filtro vira uma aba no painel. Escreva como uma busca do GitHub, por exemplo `repo:acme/api label:bug` ou `team-review-requested:acme/web`. Só aparecem pull requests abertos, a não ser que você adicione `is:closed` ou `is:merged`."
+          }
+        }
+      }
+    },
     "Each kind of alert can play its own sound. Default uses the sound above.": {
       "localizations": {
         "es": {
@@ -1110,6 +1206,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cada tipo de alerta pode tocar um som próprio. Padrão usa o som acima."
+          }
+        }
+      }
+    },
+    "Edit filter": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar filtro"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar filtro"
+          }
+        }
+      }
+    },
+    "Edit…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar…"
           }
         }
       }
@@ -1158,6 +1286,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Filtre por título, repo, #número, branch ou autor"
+          }
+        }
+      }
+    },
+    "Filters": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtros"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtros"
           }
         }
       }
@@ -1228,6 +1372,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Receber versões beta"
+          }
+        }
+      }
+    },
+    "GitHub couldn't run this filter": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub no pudo ejecutar este filtro"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub não conseguiu rodar este filtro"
           }
         }
       }
@@ -1504,6 +1664,22 @@
         }
       }
     },
+    "Name": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nombre"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome"
+          }
+        }
+      }
+    },
     "New comment": {
       "localizations": {
         "es": {
@@ -1632,6 +1808,22 @@
         }
       }
     },
+    "No matching PRs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún PR coincide"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum PR encontrado"
+          }
+        }
+      }
+    },
     "No one is waiting on you.": {
       "localizations": {
         "es": {
@@ -1692,6 +1884,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum"
+          }
+        }
+      }
+    },
+    "Nothing open matches \"%@\" right now.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada abierto coincide con \"%@\" ahora."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada aberto corresponde a \"%@\" agora."
           }
         }
       }
@@ -1900,6 +2108,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Testar"
+          }
+        }
+      }
+    },
+    "Preview on GitHub": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver en GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver no GitHub"
           }
         }
       }
@@ -2128,6 +2352,38 @@
         }
       }
     },
+    "Save": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar"
+          }
+        }
+      }
+    },
+    "Search": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Búsqueda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca"
+          }
+        }
+      }
+    },
     "Search @%@'s PRs": {
       "localizations": {
         "es": {
@@ -2140,6 +2396,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buscar nos PRs de @%@"
+          }
+        }
+      }
+    },
+    "Search syntax": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sintaxis de búsqueda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sintaxe de busca"
           }
         }
       }
@@ -2316,6 +2588,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Alternar entre Meus PRs e Para revisar"
+          }
+        }
+      }
+    },
+    "Tabs for @%@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pestañas de @%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abas de @%@"
           }
         }
       }

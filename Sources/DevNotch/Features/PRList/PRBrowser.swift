@@ -38,6 +38,23 @@ struct PRBrowser: View {
             LoadingView()
         } else if list.isSearching {
             searchResults
+        } else if let error = list.filterError(in: list.tab) {
+            MessageView(
+                symbol: "exclamationmark.triangle",
+                title: String(localized: "GitHub couldn't run this filter"),
+                detail: error,
+                actionTitle: "Edit filter"
+            ) {
+                notch.onOpenSettings?(.filters)
+            }
+            .id("\(login)|\(list.tab)")
+        } else if case .filter = list.tab, list.visiblePRs.isEmpty {
+            MessageView(
+                symbol: "line.3.horizontal.decrease.circle",
+                title: String(localized: "No matching PRs"),
+                detail: String(localized: "Nothing open matches \"\(list.title(of: list.tab))\" right now.")
+            )
+            .id("\(login)|\(list.tab)")
         } else if list.visiblePRs.isEmpty {
             MessageView(
                 symbol: list.tab == .mine ? "tray" : "checkmark.circle",
@@ -80,7 +97,7 @@ struct PRBrowser: View {
 
     private var tabSections: [PRSection] {
         let prs = list.visiblePRs
-        guard list.tab == .review else { return [PRSection(title: nil, kind: .mine, prs: prs)] }
+        guard list.tab == .review else { return [PRSection(title: nil, kind: list.tab, prs: prs)] }
         return [
             PRSection(title: String(localized: "For you"), kind: .review, prs: prs.filter(\.isDirectRequest)),
             PRSection(title: String(localized: "Via team"), kind: .review, prs: prs.filter { !$0.isDirectRequest }),

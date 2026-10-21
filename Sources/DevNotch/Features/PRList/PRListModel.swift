@@ -4,7 +4,7 @@ import SwiftUI
 @MainActor
 @Observable
 final class PRListModel {
-    private(set) var tab: PRTab = .mine
+    private var chosenTab: PRTab = .mine
     private(set) var selectedLogin: String?
     private(set) var selectedPRID: String?
     var keyboardMode = false
@@ -44,8 +44,34 @@ final class PRListModel {
         return accounts.accounts.first?.login
     }
 
+    var filters: [SavedFilter] {
+        currentLogin.map(accounts.filters(for:)) ?? []
+    }
+
+    var tabs: [PRTab] {
+        [.mine, .review] + filters.map { .filter($0.id) }
+    }
+
+    var tab: PRTab {
+        tabs.contains(chosenTab) ? chosenTab : .mine
+    }
+
+    func title(of tab: PRTab) -> String {
+        guard case .filter(let id) = tab else { return tab.title }
+        return filters.first { $0.id == id }?.name ?? ""
+    }
+
+    func filterError(in tab: PRTab) -> String? {
+        guard case .filter(let id) = tab else { return nil }
+        return store.filterError(id, for: currentLogin)
+    }
+
     func prs(in tab: PRTab) -> [PullRequest] {
-        tab == .mine ? store.mine(for: currentLogin) : store.reviewRequests(for: currentLogin)
+        switch tab {
+        case .mine: store.mine(for: currentLogin)
+        case .review: store.reviewRequests(for: currentLogin)
+        case .filter(let id): store.filtered(id, for: currentLogin)
+        }
     }
 
     var visiblePRs: [PullRequest] {
@@ -59,8 +85,14 @@ final class PRListModel {
     }
 
     func selectTab(_ tab: PRTab) {
-        withAnimation(Motion.navigate) { self.tab = tab }
+        withAnimation(Motion.navigate) { chosenTab = tab }
         resetSelection()
+    }
+
+    func selectTab(by offset: Int) {
+        let tabs = tabs
+        guard let index = tabs.firstIndex(of: tab) else { return }
+        selectTab(tabs[(index + offset + tabs.count) % tabs.count])
     }
 
     func selectAccount(_ login: String) {

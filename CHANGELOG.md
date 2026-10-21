@@ -4,6 +4,12 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+### Added
+- Save your own filters for each account, written like a GitHub search (for example `repo:acme/api label:bug`). Each one becomes a tab in the panel. Set them up in Settings → Filters.
+
+### Changed
+- The left arrow goes to the previous tab, and Tab or the right arrow to the next one.
+
 ## [0.6.0] - 2026-10-20
 
 ### Added

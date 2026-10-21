@@ -9,7 +9,11 @@ private struct StubSource: PRSource {
     let snapshots: [String: Snapshot]
 
     func snapshot(for account: Account) async throws -> Snapshot {
-        guard let snapshot = snapshots[account.login] else { throw GitHubError.noToken }
+        guard var snapshot = snapshots[account.login] else { throw GitHubError.noToken }
+        let all = snapshot.mine + snapshot.reviewRequests
+        for filter in account.filters {
+            snapshot.filtered[filter.id] = all.filter { filter.query.contains($0.repo) }
+        }
         return snapshot
     }
 }
@@ -25,6 +29,7 @@ final class NotchHarness {
     let list: PRListModel
     let notch: NotchInteraction
     private let scratch = ScratchDefaults()
+    var defaults: UserDefaults { scratch.defaults }
 
     init(accounts logins: [String] = ["me"], mine: [PullRequest] = [], review: [PullRequest] = []) async {
         let defaults = scratch.defaults

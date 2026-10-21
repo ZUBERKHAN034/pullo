@@ -3,7 +3,7 @@ import Carbon.HIToolbox
 enum KeyCommand: Equatable {
     case quit, search, close
     case moveUp, moveDown, open
-    case switchTab, selectAccount(Int), copyBranch, markRead
+    case switchTab, previousTab, selectAccount(Int), copyBranch, markRead
 
     init?(keyCode: Int, characters: String, command: Bool, searching: Bool) {
         if command {
@@ -24,7 +24,8 @@ enum KeyCommand: Equatable {
         default:
             guard !searching else { return nil }
             switch (keyCode, characters) {
-            case (kVK_Tab, _), (kVK_LeftArrow, _), (kVK_RightArrow, _): self = .switchTab
+            case (kVK_Tab, _), (kVK_RightArrow, _): self = .switchTab
+            case (kVK_LeftArrow, _): self = .previousTab
             case (_, "c"): self = .copyBranch
             case (_, "r"): self = .markRead
             default: return nil

@@ -55,6 +55,17 @@ extension NotchBehavior {
             #expect(h.list.tab == .mine)
         }
 
+        @Test func tabsCycleThroughFiltersToo() async {
+            let h = await openWithKeyboard()
+            let filter = SavedFilter(name: "API", query: "repo:acme/acme-api")
+            h.accounts.setFilters([filter], for: "me")
+            #expect(h.list.tabs == [.mine, .review, .filter(filter.id)])
+            _ = h.notch.perform(.previousTab)
+            #expect(h.list.tab == .filter(filter.id))
+            _ = h.notch.perform(.switchTab)
+            #expect(h.list.tab == .mine)
+        }
+
         @Test func numbersPickAccountsThatExist() async {
             let h = await NotchHarness(accounts: ["work", "home"])
             h.notch.toggleFromKeyboard()
