@@ -15,6 +15,13 @@ struct AppSettingsTests {
         #expect(AppSettings(defaults: scratch.defaults).panelStyle == .glass)
     }
 
+    @Test func theNotchShowsThePRNumberUntilAnotherLabelIsChosen() {
+        let scratch = ScratchDefaults()
+        #expect(AppSettings(defaults: scratch.defaults).liveCILabel == .number)
+        AppSettings(defaults: scratch.defaults).liveCILabel = .both
+        #expect(AppSettings(defaults: scratch.defaults).liveCILabel == .both)
+    }
+
     @Test func soundsChosenPerKindAreRemembered() {
         let scratch = ScratchDefaults()
         AppSettings(defaults: scratch.defaults).categorySounds = [.ciFailed: "Basso", .ciPassed: ""]

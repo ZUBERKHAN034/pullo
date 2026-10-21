@@ -8,7 +8,9 @@ struct AppearancePage: View {
         Form {
             if PanelStyle.glassIsAvailable {
                 Section {
-                    PanelStylePicker(selection: $settings.panelStyle)
+                    PreviewPicker(options: PanelStyle.allCases, selection: $settings.panelStyle, title: \.title) { style in
+                        PanelStylePreview(style: style)
+                    }
                 } header: {
                     Text("Style")
                 } footer: {
@@ -18,8 +20,13 @@ struct AppearancePage: View {
             Section {
                 Toggle("Show CI progress on the notch", isOn: $settings.showsLiveCI)
                     .toggleStyle(.switch)
+                if settings.showsLiveCI {
+                    PreviewPicker(options: LiveCILabel.allCases, selection: $settings.liveCILabel, title: \.title) { label in
+                        LiveCIPreview(label: label)
+                    }
+                }
             } footer: {
-                Text("While checks run on your pull requests, the notch widens to show how many are done.")
+                Text("While checks run on your pull requests, the notch widens to show their progress.")
             }
         }
     }

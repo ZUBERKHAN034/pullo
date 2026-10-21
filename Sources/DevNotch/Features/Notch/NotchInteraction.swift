@@ -53,10 +53,13 @@ final class NotchInteraction {
 
     var liveCI: LiveCI? {
         guard geometry.hasNotch, settings.showsLiveCI else { return nil }
-        if let finishedCI { return finishedCI }
+        if var finishedCI {
+            finishedCI.label = settings.liveCILabel
+            return finishedCI
+        }
         let logins = accounts.accounts.map(\.login).filter { !settings.mutedAccounts.contains($0) }
         let running = list.store.runningCI(for: logins)
-        return running.first.map { LiveCI(pr: $0, othersRunning: running.count - 1) }
+        return running.first.map { LiveCI(pr: $0, othersRunning: running.count - 1, label: settings.liveCILabel) }
     }
 
     // MARK: - Pointer
