@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <sub>Free and open source · macOS 14 or later · Apple silicon · English, Português, Español</sub>
+  <sub><a href="https://pullo.jrdan.dev">pullo.jrdan.dev</a> · Free and open source · macOS 14 or later · Apple silicon · English, Português, Español</sub>
 </p>
 
 <p align="center">

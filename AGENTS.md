@@ -16,6 +16,10 @@
 - A copy is still attached to each release for installs older than 0.6.1, which read it from the latest release.
 - The stable `X.Y.Z` release lists everything since the previous stable release, betas included.
 
+## Website
+- `site/` is the product page at https://pullo.jrdan.dev, a Cloudflare Worker with static assets. Deploy it with `npx wrangler deploy` from `site/`.
+- The Worker also serves `/appcast.xml`, passed through from the GitHub Pages feed, so the release workflow stays the same.
+
 ## Code
 - No comments in code, except `// MARK:`.
 - Commit messages and pull requests in English.
