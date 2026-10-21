@@ -4,6 +4,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-20
+
 ### Added
 - Each kind of alert can play its own sound, so you can tell a failed CI from an approval without looking. Set it in Settings → Alerts.
 - Alerts that arrive during a Focus are no longer lost. When the Focus ends, DevNotch shows them together in one alert.
@@ -90,7 +92,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0
 [0.6.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.0-beta.1...v0.6.0-beta.2
 [0.6.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0-beta.1
 [0.5.0]: https://github.com/jordan-cod/devnotch/compare/v0.4.0...v0.5.0
