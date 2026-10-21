@@ -4,8 +4,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 
 ## [Unreleased]
 
-### Fixed
-- The glass panel stays dark and readable when your Mac uses Light mode.
+## [0.7.0] - 2026-10-21
 
 ### Added
 - Ready-made searches to start a tab from, like Ready to merge, Failing checks or Mentions me, in Settings → Tabs → Add tab and in the tab editor.
@@ -138,7 +137,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.6.2...HEAD
+[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/jordan-cod/devnotch/compare/v0.6.2...v0.7.0
 [0.7.0-beta.3]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.2...v0.7.0-beta.3
 [0.7.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.1...v0.7.0-beta.2
 [0.6.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.1...v0.6.2
