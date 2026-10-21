@@ -17,11 +17,11 @@ struct GeneralPage: View {
                 }
             }
             Section {
-                LabeledContent("Quit DevNotch") {
+                LabeledContent("Quit Pullo") {
                     Button("Quit", role: .destructive) { system.quit() }
                 }
             } footer: {
-                Text("DevNotch lives in the notch and has no Dock icon, so this is the way to quit it.")
+                Text("Pullo lives in the notch and has no Dock icon, so this is the way to quit it.")
             }
         }
     }

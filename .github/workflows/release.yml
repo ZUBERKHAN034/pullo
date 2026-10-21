@@ -1,6 +1,6 @@
 name: Release
 
-# Pushing a tag like v0.2.0 builds DevNotch, signs it with Developer ID, notarizes it, and publishes it
+# Pushing a tag like v0.2.0 builds Pullo, signs it with Developer ID, notarizes it, and publishes it
 # as a GitHub release along with the updated Sparkle feed, which is where installed copies look for updates.
 on:
   push:
@@ -49,7 +49,7 @@ jobs:
           printf '%s\n' "$NOTES" > "$RUNNER_TEMP/notes.md"
           gh api markdown -f text="$NOTES" -f mode=markdown \
             | sed -E 's#<a id="user-content-[^"]*"[^>]*><span[^>]*></span></a>##g' \
-            > "$RUNNER_TEMP/feed/DevNotch-$VERSION.html"
+            > "$RUNNER_TEMP/feed/Pullo-$VERSION.html"
 
       - name: Test
         run: swift test
@@ -109,13 +109,13 @@ jobs:
             -exportPath "$RUNNER_TEMP/export"
 
       - name: Drop Intel slices from Sparkle
-        run: .github/thin-sparkle.sh "$RUNNER_TEMP/export/DevNotch.app"
+        run: .github/thin-sparkle.sh "$RUNNER_TEMP/export/Pullo.app"
 
       - name: Notarize the app
         env:
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
-          APP="$RUNNER_TEMP/export/DevNotch.app"
+          APP="$RUNNER_TEMP/export/Pullo.app"
           echo "$API_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/api_key.p8"
           ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/notarize.zip"
           xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
@@ -127,21 +127,22 @@ jobs:
       - name: Package the update
         run: |
           mkdir -p "$RUNNER_TEMP/feed"
-          ditto -c -k --keepParent "$RUNNER_TEMP/export/DevNotch.app" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip"
+          ditto -c -k --keepParent "$RUNNER_TEMP/export/Pullo.app" "$RUNNER_TEMP/feed/Pullo-$VERSION.zip"
 
       # People download the disk image; it's signed and notarized on its own so Gatekeeper accepts it before it's opened.
       - name: Disk image
         run: |
           python3 -m venv "$RUNNER_TEMP/dmgbuild"
           "$RUNNER_TEMP/dmgbuild/bin/pip" install --quiet dmgbuild
-          DMG="$RUNNER_TEMP/DevNotch.dmg"
+          DMG="$RUNNER_TEMP/Pullo.dmg"
           "$RUNNER_TEMP/dmgbuild/bin/dmgbuild" -s .github/dmg-settings.py \
-            -D app="$RUNNER_TEMP/export/DevNotch.app" "DevNotch" "$DMG"
+            -D app="$RUNNER_TEMP/export/Pullo.app" "Pullo" "$DMG"
           codesign --sign "Developer ID Application" --timestamp "$DMG"
           xcrun notarytool submit "$DMG" \
             --key "$RUNNER_TEMP/api_key.p8" --key-id "$API_KEY_ID" --issuer "$API_ISSUER_ID" --wait
           xcrun stapler staple "$DMG"
           spctl --assess --type open --context context:primary-signature --verbose "$DMG"
+          cp "$DMG" "$RUNNER_TEMP/DevNotch.dmg"
           rm "$RUNNER_TEMP/api_key.p8"
 
       - name: Update the Sparkle feed
@@ -164,8 +165,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "v$VERSION" ${CHANNEL:+--prerelease} \
-            --title "DevNotch $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
-            "$RUNNER_TEMP/DevNotch.dmg" "$RUNNER_TEMP/feed/DevNotch-$VERSION.zip" "$RUNNER_TEMP/feed/appcast.xml"
+            --title "Pullo $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
+            "$RUNNER_TEMP/Pullo.dmg" "$RUNNER_TEMP/DevNotch.dmg" "$RUNNER_TEMP/feed/Pullo-$VERSION.zip" "$RUNNER_TEMP/feed/appcast.xml"
 
       - name: Publish the feed
         env:

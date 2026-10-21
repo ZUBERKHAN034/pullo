@@ -21,7 +21,7 @@ struct ShortcutsPage: View {
                 row("Mark as read", "R")
                 row("Switch account", "⌘1 – ⌘9")
                 row("Clear the search, or close", "esc")
-                row("Quit DevNotch", "⌘Q")
+                row("Quit Pullo", "⌘Q")
             }
         }
     }

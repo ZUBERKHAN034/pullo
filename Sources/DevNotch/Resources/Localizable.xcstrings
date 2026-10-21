@@ -1447,73 +1447,6 @@
         }
       }
     },
-    "DevNotch": {
-      "shouldTranslate": false
-    },
-    "DevNotch Settings": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes de DevNotch"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes do DevNotch"
-          }
-        }
-      }
-    },
-    "DevNotch lives in the notch and has no Dock icon, so this is the way to quit it.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DevNotch vive en el notch y no tiene icono en el Dock, así que desde aquí puedes salir."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O DevNotch fica no notch e não tem ícone no Dock, então é por aqui que você sai dele."
-          }
-        }
-      }
-    },
-    "DevNotch reads tokens from the GitHub CLI when it needs them and never stores them.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DevNotch lee los tokens de GitHub CLI cuando los necesita y nunca los guarda."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O DevNotch lê os tokens do GitHub CLI quando precisa e nunca os guarda."
-          }
-        }
-      }
-    },
-    "DevNotch uses the accounts you're already logged into with `gh`. No token is stored.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DevNotch usa las cuentas con las que ya iniciaste sesión en `gh`. No se guarda ningún token."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O DevNotch usa as contas em que você já está logado no `gh`. Nenhum token é guardado."
-          }
-        }
-      }
-    },
     "Draft": {
       "localizations": {
         "es": {
@@ -2256,18 +2189,18 @@
         }
       }
     },
-    "Matches %lld of the %lld runs DevNotch sees right now.": {
+    "Matches %lld of the %lld runs Pullo sees right now.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coincide con %1$lld de las %2$lld ejecuciones que DevNotch ve ahora."
+            "value": "Coincide con %1$lld de las %2$lld ejecuciones que Pullo ve ahora."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bate com %1$lld das %2$lld execuções que o DevNotch vê agora."
+            "value": "Bate com %1$lld das %2$lld execuções que o Pullo vê agora."
           }
         }
       }
@@ -3056,6 +2989,73 @@
         }
       }
     },
+    "Pullo": {
+      "shouldTranslate": false
+    },
+    "Pullo Settings": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes de Pullo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes do Pullo"
+          }
+        }
+      }
+    },
+    "Pullo lives in the notch and has no Dock icon, so this is the way to quit it.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pullo vive en el notch y no tiene icono en el Dock, así que desde aquí puedes salir."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Pullo fica no notch e não tem ícone no Dock, então é por aqui que você sai dele."
+          }
+        }
+      }
+    },
+    "Pullo reads tokens from the GitHub CLI when it needs them and never stores them.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pullo lee los tokens de GitHub CLI cuando los necesita y nunca los guarda."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Pullo lê os tokens do GitHub CLI quando precisa e nunca os guarda."
+          }
+        }
+      }
+    },
+    "Pullo uses the accounts you're already logged into with `gh`. No token is stored.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pullo usa las cuentas con las que ya iniciaste sesión en `gh`. No se guarda ningún token."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Pullo usa as contas em que você já está logado no `gh`. Nenhum token é guardado."
+          }
+        }
+      }
+    },
     "Push": {
       "localizations": {
         "es": {
@@ -3104,18 +3104,18 @@
         }
       }
     },
-    "Quit DevNotch": {
+    "Quit Pullo": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Salir de DevNotch"
+            "value": "Salir de Pullo"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sair do DevNotch"
+            "value": "Sair do Pullo"
           }
         }
       }
@@ -4112,18 +4112,18 @@
         }
       }
     },
-    "Updates are signed and notarized by Apple, and installed when you quit DevNotch.": {
+    "Updates are signed and notarized by Apple, and installed when you quit Pullo.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las actualizaciones están firmadas y notarizadas por Apple, y se instalan al salir de DevNotch."
+            "value": "Las actualizaciones están firmadas y notarizadas por Apple, y se instalan al salir de Pullo."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "As atualizações são assinadas e notarizadas pela Apple e instaladas quando você sai do DevNotch."
+            "value": "As atualizações são assinadas e notarizadas pela Apple e instaladas quando você sai do Pullo."
           }
         }
       }
@@ -4224,34 +4224,34 @@
         }
       }
     },
-    "Watched by DevNotch": {
+    "Watched by Pullo": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vigilados por DevNotch"
+            "value": "Vigilados por Pullo"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acompanhados pelo DevNotch"
+            "value": "Acompanhados pelo Pullo"
           }
         }
       }
     },
-    "Welcome to DevNotch": {
+    "Welcome to Pullo": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Te damos la bienvenida a DevNotch"
+            "value": "Te damos la bienvenida a Pullo"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Boas-vindas ao DevNotch"
+            "value": "Boas-vindas ao Pullo"
           }
         }
       }

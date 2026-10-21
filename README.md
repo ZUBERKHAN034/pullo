@@ -1,8 +1,10 @@
-# DevNotch
+# Pullo
 
-DevNotch is a macOS app that puts your GitHub pull requests in the notch. It lets you know when CI fails, when someone approves or comments, and when your review is requested.
+_Formerly DevNotch._
 
-<img src="docs/media/demo.gif" alt="DevNotch showing an alert and the list of pull requests" width="720">
+Pullo is a macOS app that puts your GitHub pull requests in the notch. It lets you know when CI fails, when someone approves or comments, and when your review is requested.
+
+<img src="docs/media/demo.gif" alt="Pullo showing an alert and the list of pull requests" width="720">
 
 Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI](https://cli.github.com). Available in English, Portuguese (Brazil) and Spanish.
 
@@ -22,8 +24,8 @@ Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI
 
 ## Installation
 
-1. Download [`DevNotch.dmg`](https://github.com/jordan-cod/devnotch/releases/latest/download/DevNotch.dmg) from the latest release.
-2. Open it and drag DevNotch to your Applications folder.
+1. Download the [disk image](https://github.com/jordan-cod/devnotch/releases/latest/download/Pullo.dmg) from the latest release.
+2. Open it and drag Pullo to your Applications folder.
 3. If you don't have the GitHub CLI yet, install it and log in:
 
    ```sh
@@ -33,7 +35,7 @@ Requires a Mac with Apple silicon running macOS 14 or later, and the [GitHub CLI
 
 ## Usage
 
-1. Open DevNotch and hover over the notch.
+1. Open Pullo and hover over the notch.
 2. Pick which `gh` accounts to add.
 3. Hover over the notch to see your pull requests, or press <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>P</kbd> from any app.
 4. Click a pull request to open it in your browser. Opening it marks it as read.
@@ -82,7 +84,7 @@ Turn on **Get beta versions** in Settings → Updates. Betas may have bugs. If y
 
 ### Why does it need the GitHub CLI?
 
-So it never has to store a token. DevNotch asks `gh` for a token on each refresh and keeps it in memory only. There's no server and no sign-up: the app talks to the GitHub API directly.
+So it never has to store a token. Pullo asks `gh` for a token on each refresh and keeps it in memory only. There's no server and no sign-up: the app talks to the GitHub API directly.
 
 ### How do I add another account?
 
@@ -90,7 +92,7 @@ Run `gh auth login` with the other account, then add it in Settings › Accounts
 
 ### Does it work with external displays or Macs without a notch?
 
-DevNotch stays on your Mac's built-in screen, under the notch, even with other displays plugged in. On a Mac without a notch, or with the lid closed, it moves to the main display: hover over the top center of the menu bar.
+Pullo stays on your Mac's built-in screen, under the notch, even with other displays plugged in. On a Mac without a notch, or with the lid closed, it moves to the main display: hover over the top center of the menu bar.
 
 ### How often does it refresh?
 

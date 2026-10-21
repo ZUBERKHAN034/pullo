@@ -12,7 +12,7 @@ struct AccountSwitcher: View {
             if accounts.accounts.isEmpty {
                 Image(systemName: "arrow.triangle.pull")
                     .font(.panel(.small, .semibold))
-                Text("DevNotch")
+                Text("Pullo")
                     .font(.panel(.label, .semibold))
             }
             ForEach(accounts.accounts) { account in

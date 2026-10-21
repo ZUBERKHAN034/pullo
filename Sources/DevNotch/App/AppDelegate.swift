@@ -49,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             app.notch.enqueue(NotchAlert(
                 symbol: "hand.wave.fill",
                 tint: .blue,
-                headline: String(localized: "Welcome to DevNotch"),
+                headline: String(localized: "Welcome to Pullo"),
                 detail: String(localized: "Hover here to connect GitHub")
             ))
         }

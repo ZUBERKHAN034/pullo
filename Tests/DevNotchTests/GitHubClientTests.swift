@@ -23,7 +23,7 @@ struct GitHubClientTests {
         _ = try await client.fetchUser()
         let request = try #require(StubURLProtocol.lastRequest(token: token))
         #expect(request.value(forHTTPHeaderField: "Authorization") == "bearer \(token)")
-        #expect(request.value(forHTTPHeaderField: "User-Agent") == "DevNotch")
+        #expect(request.value(forHTTPHeaderField: "User-Agent") == "Pullo")
     }
 
     @Test func readsTheUserProfile() async throws {

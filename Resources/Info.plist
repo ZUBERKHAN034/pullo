@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>DevNotch</string>
+	<string>Pullo</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleName</key>
-	<string>DevNotch</string>
+	<string>Pullo</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -25,7 +25,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSFocusStatusUsageDescription</key>
-	<string>DevNotch holds its alerts while a Focus is on.</string>
+	<string>Pullo holds its alerts while a Focus is on.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>SUEnableAutomaticChecks</key>
