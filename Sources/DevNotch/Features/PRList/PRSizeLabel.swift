@@ -10,7 +10,7 @@ struct PRSizeLabel: View {
         }
         .font(.panel(.caption, .medium).monospacedDigit())
         .fixedSize()
-        .hint(String(localized: "+\(size.additions) −\(size.deletions) · \(size.changedFiles) files changed"), edge: .leading)
+        .hint(String(localized: "+\(size.additions) −\(size.deletions) · \(size.changedFiles) files changed"))
         .accessibilityLabel(String(localized: "\(size.additions) lines added, \(size.deletions) removed, \(size.changedFiles) files"))
     }
 

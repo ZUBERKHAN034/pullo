@@ -124,7 +124,7 @@ struct PRRow: View {
                 Text(ageDate.shortAge)
                     .font(.panel(.small, .medium).monospacedDigit())
                     .foregroundStyle(.textSecondary)
-                    .hint(ageHelp, edge: .leading)
+                    .hint(ageHelp)
             }
             .frame(minWidth: 34, alignment: .trailing)
         }

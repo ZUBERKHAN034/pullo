@@ -39,7 +39,7 @@ struct RunDetail: View {
                 .contentShape(Capsule())
             }
             .buttonStyle(.plain)
-            .hint(String(localized: "Back to the runs"), edge: .leading)
+            .hint(String(localized: "Back to the runs"))
             Spacer()
             if canRerun {
                 RunActionButton(
@@ -212,7 +212,7 @@ private struct JobRow: View {
         }
         .buttonStyle(.plain)
         .disabled(job.url == nil)
-        .hint(String(localized: "Open the job log"), edge: .leading)
+        .hint(String(localized: "Open the job log"))
     }
 
     private var detail: String? {

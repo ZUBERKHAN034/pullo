@@ -42,7 +42,7 @@ struct RunRow: View {
         .animation(Motion.hover, value: hovering)
         .onTapGesture { actions.open(run) }
         .onDrag { run.dragItem }
-        .hint(run.title, edge: .leading)
+        .hint(run.title)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { actions.open(run) }
