@@ -44,6 +44,6 @@ struct NotchBackground<S: Shape>: View {
     private var fadeRadius: CGFloat { max(blackRadius + 120 * scale, height * 1.2) }
 
     private var usesGlass: Bool {
-        currentStyle.isGlass && PanelStyle.glassIsAvailable && !reduceTransparency
+        currentStyle.usesGlass(reduceTransparency: reduceTransparency)
     }
 }

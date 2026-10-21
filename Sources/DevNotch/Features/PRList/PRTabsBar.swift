@@ -15,6 +15,7 @@ struct PRTabsBar: View {
                             tabButton(tab).id(tab)
                         }
                     }
+                    .glassGroup(spacing: 4)
                 }
                 .onChange(of: list.tab) { _, tab in
                     withAnimation(Motion.navigate) { proxy.scrollTo(tab) }
@@ -22,7 +23,7 @@ struct PRTabsBar: View {
             }
             SearchTrigger(action: list.startSearch)
             if unreadCount(in: list.tab) > 0 {
-                IconButton(symbol: "envelope.open", help: String(localized: "Mark all as read"), action: list.markAllRead)
+                IconButton(symbol: "envelope.open", help: String(localized: "Mark all as read"), floating: true, action: list.markAllRead)
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
             }
         }
@@ -45,11 +46,11 @@ struct PRTabsBar: View {
             .padding(.vertical, 6)
             .background {
                 if selected {
-                    Capsule()
-                        .fill(.surface)
+                    SelectionCapsule()
                         .matchedGeometryEffect(id: "tab", in: selection)
                 }
             }
+            .panelGlass(selected, in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)

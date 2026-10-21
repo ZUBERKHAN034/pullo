@@ -9,6 +9,10 @@ enum PanelStyle: String, CaseIterable {
 
     var isGlass: Bool { self != .solid }
 
+    func usesGlass(reduceTransparency: Bool) -> Bool {
+        isGlass && Self.glassIsAvailable && !reduceTransparency
+    }
+
     var title: String {
         switch self {
         case .solid: String(localized: "Solid")

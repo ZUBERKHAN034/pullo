@@ -42,11 +42,11 @@ struct AccountSwitcher: View {
                     .padding(.vertical, 3)
                     .background {
                         if selected {
-                            Capsule()
-                                .fill(.surfaceStrong)
+                            SelectionCapsule(fill: .surfaceStrong)
                                 .matchedGeometryEffect(id: "account", in: selection)
                         }
                     }
+                    .panelGlass(selected, in: Capsule())
                     .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
@@ -54,6 +54,7 @@ struct AccountSwitcher: View {
             }
         }
         .foregroundStyle(.textStrong)
+        .glassGroup(spacing: 4)
     }
 
     private func hasUnread(_ login: String) -> Bool {

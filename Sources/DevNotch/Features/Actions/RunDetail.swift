@@ -69,6 +69,7 @@ struct RunDetail: View {
                 notch.openInBrowser(run.url)
             }
         }
+        .glassGroup(spacing: 6)
     }
 
     private var canRerun: Bool {
@@ -299,6 +300,7 @@ private struct JobStatusIcon: View {
 }
 
 private struct RunActionButton: View {
+    @Environment(\.panelGlass) private var glass
     let title: String
     let symbol: String
     var tint: Color?
@@ -324,7 +326,12 @@ private struct RunActionButton: View {
             .foregroundStyle(tint ?? .textStrong)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(Capsule().fill(hovering ? Color.surfaceStrong : .surface))
+            .background {
+                if !glass {
+                    Capsule().fill(hovering ? Color.surfaceStrong : .surface)
+                }
+            }
+            .panelGlass(in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)

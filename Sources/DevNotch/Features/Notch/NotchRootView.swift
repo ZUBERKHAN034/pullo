@@ -3,6 +3,8 @@ import SwiftUI
 struct NotchRootView: View {
     @Environment(NotchInteraction.self) private var notch
     @Environment(AccountStore.self) private var accounts
+    @Environment(AppSettings.self) private var settings
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
         let state = notch.state
@@ -20,6 +22,7 @@ struct NotchRootView: View {
         .opacity(state == .closed && !notch.geometry.hasNotch ? 0 : 1)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .animation(Motion.peek, value: notch.liveCI)
+        .environment(\.panelGlass, settings.panelStyle.usesGlass(reduceTransparency: reduceTransparency))
     }
 
     private func panel(state: NotchState, size: CGSize, radii: (top: CGFloat, bottom: CGFloat), shape: NotchShape) -> some View {

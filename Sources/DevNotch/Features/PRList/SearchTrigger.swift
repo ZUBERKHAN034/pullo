@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SearchTrigger: View {
+    @Environment(\.panelGlass) private var glass
     let action: () -> Void
     @State private var hovering = false
 
@@ -19,8 +20,13 @@ struct SearchTrigger: View {
             .foregroundStyle(hovering ? .textStrong : .textSecondary)
             .padding(.horizontal, 10)
             .frame(width: 128, height: 26)
-            .background(Capsule().fill(hovering ? .surface : .surfaceSubtle))
-            .overlay(Capsule().strokeBorder(.hairline, lineWidth: 1))
+            .background {
+                if !glass {
+                    Capsule().fill(hovering ? .surface : .surfaceSubtle)
+                        .overlay(Capsule().strokeBorder(.hairline, lineWidth: 1))
+                }
+            }
+            .panelGlass(in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
