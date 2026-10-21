@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         app.store.start()
+        app.runs.start()
         if app.accounts.accounts.isEmpty { greetFirstLaunch() } else { app.system.requestFocusAccess() }
         panel.startListening()
         NSWorkspace.shared.notificationCenter.addObserver(
@@ -38,6 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { [app] in
             try? await Task.sleep(for: .seconds(3))
             await app.store.refresh()
+            await app.runs.refresh()
         }
     }
 

@@ -28,10 +28,18 @@ final class NotchHarness {
     let store: PRStore
     let list: PRListModel
     let notch: NotchInteraction
+    let runs: RunStore
+    let actions: ActionsModel
+    var now = Date(timeIntervalSince1970: 1_000_000)
     private let scratch = ScratchDefaults()
     var defaults: UserDefaults { scratch.defaults }
 
-    init(accounts logins: [String] = ["me"], mine: [PullRequest] = [], review: [PullRequest] = []) async {
+    init(
+        accounts logins: [String] = ["me"],
+        mine: [PullRequest] = [],
+        review: [PullRequest] = [],
+        runSource: RunSource = NoRuns()
+    ) async {
         let defaults = scratch.defaults
         defaults.set(try? JSONEncoder().encode(logins.map { Account(login: $0, avatarURL: nil) }), for: .accounts)
         accounts = AccountStore(defaults: defaults)
@@ -54,6 +62,10 @@ final class NotchHarness {
             ),
             clock: clock
         )
+        var clockNow: () -> Date = { Date() }
+        runs = RunStore(accounts: accounts, prs: store, source: runSource) { clockNow() }
+        actions = ActionsModel(store: runs, list: list)
+        clockNow = { [unowned self] in now }
         await store.refresh()
     }
 

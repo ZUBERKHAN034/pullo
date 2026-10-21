@@ -116,6 +116,22 @@
     "%lld": {
       "shouldTranslate": false
     },
+    "%lld failed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fallaron"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld falharam"
+          }
+        }
+      }
+    },
     "%lld lines added, %lld removed, %lld files": {
       "localizations": {
         "es": {
@@ -208,6 +224,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld atualizações"
+          }
+        }
+      }
+    },
+    "%lld/%lld jobs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld/%2$lld jobs"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld/%2$lld jobs"
           }
         }
       }
@@ -759,6 +791,22 @@
         }
       }
     },
+    "Cancelled": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelada"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelada"
+          }
+        }
+      }
+    },
     "Changes requested": {
       "localizations": {
         "es": {
@@ -835,6 +883,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verificando o CI…"
+          }
+        }
+      }
+    },
+    "Checking the repositories you pushed to and your open pull requests.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisando los repositorios donde hiciste push y tus pull requests abiertos."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Olhando os repositórios onde você deu push e seus pull requests abertos."
           }
         }
       }
@@ -1370,6 +1434,22 @@
         }
       }
     },
+    "Failed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falló"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falhou"
+          }
+        }
+      }
+    },
     "Failing checks": {
       "localizations": {
         "es": {
@@ -1676,6 +1756,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Acabou de entrar no gh?"
+          }
+        }
+      }
+    },
+    "Looking for your runs…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscando tus ejecuciones…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Procurando suas execuções…"
           }
         }
       }
@@ -2016,18 +2112,18 @@
         }
       }
     },
-    "No runs yet": {
+    "No runs here": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aún no hay ejecuciones"
+            "value": "No hay ejecuciones aquí"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nenhuma execução ainda"
+            "value": "Nenhuma execução aqui"
           }
         }
       }
@@ -2336,6 +2432,22 @@
         }
       }
     },
+    "Queued": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En cola"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na fila"
+          }
+        }
+      }
+    },
     "Quit": {
       "localizations": {
         "es": {
@@ -2396,6 +2508,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pronto para o merge"
+          }
+        }
+      }
+    },
+    "Recent": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recientes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recentes"
           }
         }
       }
@@ -2608,6 +2736,38 @@
         }
       }
     },
+    "Running": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En ejecución"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rodando"
+          }
+        }
+      }
+    },
+    "Runs of workflows with “deploy” in their name show up here.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aquí aparecen las ejecuciones de workflows con “deploy” en el nombre."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aqui aparecem as execuções de workflows com “deploy” no nome."
+          }
+        }
+      }
+    },
     "Save": {
       "localizations": {
         "es": {
@@ -2780,6 +2940,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar o progresso do CI no notch"
+          }
+        }
+      }
+    },
+    "Skipped": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omitida"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulada"
           }
         }
       }
@@ -3024,6 +3200,22 @@
         }
       }
     },
+    "Took %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tardó %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Levou %@"
+          }
+        }
+      }
+    },
     "Try again": {
       "localizations": {
         "es": {
@@ -3116,6 +3308,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pelo time"
+          }
+        }
+      }
+    },
+    "Waiting for approval": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando aprobación"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aguardando aprovação"
           }
         }
       }
@@ -3216,18 +3424,34 @@
         }
       }
     },
-    "Workflow runs from your repositories will show up here.": {
+    "Workflow runs from the repositories you work on show up here.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las ejecuciones de workflows de tus repositorios aparecerán aquí."
+            "value": "Aquí aparecen las ejecuciones de workflows de los repositorios en los que trabajas."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "As execuções de workflow dos seus repositórios vão aparecer aqui."
+            "value": "Aqui aparecem as execuções de workflow dos repositórios em que você trabalha."
+          }
+        }
+      }
+    },
+    "Workflow runs you start in the repositories you work on show up here.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aquí aparecen las ejecuciones de workflows que inicias en los repositorios en los que trabajas."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aqui aparecem as execuções de workflow que você inicia nos repositórios em que trabalha."
           }
         }
       }
