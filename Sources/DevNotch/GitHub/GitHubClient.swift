@@ -101,27 +101,42 @@ struct GitHubClient {
         return GitHubUser(login: payload.login, avatarURL: payload.avatar_url)
     }
 
-    private func request(for url: URL) -> URLRequest {
+    func request(for url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("DevNotch", forHTTPHeaderField: "User-Agent")
         return request
     }
 
-    private func send(_ request: URLRequest) async throws -> Data {
+    func send(_ request: URLRequest) async throws -> Data {
+        try await perform(request).data
+    }
+
+    func conditionalGet(_ url: URL, etag: String?) async throws -> Fetched<Data> {
+        var request = request(for: url)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        if let etag { request.setValue(etag, forHTTPHeaderField: "If-None-Match") }
+        let (data, response) = try await perform(request, allowing: etag == nil ? [] : [304])
+        if response.statusCode == 304 { return .notModified }
+        return .fresh(data, etag: response.value(forHTTPHeaderField: "ETag"))
+    }
+
+    private func perform(_ request: URLRequest, allowing allowed: Set<Int> = []) async throws -> (data: Data, response: HTTPURLResponse) {
         let (data, response) = try await session.data(for: request)
-        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let http = response as? HTTPURLResponse
+        let status = http?.statusCode ?? 0
+        if allowed.contains(status), let http { return (data, http) }
         if !(200..<300).contains(status) {
             Logger.github.error("\(request.url?.path() ?? "", privacy: .public) returned \(status)")
         }
         if status == 401 { throw GitHubError.unauthorized }
-        guard (200..<300).contains(status) else {
+        guard (200..<300).contains(status), let http else {
             struct Failure: Decodable { let message: String }
             if let failure = try? JSONDecoder().decode(Failure.self, from: data) {
                 throw GitHubError.api(failure.message)
             }
             throw GitHubError.http(status)
         }
-        return data
+        return (data, http)
     }
 }

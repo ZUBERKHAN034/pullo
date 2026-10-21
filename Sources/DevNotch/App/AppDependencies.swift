@@ -10,7 +10,8 @@ final class AppDependencies {
     let store: PRStore
     let list: PRListModel
     let notch: NotchInteraction
-    let actions = ActionsModel()
+    let runs: RunStore
+    let actions: ActionsModel
     let updater: Updater?
     let system: any SystemActions = LiveSystemActions()
 
@@ -24,6 +25,8 @@ final class AppDependencies {
         tracker = ReadTracker(defaults: defaults)
         store = PRStore(accounts: accounts, tracker: tracker, source: demo?.source ?? GitHubSource(tokens: tokens))
         list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system)
+        runs = RunStore(accounts: accounts, prs: store, source: demo == nil ? GitHubRunSource(tokens: tokens) : NoRuns())
+        actions = ActionsModel(store: runs, list: list)
         notch = NotchInteraction(
             list: list,
             accounts: accounts,
@@ -53,7 +56,10 @@ final class AppDependencies {
             guard let self else { return }
             notch.accountConnected(account)
             system.requestFocusAccess()
-            Task { await self.store.refresh() }
+            Task {
+                await self.store.refresh()
+                await self.runs.refresh()
+            }
         }
         accounts.onFiltersChanged = { [weak self] _ in
             guard let self else { return }
@@ -63,7 +69,10 @@ final class AppDependencies {
             guard let self else { return }
             tracker.forget(account: account.login)
             settings.mutedAccounts.remove(account.login)
-            Task { await self.store.refresh() }
+            Task {
+                await self.store.refresh()
+                await self.runs.refresh()
+            }
         }
     }
 }
