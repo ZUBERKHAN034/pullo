@@ -13,6 +13,15 @@ struct SavedFilterTests {
         #expect(filter.searchQuery == "is:pr archived:false repo:acme/api is:merged sort:created-asc")
     }
 
+    @Test func lineBreaksInTheSearchAreJustSpaces() {
+        let filter = SavedFilter(name: "Bugs", query: "repo:acme/api\n  label:bug")
+        #expect(filter.searchQuery == "is:pr archived:false is:open repo:acme/api label:bug sort:updated-desc")
+        var mine = SavedFilter.builtIn(.mine)
+        mine.query = " author:@me\n"
+        #expect(mine.usesBuiltInSearch)
+        #expect(!SavedFilter(name: "API", query: "\n").isComplete)
+    }
+
     @Test func needsANameAndAQuery() {
         #expect(!SavedFilter(name: "", query: "repo:acme/api").isComplete)
         #expect(!SavedFilter(name: "API", query: " ").isComplete)

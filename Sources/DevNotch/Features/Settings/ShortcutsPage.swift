@@ -14,7 +14,7 @@ struct ShortcutsPage: View {
             Section("In the panel") {
                 row("Move through PRs", "↑ ↓")
                 row("Open the selected PR", "↩")
-                row("Switch between My PRs and To review", String(localized: "⇥  or  ← →"))
+                row("Switch tabs", String(localized: "⇥  or  ← →"))
                 row("Search PRs", "⌘F")
                 row("Copy the branch name", "C")
                 row("Mark as read", "R")

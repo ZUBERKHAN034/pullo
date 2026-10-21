@@ -8,11 +8,16 @@ struct PRTabsBar: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 4) {
-                    ForEach(list.tabs, id: \.self) { tab in
-                        tabButton(tab)
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(list.tabs, id: \.self) { tab in
+                            tabButton(tab).id(tab)
+                        }
                     }
+                }
+                .onChange(of: list.tab) { _, tab in
+                    withAnimation(Motion.navigate) { proxy.scrollTo(tab) }
                 }
             }
             SearchTrigger(action: list.startSearch)

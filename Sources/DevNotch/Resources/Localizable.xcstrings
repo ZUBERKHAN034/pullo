@@ -2592,18 +2592,18 @@
         }
       }
     },
-    "Switch between My PRs and To review": {
+    "Switch tabs": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cambiar entre Mis PR y Por revisar"
+            "value": "Cambiar de pestaña"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alternar entre Meus PRs e Para revisar"
+            "value": "Trocar de aba"
           }
         }
       }

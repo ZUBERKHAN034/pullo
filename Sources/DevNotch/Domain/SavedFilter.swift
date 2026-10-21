@@ -30,16 +30,20 @@ struct SavedFilter: Identifiable, Codable, Equatable, Hashable {
 
     static var defaults: [SavedFilter] { [.builtIn(.mine), .builtIn(.review)] }
 
+    private var typedQuery: String {
+        query.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    }
+
     var usesBuiltInSearch: Bool {
-        preset.map { query.trimmingCharacters(in: .whitespacesAndNewlines) == $0.query } ?? false
+        preset.map { typedQuery == $0.query } ?? false
     }
 
     var isComplete: Bool {
-        !name.trimmingCharacters(in: .whitespaces).isEmpty && !query.trimmingCharacters(in: .whitespaces).isEmpty
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !typedQuery.isEmpty
     }
 
     var searchQuery: String {
-        let typed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let typed = typedQuery
         let lowered = typed.lowercased()
         let pickedState = ["is:open", "is:closed", "is:merged", "is:unmerged", "state:"].contains { lowered.contains($0) }
         var parts = ["is:pr", "archived:false"]

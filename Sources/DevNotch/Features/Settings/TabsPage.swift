@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-struct FiltersPage: View {
+struct TabsPage: View {
     @Environment(AccountStore.self) private var accounts
     @State private var chosenLogin: String?
     @State private var editing: SavedFilter?
@@ -21,13 +21,13 @@ struct FiltersPage: View {
                         }
                     }
                 }
-                filtersSection(for: login)
+                tabsSection(for: login)
             } else {
                 Text("Add an account first.").foregroundStyle(.secondary)
             }
         }
         .sheet(item: $editing) { filter in
-            FilterEditor(filter: filter) { saved in
+            TabEditor(filter: filter) { saved in
                 guard let login else { return }
                 var filters = accounts.filters(for: login)
                 if let index = filters.firstIndex(where: { $0.id == saved.id }) {
@@ -40,7 +40,7 @@ struct FiltersPage: View {
         }
     }
 
-    private func filtersSection(for login: String) -> some View {
+    private func tabsSection(for login: String) -> some View {
         let filters = accounts.filters(for: login)
         let missingPresets = ([.mine, .review] as [SavedFilter.Preset]).filter { preset in !filters.contains { $0.preset == preset } }
         return Section {
@@ -97,7 +97,7 @@ struct FiltersPage: View {
     }
 }
 
-private struct FilterEditor: View {
+private struct TabEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.system) private var system
     @State var filter: SavedFilter
@@ -126,7 +126,7 @@ private struct FilterEditor: View {
                         )
                         Spacer()
                         Button("Preview on GitHub") { filter.webURL.map(system.open) }
-                            .disabled(filter.query.trimmingCharacters(in: .whitespaces).isEmpty)
+                            .disabled(filter.query.allSatisfy(\.isWhitespace))
                     }
                     .font(.caption)
                 }

@@ -45,7 +45,7 @@ struct PRBrowser: View {
                 detail: error,
                 actionTitle: "Edit tab"
             ) {
-                notch.onOpenSettings?(.filters)
+                notch.onOpenSettings?(.tabs)
             }
             .id("\(login)|\(list.tab)")
         } else if list.visiblePRs.isEmpty {
@@ -108,7 +108,7 @@ struct PRBrowser: View {
             return PRSection(title: list.title(of: tab), kind: tab, prs: prs)
         }
         let rest = results.filter { !placed.contains($0.id) }
-        return (sections + [PRSection(title: String(localized: "Other"), kind: .filter(UUID()), prs: rest)]).filter { !$0.prs.isEmpty }
+        return (sections + [PRSection(title: String(localized: "Other"), kind: nil, prs: rest)]).filter { !$0.prs.isEmpty }
     }
 
     private var tabSections: [PRSection] {

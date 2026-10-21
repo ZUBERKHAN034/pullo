@@ -4,6 +4,10 @@ enum PRTab: Hashable {
 
     func rowKind(for pr: PullRequest) -> PRTab {
         guard case .filter = self else { return self }
-        return pr.author.caseInsensitiveCompare(pr.account) == .orderedSame ? .mine : .review
+        return Self.byAuthor(of: pr)
+    }
+
+    static func byAuthor(of pr: PullRequest) -> PRTab {
+        pr.author.caseInsensitiveCompare(pr.account) == .orderedSame ? .mine : .review
     }
 }
