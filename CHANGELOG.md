@@ -15,6 +15,19 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Fixed
 - The pill under the open notch follows the panel style, so it's glass when the panel is, instead of always black.
 
+## [0.8.0-beta.3] - 2026-10-21
+
+### Added
+- A new Actions side in the panel shows your GitHub Actions runs: what's running, waiting for approval or just finished, with job progress. Switch to it with the pill under the open notch, or ⌘← and ⌘→. It looks at the repositories you pushed to recently and the ones with your open pull requests, and filters by Mine, Everyone or Deploys.
+- Click a run in Actions to see its jobs, with failures first, matrix jobs grouped and the step that failed. From there you can re-run the failed jobs, cancel a run that's still going (click twice to confirm) or open it on GitHub. Esc goes back to the list.
+
+### Changed
+- The closed notch now also shows workflow runs you started, like a deploy, with the workflow's name. The ring turns red as soon as a job fails, and the notch flashes the result when the run finishes.
+- With the Glass panel style, the tabs, filters, account, search, buttons, the Pull requests / Actions pill and the toasts use macOS Liquid Glass and react to the pointer, instead of flat shapes drawn by the app. The Solid style looks the same as before.
+
+### Fixed
+- The pill under the open notch follows the panel style, so it's glass when the panel is, instead of always black.
+
 ## [0.8.0-beta.2] - 2026-10-21
 
 ### Added
@@ -166,6 +179,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
 [unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...HEAD
+[0.8.0-beta.3]: https://github.com/jordan-cod/devnotch/compare/v0.8.0-beta.2...v0.8.0-beta.3
 [0.8.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.8.0-beta.1...v0.8.0-beta.2
 [0.8.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...v0.8.0-beta.1
 [0.7.0]: https://github.com/jordan-cod/devnotch/compare/v0.6.2...v0.7.0
