@@ -4,8 +4,23 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-21
+
+### Added
+- A new Actions side in the panel shows your GitHub Actions runs: what's running, waiting for approval or just finished, with job progress. Switch to it with the pill under the open notch, or ⌘← and ⌘→. It looks at the repositories you pushed to recently and the ones with your open pull requests, and filters by Mine, Everyone or Deploys.
+- Click a run in Actions to see its jobs, with failures first, matrix jobs grouped and the step that failed. From there you can re-run the failed jobs, cancel a run that's still going (click twice to confirm) or open it on GitHub. Esc goes back to the list.
+- Make your own tabs for the Actions side in Settings → Tabs, per account: pick who started the run, the repository, part of the workflow name, the branch (`release/*` matches the start), the event and the status. Mine, Everyone and Deploys become regular tabs you can edit, reorder or remove, and there are ready-made ones like Production deploys or Failing on main. The slider button next to the tabs opens the settings.
+- The run detail lists every step of each job, like GitHub does, with its status and how long it took. The job that's running or failed opens by itself, the others open with a click, and clicking a step opens its log on GitHub right at that step.
+
 ### Changed
 - DevNotch is now called Pullo. Nothing else changes: your accounts, tabs and settings stay as they are, and updates keep coming the same way.
+- The closed notch now also shows workflow runs you started, like a deploy, with the workflow's name. The ring turns red as soon as a job fails, and the notch flashes the result when the run finishes.
+- With the Glass panel style, the tabs, filters, account, search, buttons, the Pull requests / Actions pill and the toasts use macOS Liquid Glass and react to the pointer, instead of flat shapes drawn by the app. The Solid style looks the same as before.
+
+### Fixed
+- The pill under the open notch follows the panel style, so it's glass when the panel is, instead of always black.
+- Tooltips show up next to the pointer, under the thing you hover (or above it when there's no room), and always inside the panel. Before, some were cut off by the panel edge, hidden behind other parts of the list, or showed up on the wrong side.
+- The count on a tab with unread pull requests stays white like the others, with a small blue dot, instead of turning the whole number blue.
 
 ## [0.8.0-beta.5] - 2026-10-21
 
@@ -203,24 +218,25 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...HEAD
-[0.8.0-beta.5]: https://github.com/jordan-cod/devnotch/compare/v0.8.0-beta.4...v0.8.0-beta.5
-[0.8.0-beta.4]: https://github.com/jordan-cod/devnotch/compare/v0.8.0-beta.3...v0.8.0-beta.4
-[0.8.0-beta.3]: https://github.com/jordan-cod/devnotch/compare/v0.8.0-beta.2...v0.8.0-beta.3
-[0.8.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.8.0-beta.1...v0.8.0-beta.2
-[0.8.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.7.0...v0.8.0-beta.1
-[0.7.0]: https://github.com/jordan-cod/devnotch/compare/v0.6.2...v0.7.0
-[0.7.0-beta.3]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.2...v0.7.0-beta.3
-[0.7.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.7.0-beta.1...v0.7.0-beta.2
-[0.6.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.1...v0.6.2
-[0.6.1]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...v0.6.1
-[0.7.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...v0.7.0-beta.1
-[0.6.0]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0
-[0.6.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.0-beta.1...v0.6.0-beta.2
-[0.6.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0-beta.1
-[0.5.0]: https://github.com/jordan-cod/devnotch/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/jordan-cod/devnotch/compare/v0.3.1...v0.4.0
-[0.3.1]: https://github.com/jordan-cod/devnotch/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/jordan-cod/devnotch/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/jordan-cod/devnotch/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/jordan-cod/devnotch/releases/tag/v0.2.0
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/jordan-cod/pullo/compare/v0.7.0...v0.8.0
+[0.8.0-beta.5]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.4...v0.8.0-beta.5
+[0.8.0-beta.4]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.3...v0.8.0-beta.4
+[0.8.0-beta.3]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.2...v0.8.0-beta.3
+[0.8.0-beta.2]: https://github.com/jordan-cod/pullo/compare/v0.8.0-beta.1...v0.8.0-beta.2
+[0.8.0-beta.1]: https://github.com/jordan-cod/pullo/compare/v0.7.0...v0.8.0-beta.1
+[0.7.0]: https://github.com/jordan-cod/pullo/compare/v0.6.2...v0.7.0
+[0.7.0-beta.3]: https://github.com/jordan-cod/pullo/compare/v0.7.0-beta.2...v0.7.0-beta.3
+[0.7.0-beta.2]: https://github.com/jordan-cod/pullo/compare/v0.7.0-beta.1...v0.7.0-beta.2
+[0.6.2]: https://github.com/jordan-cod/pullo/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/jordan-cod/pullo/compare/v0.6.0...v0.6.1
+[0.7.0-beta.1]: https://github.com/jordan-cod/pullo/compare/v0.6.0...v0.7.0-beta.1
+[0.6.0]: https://github.com/jordan-cod/pullo/compare/v0.5.0...v0.6.0
+[0.6.0-beta.2]: https://github.com/jordan-cod/pullo/compare/v0.6.0-beta.1...v0.6.0-beta.2
+[0.6.0-beta.1]: https://github.com/jordan-cod/pullo/compare/v0.5.0...v0.6.0-beta.1
+[0.5.0]: https://github.com/jordan-cod/pullo/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/jordan-cod/pullo/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/jordan-cod/pullo/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/jordan-cod/pullo/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/jordan-cod/pullo/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/jordan-cod/pullo/releases/tag/v0.2.0
