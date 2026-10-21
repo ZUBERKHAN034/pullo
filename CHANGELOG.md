@@ -11,6 +11,11 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - The quick search in the panel (⌘F) is now called Search, and it looks through every tab.
 - The left arrow goes to the previous tab, and Tab or the right arrow to the next one.
 
+## [0.6.1] - 2026-10-21
+
+### Fixed
+- DevNotch looks for updates at a new address, so beta versions reach people who turned them on again.
+
 ## [0.7.0-beta.1] - 2026-10-20
 
 ### Added
@@ -108,7 +113,8 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/jordan-cod/devnotch/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...v0.6.1
 [0.7.0-beta.1]: https://github.com/jordan-cod/devnotch/compare/v0.6.0...v0.7.0-beta.1
 [0.6.0]: https://github.com/jordan-cod/devnotch/compare/v0.5.0...v0.6.0
 [0.6.0-beta.2]: https://github.com/jordan-cod/devnotch/compare/v0.6.0-beta.1...v0.6.0-beta.2
