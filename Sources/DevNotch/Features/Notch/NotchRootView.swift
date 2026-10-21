@@ -21,6 +21,7 @@ struct NotchRootView: View {
         }
         .opacity(state == .closed && !notch.geometry.hasNotch ? 0 : 1)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .hintLayer(within: CGSize(width: size.width + radii.top * 2, height: size.height))
         .animation(Motion.peek, value: notch.liveCI)
         .environment(\.panelGlass, settings.panelStyle.usesGlass(reduceTransparency: reduceTransparency))
     }

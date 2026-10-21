@@ -6,7 +6,6 @@ struct IconButton: View {
     let help: String
     var spinning = false
     var active = false
-    var hintEdge: HorizontalEdge = .leading
     var floating = false
     let action: () -> Void
     @State private var hovering = false
@@ -29,6 +28,6 @@ struct IconButton: View {
         .buttonStyle(.plain)
         .accessibilityLabel(help)
         .onHover { hovering = $0 }
-        .hint(help, edge: hintEdge)
+        .hint(help)
     }
 }
