@@ -8,12 +8,16 @@ struct NotchBackground<S: Shape>: View {
     let shape: S
     let notchWidth: CGFloat
     let height: CGFloat
+    var style: PanelStyle?
+    var scale: CGFloat = 1
+
+    private var currentStyle: PanelStyle { style ?? settings.panelStyle }
 
     var body: some View {
         if usesGlass, #available(macOS 26, *) {
             ZStack {
                 Color.clear.glassEffect(.regular, in: shape)
-                if settings.panelStyle == .glassDarkTop {
+                if currentStyle == .glassDarkTop {
                     darkTop
                 }
                 Color.black.opacity(state == .closed ? 1 : 0)
@@ -36,10 +40,10 @@ struct NotchBackground<S: Shape>: View {
         )
     }
 
-    private var blackRadius: CGFloat { notchWidth / 2 + 24 }
-    private var fadeRadius: CGFloat { max(blackRadius + 120, height * 1.2) }
+    private var blackRadius: CGFloat { notchWidth / 2 + 24 * scale }
+    private var fadeRadius: CGFloat { max(blackRadius + 120 * scale, height * 1.2) }
 
     private var usesGlass: Bool {
-        settings.panelStyle.isGlass && PanelStyle.glassIsAvailable && !reduceTransparency
+        currentStyle.isGlass && PanelStyle.glassIsAvailable && !reduceTransparency
     }
 }
