@@ -16,6 +16,7 @@ All notable changes to DevNotch are listed here, newest first. The format follow
 ### Fixed
 - The pill under the open notch follows the panel style, so it's glass when the panel is, instead of always black.
 - Tooltips show up next to the pointer, under the thing you hover (or above it when there's no room), and always inside the panel. Before, some were cut off by the panel edge, hidden behind other parts of the list, or showed up on the wrong side.
+- The count on a tab with unread pull requests stays white like the others, with a small blue dot, instead of turning the whole number blue.
 
 ## [0.8.0-beta.3] - 2026-10-21
 

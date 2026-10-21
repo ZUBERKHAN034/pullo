@@ -60,13 +60,20 @@ struct PRTabsBar: View {
         let total = list.prs(in: tab).count
         let unread = unreadCount(in: tab)
         let loaded = store.snapshots[list.currentLogin ?? ""] != nil
-        return Text(loaded ? "\(total)" : "–")
-            .font(.panel(.caption, .bold, design: .rounded))
-            .foregroundStyle(unread > 0 ? Color.unread : selected ? .textStrong : .textSecondary)
-            .contentTransition(.numericText())
-            .padding(.horizontal, 5)
-            .padding(.vertical, 1)
-            .background(Capsule().fill(unread > 0 ? Color.unread.opacity(0.18) : selected ? .surfaceStrong : .surfaceSubtle))
+        return HStack(spacing: 4) {
+            if unread > 0 {
+                UnreadDot(size: 5)
+                    .transition(.scale.combined(with: .opacity))
+            }
+            Text(loaded ? "\(total)" : "–")
+                .contentTransition(.numericText())
+        }
+        .font(.panel(.caption, .bold, design: .rounded))
+        .foregroundStyle(selected ? .textStrong : .textSecondary)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 1)
+        .background(Capsule().fill(selected ? .surfaceStrong : .surfaceSubtle))
+        .animation(Motion.navigate, value: unread > 0)
     }
 
     private func unreadCount(in tab: PRTab) -> Int {
