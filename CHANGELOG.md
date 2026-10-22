@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Changed
+- Pullo now checks for updates at pullo.jrdan.dev, which counts how many Macs check each day so we know how many people use Pullo. It keeps only the day, the app version and the country. Turn off automatic update checks in Settings → Updates to be left out.
+
 ## [0.10.0] - 2026-10-22
 
 ### Added
