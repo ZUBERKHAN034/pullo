@@ -4240,18 +4240,18 @@
         }
       }
     },
-    "Updates are signed and notarized by Apple, and installed when you quit Pullo.": {
+    "Updates are signed and notarized by Apple, and installed when you quit Pullo. Checking also counts your Mac, anonymously, in how many use Pullo each day.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las actualizaciones están firmadas y notarizadas por Apple, y se instalan al salir de Pullo."
+            "value": "Las actualizaciones están firmadas y notarizadas por Apple, y se instalan al salir de Pullo. Buscar también cuenta tu Mac, de forma anónima, entre los que usan Pullo cada día."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "As atualizações são assinadas e notarizadas pela Apple e instaladas quando você sai do Pullo."
+            "value": "As atualizações são assinadas e notarizadas pela Apple e instaladas quando você sai do Pullo. A busca também conta seu Mac, de forma anônima, entre os que usam o Pullo a cada dia."
           }
         }
       }
