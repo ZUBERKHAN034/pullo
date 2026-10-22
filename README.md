@@ -25,7 +25,7 @@
 CI results, approvals, comments and review requests slide out of the notch, then get out of the way.
 
 <p align="center">
-  <img src="docs/media/alert.png" width="500" alt="An approval alert in the notch">
+  <img src="docs/media/alert.png" width="880" alt="An approval alert in the notch">
 </p>
 
 ## Keep an eye on your Actions
