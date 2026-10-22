@@ -43,8 +43,8 @@ struct SearchTests {
 struct DisplayLoginTests {
     @Test func dropsTheSharedCompanySuffix() {
         let pr = PullRequest.make(account: "gabriel_acme")
-        #expect(pr.displayLogin("icaro-barbosa_acme") == "icaro-barbosa")
-        #expect(pr.displayLogin("Luan_ACME") == "Luan")
+        #expect(pr.displayLogin("marina-dev_acme") == "marina-dev")
+        #expect(pr.displayLogin("Bruno_ACME") == "Bruno")
     }
 
     @Test func leavesOtherLoginsAlone() {

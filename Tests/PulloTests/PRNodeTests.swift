@@ -48,9 +48,9 @@ struct PRNodeTests {
       ] },
       "reviews": { "nodes": [
         { "id": "r1", "author": { "__typename": "Bot", "login": "gemini-code-assist" } },
-        { "id": "r2", "author": { "__typename": "User", "login": "icaro" } }
+        { "id": "r2", "author": { "__typename": "User", "login": "rafa-lima" } }
       ] },
-      "latestReviews": { "nodes": [ { "state": "CHANGES_REQUESTED", "author": { "login": "icaro" } } ] },
+      "latestReviews": { "nodes": [ { "state": "CHANGES_REQUESTED", "author": { "login": "rafa-lima" } } ] },
       "reviewRequests": { "nodes": [
         { "requestedReviewer": { "__typename": "Team", "name": "engineering" } },
         { "requestedReviewer": null }
@@ -72,14 +72,14 @@ struct PRNodeTests {
         #expect(pr.ci == .failure)
         #expect(pr.review == .changesRequested)
         #expect(pr.hasConflict)
-        #expect(pr.changeRequesters == ["icaro"])
+        #expect(pr.changeRequesters == ["rafa-lima"])
         #expect(pr.commitCount == 2)
     }
 
     @Test func ignoresBotsAndYourOwnActivity() throws {
         let pr = try decode(json).pullRequest(account: "me")
         #expect(pr.othersCommentIDs == ["c3"])
-        #expect(pr.othersReviews == [Activity(id: "r2", author: "icaro")])
+        #expect(pr.othersReviews == [Activity(id: "r2", author: "rafa-lima")])
     }
 
     @Test func teamRequestUnlessYouWereAskedDirectly() throws {
