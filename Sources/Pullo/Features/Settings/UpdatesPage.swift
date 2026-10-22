@@ -16,7 +16,9 @@ struct UpdatesPage: View {
                         .disabled(!updater.canCheckForUpdates)
                 }
             } footer: {
-                Text("Updates are signed and notarized by Apple, and installed when you quit Pullo. Checking also counts your Mac, anonymously, in how many use Pullo each day.")
+                Text(
+                    "Updates are signed and notarized by Apple, and installed when you quit Pullo. Checking also counts your Mac, anonymously, in how many use Pullo each day."
+                )
             }
             Section {
                 Toggle("Get beta versions", isOn: Binding(
