@@ -7,6 +7,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 ### Added
 - Each pull request tab can sort by last update or newest first (Settings → Tabs → Edit → Sort by).
 
+### Fixed
+- ⌘A, ⌘C, ⌘V, ⌘X and ⌘Z now work in text fields, like the tab editor in Settings, and ⌘W closes the Settings window.
+
 ## [0.9.0] - 2026-10-21
 
 ### Changed
