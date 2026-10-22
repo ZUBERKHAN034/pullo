@@ -10,6 +10,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 ### Changed
 - Editing a pull request tab is now a set of menus (author, repository, review, checks, state and label) instead of a search you have to type. The GitHub search is still there for anything else.
 
+### Fixed
+- ⌘A, ⌘C, ⌘V, ⌘X and ⌘Z now work in text fields, like the tab editor in Settings, and ⌘W closes the Settings window.
+
 ## [0.9.0] - 2026-10-21
 
 ### Changed
