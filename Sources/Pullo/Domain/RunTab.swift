@@ -110,10 +110,6 @@ extension RunTab {
     }
 }
 
-extension String {
-    fileprivate var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
-}
-
 extension RunTab.Starter {
     var title: String {
         switch self {

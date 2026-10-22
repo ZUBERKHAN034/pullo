@@ -135,7 +135,7 @@ struct TabsPage: View {
             }
             HStack {
                 Menu("Add tab") {
-                    Button("Blank…") { editing = SavedFilter(name: "", query: "") }
+                    Button("Blank…") { editing = SavedFilter(name: "", query: "author:@me") }
                     Section("Examples") {
                         ForEach(SavedFilter.examples, id: \.query) { example in
                             Button(example.name) { editing = example }
@@ -154,11 +154,7 @@ struct TabsPage: View {
             Text("Pull request tabs")
         } footer: {
             Text(
-                .init(
-                    String(
-                        localized: "Each one is a tab in the panel, in this order. Drag to reorder. Write it like a GitHub search, for example `repo:acme/api label:bug` or `team-review-requested:acme/web`. Only open pull requests show up unless you add `is:closed` or `is:merged`. Alerts always follow your PRs and review requests, whatever tabs you keep."
-                    )
-                )
+                "Each one is a tab in the panel, in this order. Drag to reorder. Alerts always follow your PRs and review requests, whatever tabs you keep."
             )
         }
     }
@@ -167,8 +163,48 @@ struct TabsPage: View {
 private struct TabEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.system) private var system
-    @State var filter: SavedFilter
+    @Environment(PRListModel.self) private var list
+    @State private var filter: SavedFilter
+    @State private var fields: PRQuery
+    @State private var showsQuery: Bool
     let onSave: (SavedFilter) -> Void
+
+    init(filter: SavedFilter, onSave: @escaping (SavedFilter) -> Void) {
+        let fields = PRQuery(parsing: filter.query)
+        _filter = State(initialValue: filter)
+        _fields = State(initialValue: fields)
+        _showsQuery = State(initialValue: !fields.extra.isEmpty)
+        self.onSave = onSave
+    }
+
+    private func field<Value>(_ path: WritableKeyPath<PRQuery, Value>) -> Binding<Value> {
+        Binding {
+            fields[keyPath: path]
+        } set: {
+            fields[keyPath: path] = $0
+            filter.query = fields.text
+        }
+    }
+
+    private var query: Binding<String> {
+        Binding {
+            filter.query
+        } set: {
+            filter.query = $0
+            fields = PRQuery(parsing: $0)
+        }
+    }
+
+    private var repos: [String] {
+        var known = Set<String>()
+        return (list.tabs + [.mine, .review]).flatMap(list.prs(in:)).map(\.repo)
+            .filter { known.insert($0.lowercased()).inserted }.sorted()
+    }
+
+    private func use(_ example: SavedFilter) {
+        if filter.name.allSatisfy(\.isWhitespace) { filter.name = example.name }
+        query.wrappedValue = example.query
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -182,41 +218,84 @@ private struct TabEditor: View {
                     }
                 }
                 Section {
-                    TextField("Search query", text: $filter.query, prompt: Text(verbatim: "repo:acme/api label:bug"), axis: .vertical)
-                        .labelsHidden()
-                        .font(.body.monospaced())
-                        .lineLimit(2...4)
+                    Picker("Author", selection: field(\.author)) {
+                        ForEach(PRQuery.Author.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    if fields.author == .user {
+                        TextField("GitHub user", text: field(\.user), prompt: Text(verbatim: "octocat"))
+                    }
+                    LabeledContent("Repository") {
+                        HStack(spacing: 4) {
+                            TextField("Repository", text: field(\.repo), prompt: Text("Any"))
+                                .labelsHidden()
+                            Menu {
+                                Button("Any") { field(\.repo).wrappedValue = "" }
+                                if !repos.isEmpty {
+                                    Section("In your tabs") {
+                                        ForEach(repos, id: \.self) { repo in
+                                            Button { field(\.repo).wrappedValue = repo } label: { Text(verbatim: repo) }
+                                        }
+                                    }
+                                }
+                            } label: {
+                                Image(systemName: "chevron.up.chevron.down")
+                            }
+                            .menuStyle(.borderlessButton)
+                            .menuIndicator(.hidden)
+                            .fixedSize()
+                            .accessibilityLabel(String(localized: "Pick a repository"))
+                        }
+                    }
+                    Picker("Review", selection: field(\.review)) {
+                        ForEach(PRQuery.Review.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    Picker("Checks", selection: field(\.checks)) {
+                        ForEach(PRQuery.Checks.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    Picker("State", selection: field(\.state)) {
+                        ForEach(PRQuery.State.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    TextField("Label", text: field(\.label), prompt: Text("Any"))
                 } header: {
-                    Text("Search query")
+                    HStack {
+                        Text("Show pull requests where")
+                        Spacer()
+                        Menu("Examples") {
+                            ForEach(SavedFilter.examples, id: \.query) { example in
+                                Button(example.name) { use(example) }
+                            }
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
+                        .font(.callout)
+                    }
+                }
+                Section {
+                    DisclosureGroup("GitHub search", isExpanded: $showsQuery) {
+                        TextField("Search query", text: query, prompt: Text(verbatim: "repo:acme/api label:bug"), axis: .vertical)
+                            .labelsHidden()
+                            .font(.body.monospaced())
+                            .lineLimit(2...4)
+                    }
                 } footer: {
                     HStack {
+                        Text("Anything the fields can't show stays in the search.")
+                        Spacer()
                         Link(
                             "Search syntax",
                             destination: URL(
                                 static: "https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests"
                             )
                         )
-                        Spacer()
-                        Menu("Examples") {
-                            ForEach(SavedFilter.examples, id: \.query) { example in
-                                Button {
-                                    if filter.name.allSatisfy(\.isWhitespace) { filter.name = example.name }
-                                    filter.query = example.query
-                                } label: {
-                                    Text(example.name)
-                                    Text(verbatim: example.query)
-                                }
-                            }
-                        }
-                        .menuStyle(.borderlessButton)
-                        .fixedSize()
                         Button("Preview on GitHub") { filter.webURL.map(system.open) }
+                            .buttonStyle(.link)
                             .disabled(filter.query.allSatisfy(\.isWhitespace))
                     }
                     .font(.caption)
                 }
             }
             .formStyle(.grouped)
+            .frame(minHeight: 530)
             HStack {
                 Spacer()
                 Button("Cancel", role: .cancel) { dismiss() }
@@ -226,11 +305,11 @@ private struct TabEditor: View {
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(!filter.isComplete)
+                .disabled(!filter.isComplete || !fields.isComplete)
             }
             .padding([.horizontal, .bottom], 20)
         }
-        .frame(width: 460)
+        .frame(width: 480)
     }
 }
 
