@@ -21,6 +21,7 @@ extension PullRequest {
         approvers: [String] = [],
         changeRequesters: [String] = [],
         reviewRequest: ReviewRequest = .direct,
+        createdAt: Date = Date(timeIntervalSince1970: 0),
         updatedAt: Date = Date(timeIntervalSince1970: 0),
         checks: CheckProgress? = nil
     ) -> PullRequest {
@@ -34,7 +35,7 @@ extension PullRequest {
             branch: branch,
             author: author,
             isDraft: draft,
-            createdAt: Date(timeIntervalSince1970: 0),
+            createdAt: createdAt,
             updatedAt: updatedAt,
             ci: ci,
             review: review,

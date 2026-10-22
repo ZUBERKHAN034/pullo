@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Added
+- Each pull request tab can sort by last update or newest first (Settings → Tabs → Edit → Sort by).
+
 ## [0.9.0] - 2026-10-21
 
 ### Changed

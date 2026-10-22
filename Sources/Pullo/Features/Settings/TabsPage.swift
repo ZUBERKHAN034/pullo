@@ -176,6 +176,10 @@ private struct TabEditor: View {
                 Section {
                     TextField("Name", text: $filter.name, prompt: Text("Bugs in the API"))
                     AccountPicker(account: $filter.account)
+                    Picker("Sort by", selection: $filter.sort) {
+                        Text("Default").tag(SavedFilter.Sort?.none)
+                        ForEach(SavedFilter.Sort.allCases, id: \.self) { Text($0.title).tag(SavedFilter.Sort?.some($0)) }
+                    }
                 }
                 Section {
                     TextField("Search query", text: $filter.query, prompt: Text(verbatim: "repo:acme/api label:bug"), axis: .vertical)
