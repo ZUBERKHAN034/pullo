@@ -1527,22 +1527,6 @@
         }
       }
     },
-    "Each one is a tab in the panel, in this order. Drag to reorder. Write it like a GitHub search, for example `repo:acme/api label:bug` or `team-review-requested:acme/web`. Only open pull requests show up unless you add `is:closed` or `is:merged`. Alerts always follow your PRs and review requests, whatever tabs you keep.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cada una es una pestaña del panel, en este orden. Arrastra para reordenar. Escríbela como una búsqueda de GitHub, por ejemplo `repo:acme/api label:bug` o `team-review-requested:acme/web`. Solo aparecen pull requests abiertos, a menos que agregues `is:closed` o `is:merged`. Las alertas siempre siguen tus PRs y solicitudes de revisión, sin importar qué pestañas conserves."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cada uma é uma aba no painel, nesta ordem. Arraste para reordenar. Escreva como uma busca do GitHub, por exemplo `repo:acme/api label:bug` ou `team-review-requested:acme/web`. Só aparecem pull requests abertos, a não ser que você adicione `is:closed` ou `is:merged`. Os alertas sempre acompanham seus PRs e pedidos de review, não importa quais abas você mantenha."
-          }
-        }
-      }
-    },
     "Each one is a tab on the Actions side of the panel, in this order. Drag to reorder.": {
       "localizations": {
         "es": {
@@ -4818,6 +4802,278 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mais novos primeiro"
+          }
+        }
+      }
+    },
+    "Anything the fields can't show stays in the search.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo que los campos no muestran se queda en la búsqueda."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O que os campos não mostram continua na busca."
+          }
+        }
+      }
+    },
+    "Author": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autor"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autor"
+          }
+        }
+      }
+    },
+    "Checks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checks"
+          }
+        }
+      }
+    },
+    "Closed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrados"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fechados"
+          }
+        }
+      }
+    },
+    "Drafts only": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo borradores"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Só drafts"
+          }
+        }
+      }
+    },
+    "Each one is a tab in the panel, in this order. Drag to reorder. Alerts always follow your PRs and review requests, whatever tabs you keep.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada una es una pestaña del panel, en este orden. Arrastra para reordenar. Las alertas siempre siguen tus PRs y solicitudes de revisión, sin importar qué pestañas conserves."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada uma é uma aba no painel, nesta ordem. Arraste para reordenar. Os alertas sempre acompanham seus PRs e pedidos de review, não importa quais abas você mantenha."
+          }
+        }
+      }
+    },
+    "GitHub search": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Búsqueda de GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca do GitHub"
+          }
+        }
+      }
+    },
+    "In your tabs": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En tus pestañas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nas suas abas"
+          }
+        }
+      }
+    },
+    "Label": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiqueta"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Label"
+          }
+        }
+      }
+    },
+    "Merged": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fusionados"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mergeados"
+          }
+        }
+      }
+    },
+    "Open": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abiertos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abertos"
+          }
+        }
+      }
+    },
+    "Passing": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasando"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passando"
+          }
+        }
+      }
+    },
+    "Ready for review": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listos para revisión"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prontos pra review"
+          }
+        }
+      }
+    },
+    "Requested from me": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitada a mí"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedida pra mim"
+          }
+        }
+      }
+    },
+    "Review": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisión"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review"
+          }
+        }
+      }
+    },
+    "Show pull requests where": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar pull requests donde"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar pull requests onde"
+          }
+        }
+      }
+    },
+    "State": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado"
           }
         }
       }

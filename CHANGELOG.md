@@ -7,6 +7,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 ### Added
 - Each pull request tab can sort by last update or newest first (Settings → Tabs → Edit → Sort by).
 
+### Changed
+- Editing a pull request tab is now a set of menus (author, repository, review, checks, state and label) instead of a search you have to type. The GitHub search is still there for anything else.
+
 ## [0.9.0] - 2026-10-21
 
 ### Changed
