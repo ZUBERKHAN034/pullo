@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-22
+
 ### Added
 - Each pull request tab can sort by last update or newest first (Settings → Tabs → Edit → Sort by).
 
@@ -240,7 +242,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/jordan-cod/pullo/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/jordan-cod/pullo/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/jordan-cod/pullo/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/jordan-cod/pullo/compare/v0.7.0...v0.8.0
