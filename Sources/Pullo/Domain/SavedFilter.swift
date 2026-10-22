@@ -19,11 +19,30 @@ struct SavedFilter: AccountScoped, Codable, Hashable {
         }
     }
 
+    enum Sort: String, Codable, CaseIterable {
+        case updated, created
+
+        var title: String {
+            switch self {
+            case .updated: String(localized: "Last updated")
+            case .created: String(localized: "Newest first")
+            }
+        }
+
+        func orders(_ a: PullRequest, before b: PullRequest) -> Bool {
+            switch self {
+            case .updated: a.updatedAt > b.updatedAt
+            case .created: a.createdAt > b.createdAt
+            }
+        }
+    }
+
     var id = UUID()
     var name: String
     var query: String
     var preset: Preset?
     var account: String?
+    var sort: Sort?
 
     static func builtIn(_ preset: Preset) -> SavedFilter {
         SavedFilter(name: preset.name, query: preset.query, preset: preset)

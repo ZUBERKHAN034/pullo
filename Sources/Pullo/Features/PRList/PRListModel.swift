@@ -81,6 +81,12 @@ final class PRListModel {
     }
 
     func prs(in tab: PRTab) -> [PullRequest] {
+        let prs = unsortedPRs(in: tab)
+        guard let sort = filter(of: tab)?.sort else { return prs }
+        return prs.sorted(by: sort.orders)
+    }
+
+    private func unsortedPRs(in tab: PRTab) -> [PullRequest] {
         let lists = logins(for: tab).map { prs(in: tab, for: $0) }
         guard lists.count(where: { !$0.isEmpty }) > 1 else { return lists.first { !$0.isEmpty } ?? [] }
         var seen = Set<String>()

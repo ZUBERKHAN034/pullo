@@ -57,4 +57,10 @@ struct SavedFilterTests {
         #expect(examples.allSatisfy { $0.preset == nil })
         #expect(Set(examples.map(\.query)).count == examples.count)
     }
+
+    @Test func tabsSavedBeforeSortingKeepTheirOrder() throws {
+        let saved = #"{"id":"6F9E2A48-4C1B-4E4B-9A55-3C1A5D7E9B10","name":"API","query":"repo:acme/api"}"#
+        let filter = try JSONDecoder().decode(SavedFilter.self, from: Data(saved.utf8))
+        #expect(filter.sort == nil)
+    }
 }

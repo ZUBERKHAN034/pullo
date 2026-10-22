@@ -56,6 +56,34 @@ extension NotchBehavior {
             #expect(h.list.visiblePRs.map(\.id) == ["PR_2", "PR_1"])
         }
 
+        @Test func aTabCanSortByLastUpdate() async {
+            let h = await NotchHarness(
+                mine: [
+                    .make(id: "PR_1", draft: true, updatedAt: Date(timeIntervalSince1970: 3)),
+                    .make(id: "PR_2", ci: .failure, updatedAt: Date(timeIntervalSince1970: 1)),
+                    .make(id: "PR_3", updatedAt: Date(timeIntervalSince1970: 2)),
+                ]
+            )
+            #expect(h.list.visiblePRs.map(\.id).first == "PR_2")
+            var mine = h.accounts.tabs[0]
+            mine.sort = .updated
+            h.accounts.setTabs([mine])
+            #expect(h.list.visiblePRs.map(\.id) == ["PR_1", "PR_3", "PR_2"])
+        }
+
+        @Test func aTabCanShowTheNewestFirst() async {
+            let h = await NotchHarness(
+                review: [
+                    .make(id: "PR_1", author: "ana", createdAt: Date(timeIntervalSince1970: 1)),
+                    .make(id: "PR_2", author: "ana", createdAt: Date(timeIntervalSince1970: 2)),
+                ]
+            )
+            var review = h.accounts.tabs[1]
+            review.sort = .created
+            h.accounts.setTabs([review])
+            #expect(h.list.visiblePRs.map(\.id) == ["PR_2", "PR_1"])
+        }
+
         @Test func aTabCanStickToOneAccount() async {
             let h = await NotchHarness(
                 accounts: ["me", "work"],
