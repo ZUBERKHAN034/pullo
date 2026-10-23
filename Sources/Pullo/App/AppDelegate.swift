@@ -41,7 +41,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 symbol: "hand.wave.fill",
                 tint: .blue,
                 headline: String(localized: "Welcome to Pullo"),
-                detail: String(localized: "Hover here or press \(Shortcut.togglePanel.symbols) to connect GitHub")
+                detail: app.settings.shortcut.shortcut.map {
+                    String(localized: "Hover here or press \($0.symbols) to connect GitHub")
+                } ?? String(localized: "Hover here to connect GitHub")
             ))
         }
     }

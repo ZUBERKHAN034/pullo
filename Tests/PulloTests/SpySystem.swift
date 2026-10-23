@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 @testable import Pullo
 
 @MainActor
@@ -10,6 +10,7 @@ final class SpySystem: SystemActions {
     private(set) var quitCount = 0
     private(set) var focusRequests = 0
     var isInFocus = false
+    var fullScreen = false
 
     func open(_ url: URL) { opened.append(url) }
     func copy(_ text: String) { copied.append(text) }
@@ -17,4 +18,5 @@ final class SpySystem: SystemActions {
     func play(sound: String) { sounds.append(sound) }
     func quit() { quitCount += 1 }
     func requestFocusAccess() { focusRequests += 1 }
+    func hasFullScreenApp(on screenFrame: NSRect) -> Bool { fullScreen }
 }

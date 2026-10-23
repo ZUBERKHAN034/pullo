@@ -2,10 +2,23 @@ import AppKit
 import SwiftUI
 
 struct ShortcutsPage: View {
+    @Environment(AppSettings.self) private var settings
+
     var body: some View {
+        @Bindable var settings = settings
         Form {
             Section {
-                row("Open or close the panel", Shortcut.togglePanel.symbols)
+                Picker("Open or close the panel", selection: $settings.shortcut) {
+                    ForEach(ShortcutChoice.allCases, id: \.self) { choice in
+                        if choice == .off { Divider() }
+                        Text(choice.title).tag(choice)
+                    }
+                }
+                if settings.shortcutUnavailable {
+                    Label("Another app already uses this shortcut. Pick another one.", systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
             } header: {
                 Text("Anywhere")
             } footer: {

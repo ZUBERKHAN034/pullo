@@ -35,6 +35,7 @@ final class NotchInteraction {
     @ObservationIgnored private var pointer: NSPoint?
     @ObservationIgnored private var buttonHeld = false
     @ObservationIgnored private var missedDuringFocus: [NotchAlert] = []
+    @ObservationIgnored private var missedReason = HoldReason.focus
     @ObservationIgnored private var focusWatch: Task<Void, Never>?
     @ObservationIgnored private var finishedCITask: Task<Void, Never>?
     private var finishedCI: LiveCI?
@@ -283,8 +284,8 @@ final class NotchInteraction {
 
     private func showNextPeek(evenInFocus: Bool = false) {
         guard state == .closed, let alert = alerts.next() else { return }
-        if !evenInFocus, system.isInFocus {
-            holdUntilFocusEnds(alert)
+        if !evenInFocus, let reason = holdReason {
+            hold(alert, because: reason)
             return
         }
         withAnimation(Motion.peek) {
@@ -296,7 +297,14 @@ final class NotchInteraction {
         dismissPeek(after: AlertQueue.displayTime(for: alert))
     }
 
-    private func holdUntilFocusEnds(_ alert: NotchAlert) {
+    private var holdReason: HoldReason? {
+        if system.isInFocus { return .focus }
+        if settings.holdsAlertsInFullScreen, system.hasFullScreenApp(on: geometry.screenFrame) { return .fullScreen }
+        return nil
+    }
+
+    private func hold(_ alert: NotchAlert, because reason: HoldReason) {
+        if missedDuringFocus.isEmpty { missedReason = reason }
         missedDuringFocus += alert.stack.isEmpty ? [alert] : alert.stack
         guard focusWatch == nil else { return }
         let clock = clock
@@ -304,7 +312,7 @@ final class NotchInteraction {
             while !Task.isCancelled {
                 try? await clock.sleep(for: .seconds(5))
                 guard let self, !Task.isCancelled else { return }
-                if !system.isInFocus {
+                if holdReason == nil {
                     showMissedAlerts()
                     return
                 }
@@ -315,7 +323,7 @@ final class NotchInteraction {
     private func showMissedAlerts() {
         focusWatch = nil
         guard !missedDuringFocus.isEmpty else { return }
-        alerts.append([NotchAlert.summary(of: missedDuringFocus, note: String(localized: "While you were in Focus"))])
+        alerts.append([NotchAlert.summary(of: missedDuringFocus, note: missedReason.note)])
         missedDuringFocus.removeAll()
         if state == .closed { showNextPeek() }
     }
@@ -409,6 +417,17 @@ final class NotchInteraction {
             actions.open(run)
             return true
         default: return false
+        }
+    }
+}
+
+enum HoldReason {
+    case focus, fullScreen
+
+    var note: String {
+        switch self {
+        case .focus: String(localized: "While you were in Focus")
+        case .fullScreen: String(localized: "While an app was full screen")
         }
     }
 }

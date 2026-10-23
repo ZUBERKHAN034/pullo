@@ -6,7 +6,17 @@ struct GeneralPage: View {
     @Environment(AppSettings.self) private var settings
 
     var body: some View {
+        @Bindable var settings = settings
         Form {
+            Section {
+                Picker("Show on", selection: $settings.display) {
+                    ForEach(DisplayChoice.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+            } footer: {
+                Text(
+                    "Built-in display uses the notch when there is one. Display with the pointer moves Pullo to the screen you're working on."
+                )
+            }
             Section {
                 Toggle("Open at login", isOn: Binding(
                     get: { settings.launchAtLogin },

@@ -14,6 +14,10 @@ final class AppSettings {
     var panelStyle: PanelStyle { didSet { save() } }
     var showsLiveCI: Bool { didSet { save() } }
     var liveCILabel: LiveCILabel { didSet { save() } }
+    var display: DisplayChoice { didSet { save() } }
+    var shortcut: ShortcutChoice { didSet { save() } }
+    var holdsAlertsInFullScreen: Bool { didSet { save() } }
+    var shortcutUnavailable = false
     private(set) var launchAtLogin: Bool
     private(set) var launchAtLoginFailure: String?
 
@@ -34,6 +38,9 @@ final class AppSettings {
         panelStyle = (defaults.object(for: .panelStyle) as? String).flatMap(PanelStyle.init(rawValue:)) ?? .solid
         showsLiveCI = defaults.object(for: .liveCI) as? Bool ?? true
         liveCILabel = (defaults.object(for: .liveCILabel) as? String).flatMap(LiveCILabel.init(rawValue:)) ?? .number
+        display = (defaults.object(for: .display) as? String).flatMap(DisplayChoice.init(rawValue:)) ?? .builtIn
+        shortcut = (defaults.object(for: .shortcut) as? String).flatMap(ShortcutChoice.init(rawValue:)) ?? .optionCommandP
+        holdsAlertsInFullScreen = defaults.object(for: .holdInFullScreen) as? Bool ?? false
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
@@ -67,6 +74,9 @@ final class AppSettings {
             Logger.settings.error("Changing open at login failed: \(error.localizedDescription, privacy: .public)")
             launchAtLoginFailure = error.localizedDescription
         }
+        display = (defaults.object(for: .display) as? String).flatMap(DisplayChoice.init(rawValue:)) ?? .builtIn
+        shortcut = (defaults.object(for: .shortcut) as? String).flatMap(ShortcutChoice.init(rawValue:)) ?? .optionCommandP
+        holdsAlertsInFullScreen = defaults.object(for: .holdInFullScreen) as? Bool ?? false
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
@@ -79,5 +89,8 @@ final class AppSettings {
         defaults.set(panelStyle.rawValue, for: .panelStyle)
         defaults.set(showsLiveCI, for: .liveCI)
         defaults.set(liveCILabel.rawValue, for: .liveCILabel)
+        defaults.set(display.rawValue, for: .display)
+        defaults.set(shortcut.rawValue, for: .shortcut)
+        defaults.set(holdsAlertsInFullScreen, for: .holdInFullScreen)
     }
 }

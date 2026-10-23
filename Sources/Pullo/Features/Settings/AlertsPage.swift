@@ -8,6 +8,7 @@ struct AlertsPage: View {
     @Environment(\.system) private var system
 
     var body: some View {
+        @Bindable var settings = settings
         Form {
             Section {
                 Picker("Sound", selection: Binding(
@@ -27,6 +28,12 @@ struct AlertsPage: View {
                 }
             } footer: {
                 Text("Alerts drop down from the notch when something changes on a PR.")
+            }
+
+            Section {
+                Toggle("Hold alerts while an app is full screen", isOn: $settings.holdsAlertsInFullScreen)
+            } footer: {
+                Text("Like during Focus, you get one summary when you leave full screen.")
             }
 
             Section {
