@@ -79,3 +79,10 @@ final class TestClock: Clock, @unchecked Sendable {
         }
     }
 }
+
+@MainActor
+func eventually(_ condition: @MainActor () async -> Bool) async {
+    for _ in 0..<1000 where await !condition() {
+        await Task.detached(priority: .low) { await Task.yield() }.value
+    }
+}

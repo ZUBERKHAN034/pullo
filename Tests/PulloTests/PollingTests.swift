@@ -107,10 +107,15 @@ extension NotchBehavior {
             let store = store(source, clock: clock) { .now }
             store.start()
             await clock.settle()
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
+            await eventually { clock.hasSleepers }
             await clock.advance(by: .seconds(59))
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
+            await eventually { clock.hasSleepers }
             await clock.advance(by: .seconds(1))
+            await eventually { await source.calls == 2 }
             #expect(await source.calls == 2)
             store.poller.stop()
         }
@@ -125,17 +130,22 @@ extension NotchBehavior {
             network.start { activity.set(.offline, !$0) }
             store.start()
             await clock.settle()
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
 
             network.set(reachable: false)
+            await eventually { clock.hasSleepers }
             await clock.advance(by: .seconds(600))
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
 
             network.set(reachable: true)
             await clock.settle()
+            await eventually { await source.calls == 2 }
             #expect(await source.calls == 2)
             network.set(reachable: true)
             await clock.settle()
+            await eventually { await source.calls == 2 }
             #expect(await source.calls == 2)
             store.poller.stop()
         }
@@ -151,10 +161,13 @@ extension NotchBehavior {
             activity.set(.systemAsleep, true)
             activity.set(.locked, true)
             activity.set(.systemAsleep, false)
+            await eventually { clock.hasSleepers }
             await clock.advance(by: .seconds(120))
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
             activity.set(.locked, false)
             await clock.settle()
+            await eventually { await source.calls == 2 }
             #expect(await source.calls == 2)
             store.poller.stop()
         }
@@ -167,16 +180,22 @@ extension NotchBehavior {
             await source.fail(with: .rateLimited(until: now + 600))
             store.start()
             await clock.settle()
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
+            await eventually { store.errors["me"]?.kind == .rateLimited }
             #expect(store.errors["me"]?.kind == .rateLimited)
             await source.fail(with: nil)
             for _ in 0..<9 {
                 now += 60
+                await eventually { clock.hasSleepers }
                 await clock.advance(by: .seconds(60))
             }
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
             now += 60
+            await eventually { clock.hasSleepers }
             await clock.advance(by: .seconds(60))
+            await eventually { await source.calls == 2 }
             #expect(await source.calls == 2)
             #expect(store.errors["me"] == nil)
             store.poller.stop()
@@ -189,10 +208,13 @@ extension NotchBehavior {
             await source.fail(with: .unauthorized)
             store.start()
             await clock.settle()
+            await eventually { clock.hasSleepers }
             await clock.advance(by: .seconds(600))
+            await eventually { await source.calls == 1 }
             #expect(await source.calls == 1)
             await source.fail(with: nil)
             await store.refresh()
+            await eventually { await source.calls == 2 }
             #expect(await source.calls == 2)
             #expect(store.errors["me"] == nil)
             store.poller.stop()
@@ -208,8 +230,10 @@ extension NotchBehavior {
             await clock.settle()
             for _ in 0..<10 {
                 now += 60
+                await eventually { clock.hasSleepers }
                 await clock.advance(by: .seconds(60))
             }
+            await eventually { await source.calls == 5 }
             #expect(await source.calls == 5)
             store.poller.stop()
         }
