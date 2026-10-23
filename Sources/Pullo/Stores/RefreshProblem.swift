@@ -20,7 +20,7 @@ struct RefreshProblem: Equatable {
         since = previous?.since ?? now
         kind = switch error as? GitHubError {
         case .offline: .offline
-        case .timedOut, .server: .unavailable
+        case .timedOut, .queryTimedOut, .server: .unavailable
         case .rateLimited: .rateLimited
         case .unauthorized, .noToken, .ghTimedOut: .signIn
         default: .other

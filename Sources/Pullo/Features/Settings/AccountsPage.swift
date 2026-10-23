@@ -53,7 +53,7 @@ struct AccountsPage: View {
                     Text(failure.message).font(.caption).foregroundStyle(.orange)
                 }
                 LabeledContent("Logged in with gh just now?") {
-                    Button("Check again") { accounts.reloadGHUsers() }
+                    Button("Check again") { accounts.reloadGHUsers(recheck: true) }
                 }
             }
         }

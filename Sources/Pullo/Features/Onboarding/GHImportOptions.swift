@@ -27,7 +27,7 @@ struct GHImportOptions: View {
                 }
             }
             if importable.isEmpty {
-                PillButton(title: String(localized: "Check again"), symbol: "arrow.clockwise") { accounts.reloadGHUsers() }
+                PillButton(title: String(localized: "Check again"), symbol: "arrow.clockwise") { accounts.reloadGHUsers(recheck: true) }
             }
             if let failure = accounts.importFailure {
                 Text(failure.message).font(.panel(.small)).foregroundStyle(.orange).lineLimit(2)

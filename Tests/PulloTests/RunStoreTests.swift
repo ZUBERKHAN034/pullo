@@ -84,5 +84,68 @@ extension NotchBehavior {
             h.actions.select(h.actions.tabs[1])
             #expect(Set(h.actions.active.map(\.id)) == [1, 2])
         }
+
+        @Test func stopsAskingForAnAccountsReposOnceOffline() async {
+            let source = StubRunSource(pushed: ["acme/a", "acme/b", "acme/c"])
+            let h = await NotchHarness(runSource: source)
+            await h.runs.refresh()
+            await source.failRuns(with: .offline)
+            h.now += 60
+            await h.runs.refresh()
+            #expect(await source.runRequests.count == 4)
+            #expect(h.runs.errors["me"]?.kind == .offline)
+        }
+
+        @Test func parksARepoTheOrganizationBlocks() async {
+            let source = StubRunSource(pushed: ["acme/api", "sso/secret"], runs: ["acme/api": [.make(id: 1)]])
+            await source.failRuns(in: "sso/secret", with: .forbidden("Resource protected by organization SAML enforcement."))
+            let h = await NotchHarness(runSource: source)
+            await h.runs.refresh()
+            #expect(h.runs.errors["me"] == nil)
+            h.now += 3600
+            await h.runs.refresh()
+            #expect(await source.runRequests.filter { $0 == "sso/secret" }.count == 1)
+            h.now += RunStore.parkingTime
+            await h.runs.refresh()
+            #expect(await source.runRequests.filter { $0 == "sso/secret" }.count == 2)
+        }
+
+        @Test func withThePanelClosedOnlyYourRunningReposAreCheckedOften() async {
+            let source = StubRunSource(pushed: ["acme/mine", "acme/theirs", "acme/quiet"], runs: [
+                "acme/mine": [.make(id: 1, repo: "acme/mine", state: .running, actor: "me")],
+                "acme/theirs": [.make(id: 2, repo: "acme/theirs", state: .running, actor: "ana")],
+                "acme/quiet": [.make(id: 3, repo: "acme/quiet")],
+            ])
+            let h = await NotchHarness(runSource: source)
+            h.runs.setPanelOpen(false)
+            await h.runs.refresh()
+            #expect(await source.jobRequests == [1])
+            for _ in 0..<9 {
+                h.now += 30
+                await h.runs.refresh()
+            }
+            let requests = await source.runRequests
+            #expect(requests.filter { $0 == "acme/mine" }.count == 10)
+            #expect(requests.filter { $0 == "acme/theirs" }.count == 1)
+            #expect(requests.filter { $0 == "acme/quiet" }.count == 1)
+            h.now += 30
+            await h.runs.refresh()
+            #expect(await source.runRequests.filter { $0 == "acme/theirs" }.count == 2)
+
+            h.runs.setPanelOpen(true)
+            h.now += 10
+            await h.runs.refresh()
+            #expect(await source.jobRequests.contains(2))
+        }
+
+        @Test func openingThePanelFollowsItsState() async {
+            let h = await NotchHarness()
+            #expect(h.runs.isPanelOpen)
+            h.notch.open()
+            h.notch.close()
+            #expect(!h.runs.isPanelOpen)
+            h.notch.open()
+            #expect(h.runs.isPanelOpen)
+        }
     }
 }

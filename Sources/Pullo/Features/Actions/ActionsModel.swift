@@ -145,7 +145,7 @@ final class ActionsModel {
                 list.showToast(String(localized: "Cancelling the run"))
             }
         } catch {
-            Logger.store.error("Run command failed: \(error.localizedDescription, privacy: .public)")
+            Logger.store.error("Run command failed: \(error.localizedDescription, privacy: .private(mask: .hash))")
             switch command {
             case .rerunFailedJobs: list.showToast(String(localized: "Couldn't re-run the jobs"))
             case .cancel: list.showToast(String(localized: "Couldn't cancel the run"))
