@@ -4,6 +4,15 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Added
+- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
+- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
+
+### Fixed
+- With Reduce Motion on, the panel fades instead of bouncing, and the loading screen and lists no longer slide, blur or shimmer.
+- With Increase Contrast on, dimmed text in the panel is brighter and easier to read. Section titles in Actions and the keyboard hints are a little easier to read too.
+- Time units like "5m" and "2h" now follow the app's language, and a message in Settings → Accounts is now translated.
+
 ## [0.10.2] - 2026-10-23
 
 ### Removed

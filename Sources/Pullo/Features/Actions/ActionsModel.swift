@@ -13,6 +13,7 @@ final class ActionsModel {
 
     private var chosenTabID: RunTab.ID?
     private(set) var openedRunID: Int?
+    private(set) var selectedRunID: Int?
     private(set) var running: Command?
 
     let store: RunStore
@@ -62,12 +63,47 @@ final class ActionsModel {
 
     func select(_ tab: RunTab) {
         withAnimation(Motion.navigate) { chosenTabID = tab.id }
+        if selectedRunID != nil { selectedRunID = visibleRuns.first?.id }
+    }
+
+    func selectTab(by offset: Int) -> Bool {
+        let tabs = tabs
+        guard !tabs.isEmpty else { return false }
+        let index = tabs.firstIndex { $0.id == tab?.id } ?? 0
+        select(tabs[(index + offset + tabs.count) % tabs.count])
+        return true
     }
 
     func selectTab(number: Int) -> Bool {
         guard tabs.indices.contains(number - 1) else { return false }
         select(tabs[number - 1])
         return true
+    }
+
+    // MARK: - Selection
+
+    var visibleRuns: [WorkflowRun] { active + recent }
+
+    var selectedRun: WorkflowRun? {
+        guard let selectedRunID else { return nil }
+        return visibleRuns.first { $0.id == selectedRunID }
+    }
+
+    func moveSelection(by delta: Int) -> Bool {
+        let runs = visibleRuns
+        guard !runs.isEmpty else { return false }
+        let current = runs.firstIndex { $0.id == selectedRunID }
+        let next = current.map { min(max($0 + delta, 0), runs.count - 1) } ?? 0
+        selectedRunID = runs[next].id
+        return true
+    }
+
+    func selectFirstIfNeeded() {
+        if selectedRun == nil { selectedRunID = visibleRuns.first?.id }
+    }
+
+    func resetSelection() {
+        selectedRunID = nil
     }
 
     // MARK: - Run detail

@@ -27,7 +27,7 @@ struct ExpandedView: View {
             if let message = list.toast {
                 Toast(message: message)
                     .padding(.bottom, 14)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(.fadeSlide(from: .bottom))
             }
         }
     }
