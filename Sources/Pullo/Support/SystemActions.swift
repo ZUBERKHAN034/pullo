@@ -11,6 +11,7 @@ protocol SystemActions {
     func quit()
     var isInFocus: Bool { get }
     func requestFocusAccess()
+    func hasFullScreenApp(on screenFrame: NSRect) -> Bool
 }
 
 struct LiveSystemActions: SystemActions {
@@ -45,6 +46,30 @@ struct LiveSystemActions: SystemActions {
     func requestFocusAccess() {
         guard INFocusStatusCenter.default.authorizationStatus == .notDetermined else { return }
         INFocusStatusCenter.default.requestAuthorization { _ in }
+    }
+
+    func hasFullScreenApp(on screenFrame: NSRect) -> Bool {
+        guard NSApp.currentSystemPresentationOptions.contains(.fullScreen),
+              let front = NSWorkspace.shared.frontmostApplication,
+              front.processIdentifier != ProcessInfo.processInfo.processIdentifier,
+              let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+              as? [[String: Any]]
+        else { return false }
+        let primaryHeight = NSScreen.screens.first?.frame.height ?? screenFrame.height
+        let screen = CGRect(
+            x: screenFrame.minX,
+            y: primaryHeight - screenFrame.maxY,
+            width: screenFrame.width,
+            height: screenFrame.height
+        )
+        return windows.contains { window in
+            guard window[kCGWindowOwnerPID as String] as? pid_t == front.processIdentifier,
+                  window[kCGWindowLayer as String] as? Int == 0,
+                  let dictionary = window[kCGWindowBounds as String] as? NSDictionary,
+                  let bounds = CGRect(dictionaryRepresentation: dictionary)
+            else { return false }
+            return screen.contains(CGPoint(x: bounds.midX, y: bounds.midY)) && bounds.width >= screen.width
+        }
     }
 }
 

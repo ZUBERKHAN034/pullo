@@ -9,6 +9,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - Opening Pullo again from Finder or Spotlight opens the panel.
 - While you set up, copy the `gh auth login` command or open Terminal right from the panel. Pullo adds your account as soon as you log in.
 - ⌘, in the panel opens Settings.
+- Choose which display Pullo shows on: the built-in one, the main one, or the one with the pointer (Settings → General).
+- Pick another shortcut to open the panel, or turn it off (Settings → Shortcuts), handy since ⌥⌘P is also Finder's Show Path Bar. Pullo tells you when another app already uses the shortcut.
+- Pullo can hold alerts while an app is full screen and show one summary when you leave, like during Focus (Settings → Alerts). It's off by default.
 
 ### Changed
 - The panel stays open while you set up your first account, even when you switch to Terminal. "Not now" closes it.

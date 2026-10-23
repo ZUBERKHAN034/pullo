@@ -1,4 +1,5 @@
 import AppKit
+import Observation
 
 @MainActor
 final class NotchPanelController {
@@ -6,6 +7,7 @@ final class NotchPanelController {
     private let panel: NotchPanel
     private var notch: NotchInteraction { app.notch }
     private var hotKey: HotKey?
+    private var registeredShortcut: ShortcutChoice?
     private var monitors: [Any] = []
 
     init(app: AppDependencies) {
@@ -19,9 +21,8 @@ final class NotchPanelController {
     }
 
     func startListening() {
-        hotKey = HotKey(.togglePanel) { [weak self] in
-            MainActor.assumeIsolated { self?.toggleFromKeyboard() }
-        }
+        registerShortcut()
+        observeSettings()
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification,
             object: nil,
@@ -55,8 +56,45 @@ final class NotchPanelController {
         if notch.state == .open { panel.makeKeyAndOrderFront(nil) }
     }
 
+    private func registerShortcut() {
+        let choice = app.settings.shortcut
+        guard choice != registeredShortcut else { return }
+        hotKey = nil
+        registeredShortcut = choice
+        guard let shortcut = choice.shortcut else {
+            app.settings.shortcutUnavailable = false
+            return
+        }
+        hotKey = HotKey(shortcut) { [weak self] in
+            MainActor.assumeIsolated { self?.toggleFromKeyboard() }
+        }
+        app.settings.shortcutUnavailable = hotKey == nil
+    }
+
+    private func observeSettings() {
+        withObservationTracking {
+            _ = app.settings.shortcut
+            _ = app.settings.display
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated {
+                    self?.registerShortcut()
+                    self?.screensChanged()
+                    self?.observeSettings()
+                }
+            }
+        }
+    }
+
+    private func followPointer(to point: NSPoint) {
+        guard app.settings.display == .pointer, notch.state == .closed,
+              !notch.geometry.screenFrame.insetBy(dx: 0, dy: -1).contains(point)
+        else { return }
+        screensChanged()
+    }
+
     private func screensChanged() {
-        guard let screen = NotchGeometry.notchedScreen else { return }
+        guard let screen = app.settings.display.screen() else { return }
         let target = NotchGeometry(screen: screen)
         guard target != notch.geometry else { return }
         if target.screenFrame != notch.geometry.screenFrame { notch.close() }
@@ -66,6 +104,7 @@ final class NotchPanelController {
 
     private func pointerChanged(_ event: NSEvent) {
         let buttonHeld = event.type == .leftMouseDragged
+        followPointer(to: NSEvent.mouseLocation)
         notch.mouseMoved(to: NSEvent.mouseLocation, buttonHeld: buttonHeld)
         if notch.state == .open, buttonHeld { return }
         updateMouseCapture()

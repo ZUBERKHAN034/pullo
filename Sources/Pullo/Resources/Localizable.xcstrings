@@ -5349,6 +5349,150 @@
           }
         }
       }
+    },
+    "Built-in display": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantalla integrada"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tela integrada"
+          }
+        }
+      }
+    },
+    "Main display": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantalla principal"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tela principal"
+          }
+        }
+      }
+    },
+    "Display with the pointer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantalla con el cursor"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tela com o cursor"
+          }
+        }
+      }
+    },
+    "Show on": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar en"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar em"
+          }
+        }
+      }
+    },
+    "Built-in display uses the notch when there is one. Display with the pointer moves Pullo to the screen you're working on.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantalla integrada usa el notch cuando lo hay. Pantalla con el cursor lleva Pullo a la pantalla en la que estás trabajando."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tela integrada usa o notch quando houver um. Tela com o cursor leva o Pullo para a tela em que você está trabalhando."
+          }
+        }
+      }
+    },
+    "Another app already uses this shortcut. Pick another one.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otra app ya usa este atajo. Elige otro."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outro app já usa este atalho. Escolha outro."
+          }
+        }
+      }
+    },
+    "Hold alerts while an app is full screen": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retener alertas mientras una app está en pantalla completa"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segurar alertas enquanto um app está em tela cheia"
+          }
+        }
+      }
+    },
+    "Like during Focus, you get one summary when you leave full screen.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como en concentración, recibes un resumen al salir de pantalla completa."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como no Foco, você recebe um resumo quando sair da tela cheia."
+          }
+        }
+      }
+    },
+    "While an app was full screen": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras una app estaba en pantalla completa"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto um app estava em tela cheia"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

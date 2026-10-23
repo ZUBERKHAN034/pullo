@@ -33,7 +33,7 @@ final class AppDependencies {
             accounts: accounts,
             settings: settings,
             system: system,
-            geometry: NotchGeometry.notchedScreen.map { NotchGeometry(screen: $0) } ?? .placeholder
+            geometry: settings.display.screen().map { NotchGeometry(screen: $0) } ?? .placeholder
         )
         updater = demo == nil ? Updater() : nil
         connect()
