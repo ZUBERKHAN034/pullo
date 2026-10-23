@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-23
+
 ### Added
 - A "Team reviews" example tab, and a Review option for pull requests requested from one of your teams, picked from the teams GitHub says you're on. The Review menu also tells "me or my teams" apart from "me only".
 - On a Mac without a notch, Pullo now shows a small tab at the top of the screen, so you can find it and hover it. CI progress shows on it too.
@@ -13,6 +15,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - Choose which display Pullo shows on: the built-in one, the main one, or the one with the pointer (Settings → General).
 - Pick another shortcut to open the panel, or turn it off (Settings → Shortcuts), handy since ⌥⌘P is also Finder's Show Path Bar. Pullo tells you when another app already uses the shortcut.
 - Pullo can hold alerts while an app is full screen and show one summary when you leave, like during Focus (Settings → Alerts). It's off by default.
+- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
+- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
 
 ### Changed
 - The panel stays open while you set up your first account, even when you switch to Terminal. "Not now" closes it.
@@ -22,8 +26,6 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ### Fixed
 - When adding an account fails, Pullo says what went wrong in plain words and offers a way to fix it.
-- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
-- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
 - When GitHub's request limit is reached, Pullo waits until it resets instead of asking again every minute. When GitHub keeps failing, it waits a bit longer each time, up to five minutes, and when your sign-in is rejected it stops asking until you try again.
 - Pullo now finds gh installed with MacPorts, Nix, mise or anywhere on your shell's PATH, and reads gh's settings from `XDG_CONFIG_HOME` when you use it.
 - A slow or broken gh no longer holds Pullo up, and Pullo stops asking it for a token on every refresh after it fails. "Check again" in Settings → Accounts asks right away.
@@ -291,7 +293,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.10.2...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/jordan-cod/pullo/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/jordan-cod/pullo/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/jordan-cod/pullo/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/jordan-cod/pullo/compare/v0.9.0...v0.10.0
