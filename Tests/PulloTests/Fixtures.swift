@@ -54,18 +54,29 @@ extension PullRequest {
 }
 
 final class ScratchDefaults {
+    private static let folder = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Preferences")
+    private static let sweep: Void = {
+        let stale = Date.now.addingTimeInterval(-10 * 60)
+        let files = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: [.contentModificationDateKey])) ??
+            []
+        for file in files where file.lastPathComponent.hasPrefix("PulloTests.") {
+            let modified = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .now
+            if modified < stale { try? FileManager.default.removeItem(at: file) }
+        }
+    }()
+
     private let suite = "PulloTests.\(UUID().uuidString)"
     let defaults: UserDefaults
 
     init() {
+        Self.sweep
         guard let defaults = UserDefaults(suiteName: suite) else { preconditionFailure("No defaults suite \(suite)") }
         self.defaults = defaults
     }
 
     deinit {
         defaults.removePersistentDomain(forName: suite)
-        let file = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Preferences/\(suite).plist")
-        try? FileManager.default.removeItem(at: file)
+        try? FileManager.default.removeItem(at: Self.folder.appending(path: "\(suite).plist"))
     }
 }
 

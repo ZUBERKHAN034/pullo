@@ -62,6 +62,22 @@ struct SavedFilter: AccountScoped, Codable, Hashable {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !typedQuery.isEmpty
     }
 
+    private static let scopes: Set<String> = [
+        "author", "assignee", "mentions", "commenter", "involves", "review-requested", "user-review-requested",
+        "team-review-requested", "reviewed-by", "repo", "org", "user", "team",
+    ]
+
+    static var unscopedMessage: String {
+        String(localized: "This search would cover all of GitHub. Add an author, repository or organization.")
+    }
+
+    var isScoped: Bool {
+        PRQuery.tokens(in: typedQuery).contains { token in
+            guard let colon = token.firstIndex(of: ":"), token.index(after: colon) < token.endIndex else { return false }
+            return Self.scopes.contains(token[..<colon].lowercased())
+        }
+    }
+
     var searchQuery: String {
         let typed = typedQuery
         let lowered = typed.lowercased()

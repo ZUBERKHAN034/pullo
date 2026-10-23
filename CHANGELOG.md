@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Fixed
+- A tab whose search had no author, repository or organization showed pull requests from all of GitHub. The tab editor now asks for one, and such tabs show what to fix instead of strangers' PRs.
+
 ## [0.11.1] - 2026-10-23
 
 ### Changed
