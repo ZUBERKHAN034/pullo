@@ -7,7 +7,7 @@ extension NotchBehavior {
     struct PeekTests {
         @Test func anAlertDropsOutThenGoesAway() async {
             let h = await NotchHarness()
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             #expect(h.notch.state == .peek)
             #expect(h.notch.peekAlert?.headline == "CI passed")
             await h.clock.advance(by: .milliseconds(4499))
@@ -19,7 +19,7 @@ extension NotchBehavior {
         @Test func alertsTapTheTrackpadAndPlayTheChosenSound() async {
             let h = await NotchHarness()
             h.settings.sound = "Pop"
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             #expect(h.system.taps == 1)
             #expect(h.system.sounds == ["Pop"])
         }
@@ -28,15 +28,15 @@ extension NotchBehavior {
             let h = await NotchHarness()
             h.settings.haptics = false
             h.settings.sound = nil
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             #expect(h.system.taps == 0)
             #expect(h.system.sounds.isEmpty)
         }
 
         @Test func alertsArrivingDuringAPeekShowNext() async {
             let h = await NotchHarness()
-            h.notch.enqueue(h.alert("first"))
-            h.notch.enqueue(h.alert("second"))
+            h.peeks.enqueue(h.alert("first"))
+            h.peeks.enqueue(h.alert("second"))
             #expect(h.notch.peekAlert?.headline == "first")
             await h.clock.advance(by: .milliseconds(4500))
             #expect(h.notch.state == .closed)
@@ -47,7 +47,7 @@ extension NotchBehavior {
 
         @Test func alertsArrivingTogetherStackAndStayLonger() async {
             let h = await NotchHarness()
-            h.notch.enqueue([h.alert("low"), h.alert("high", priority: 2)])
+            h.peeks.enqueue([h.alert("low"), h.alert("high", priority: 2)])
             #expect(h.notch.peekAlert?.stack.map(\.headline) == ["high", "low"])
             await h.clock.advance(by: .milliseconds(4500))
             #expect(h.notch.state == .peek)
@@ -58,7 +58,7 @@ extension NotchBehavior {
         @Test func alertsWhileOpenAreDropped() async {
             let h = await NotchHarness()
             h.notch.open()
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             h.notch.close()
             await h.clock.advance(by: .seconds(1))
             #expect(h.notch.state == .closed)
@@ -67,7 +67,7 @@ extension NotchBehavior {
 
         @Test func hoveringHoldsThePeekAndLeavingLetsItGo() async {
             let h = await NotchHarness()
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             h.notch.mouseMoved(to: h.inside(.peek))
             await h.clock.advance(by: .seconds(10))
             #expect(h.notch.state == .peek)
@@ -87,7 +87,7 @@ extension NotchBehavior {
 
             var alert = h.alert()
             alert.pr = changed
-            h.notch.enqueue(alert)
+            h.peeks.enqueue(alert)
             h.notch.tapPeek(alert)
             #expect(h.system.opened == [changed.url])
             #expect(!h.tracker.isUnread(changed))
@@ -98,7 +98,7 @@ extension NotchBehavior {
             let pr = PullRequest.make()
             let h = await NotchHarness(mine: [pr])
             h.settings.toggle(AlertCategory(PREvent(kind: .ciPassed, pr: pr, actor: nil)))
-            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
+            h.peeks.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
             #expect(h.notch.state == .closed)
         }
 
@@ -107,7 +107,7 @@ extension NotchBehavior {
             let h = await NotchHarness(mine: [pr])
             h.settings.sound = "Glass"
             h.settings.categorySounds[.ciFailed] = "Basso"
-            h.notch.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            h.peeks.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
             await h.clock.advance(by: .seconds(2))
             #expect(h.system.sounds == ["Basso"])
         }
@@ -117,7 +117,7 @@ extension NotchBehavior {
             let h = await NotchHarness(mine: [pr])
             h.settings.sound = "Glass"
             h.settings.categorySounds[.ciFailed] = "Basso"
-            h.notch.enqueue(events: [PREvent(kind: .approved, pr: pr, actor: "octocat")])
+            h.peeks.enqueue(events: [PREvent(kind: .approved, pr: pr, actor: "octocat")])
             #expect(h.system.sounds == ["Glass"])
         }
 
@@ -126,7 +126,7 @@ extension NotchBehavior {
             let h = await NotchHarness(mine: [pr])
             h.settings.sound = "Glass"
             h.settings.categorySounds[.ciPassed] = ""
-            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
+            h.peeks.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil)])
             await h.clock.advance(by: .seconds(2))
             #expect(h.notch.state == .peek)
             #expect(h.system.sounds.isEmpty)
@@ -137,7 +137,7 @@ extension NotchBehavior {
             let h = await NotchHarness(mine: [pr])
             h.settings.categorySounds[.ciPassed] = "Pop"
             h.settings.categorySounds[.ciFailed] = "Basso"
-            h.notch.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil), PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            h.peeks.enqueue(events: [PREvent(kind: .ciPassed, pr: pr, actor: nil), PREvent(kind: .ciFailed, pr: pr, actor: nil)])
             await h.clock.advance(by: .seconds(2))
             #expect(h.system.sounds == ["Basso"])
         }
@@ -145,7 +145,7 @@ extension NotchBehavior {
         @Test func alertsStayHiddenDuringFocus() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             #expect(h.notch.state == .closed)
             #expect(h.system.taps == 0)
             #expect(h.system.sounds.isEmpty)
@@ -154,9 +154,9 @@ extension NotchBehavior {
         @Test func alertsArrivingAfterFocusShowRightAway() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
-            h.notch.enqueue(h.alert("during focus"))
+            h.peeks.enqueue(h.alert("during focus"))
             h.system.isInFocus = false
-            h.notch.enqueue(h.alert("after focus"))
+            h.peeks.enqueue(h.alert("after focus"))
             #expect(h.notch.peekAlert?.headline == "after focus")
             #expect(h.notch.peekAlert?.stack.isEmpty == true)
         }
@@ -164,8 +164,8 @@ extension NotchBehavior {
         @Test func alertsMissedDuringFocusShowTogetherWhenItEnds() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
-            h.notch.enqueue(h.alert("first"))
-            h.notch.enqueue(h.alert("second"))
+            h.peeks.enqueue(h.alert("first"))
+            h.peeks.enqueue(h.alert("second"))
             h.system.isInFocus = false
             await h.clock.advance(by: .seconds(5))
             #expect(h.notch.state == .peek)
@@ -177,7 +177,7 @@ extension NotchBehavior {
         @Test func missedAlertsWaitForTheWholeFocus() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             await h.clock.advance(by: .seconds(60))
             #expect(h.notch.state == .closed)
             h.system.isInFocus = false
@@ -188,7 +188,7 @@ extension NotchBehavior {
         @Test func openingThePanelDuringFocusForgetsWhatWasMissed() async {
             let h = await NotchHarness()
             h.system.isInFocus = true
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             h.notch.open()
             h.notch.close()
             h.system.isInFocus = false

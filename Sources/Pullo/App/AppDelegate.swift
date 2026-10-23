@@ -37,7 +37,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func greetFirstLaunch() {
         Task { [app] in
             try? await Task.sleep(for: .seconds(1))
-            app.notch.enqueue(NotchAlert(
+            app.peeks.enqueue(NotchAlert(
                 symbol: "hand.wave.fill",
                 tint: .blue,
                 headline: String(localized: "Welcome to Pullo"),

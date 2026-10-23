@@ -12,6 +12,7 @@ final class AppDependencies {
     let toasts: ToastCenter
     let list: PRListModel
     let actions: ActionsModel
+    let peeks: PeekPresenter
     let notch: NotchInteraction
     let updater: Updater?
     let system: any SystemActions
@@ -59,12 +60,14 @@ final class AppDependencies {
         toasts = ToastCenter(clock: clock)
         list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system, toasts: toasts)
         actions = ActionsModel(store: runs, accounts: accounts, toasts: toasts)
+        peeks = PeekPresenter(accounts: accounts, settings: settings, system: system, clock: clock)
         notch = NotchInteraction(
             list: list,
             actions: actions,
+            peeks: peeks,
+            liveCI: LiveCIModel(prs: store, runs: runs, accounts: accounts, settings: settings, peeks: peeks),
             runs: runs,
             accounts: accounts,
-            settings: settings,
             system: system,
             geometry: geometry ?? settings.display.screen().map { NotchGeometry(screen: $0) } ?? .placeholder,
             clock: clock
@@ -94,11 +97,11 @@ final class AppDependencies {
 
     private func connect() {
         runs.setPanelOpen(notch.state == .open)
-        store.onEvents = { [weak self] events in self?.notch.enqueue(events: events) }
-        runs.onRunsFinished = { [weak self] finished in self?.notch.runsFinished(finished) }
+        store.onEvents = { [weak self] events in self?.peeks.enqueue(events: events) }
+        runs.onRunsFinished = { [weak self] finished in self?.peeks.runsFinished(finished) }
         accounts.onAccountAdded = { [weak self] account in
             guard let self else { return }
-            notch.accountConnected(account)
+            peeks.accountConnected(account)
             system.requestFocusAccess()
             Task {
                 await self.store.refresh()

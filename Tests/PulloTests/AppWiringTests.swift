@@ -2,7 +2,7 @@ import Foundation
 @testable import Pullo
 import Testing
 
-private actor ChangingSource: PRSource {
+actor ChangingSource: PRSource {
     private var snapshots: [String: Snapshot] = [:]
     private(set) var requests: [String] = []
 

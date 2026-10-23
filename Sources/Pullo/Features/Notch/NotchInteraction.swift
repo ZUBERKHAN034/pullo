@@ -12,75 +12,54 @@ final class NotchInteraction {
         }
     }
 
-    private(set) var peekAlert: NotchAlert?
     private(set) var area: PanelArea = .pullRequests
     var geometry: NotchGeometry
 
     let list: PRListModel
+    let peeks: PeekPresenter
     private let actions: ActionsModel
+    private let liveCIModel: LiveCIModel
     private let runs: RunStore
     private let accounts: AccountStore
-    private let settings: AppSettings
     private let system: any SystemActions
     private let clock: any Clock<Duration>
 
     @ObservationIgnored var onStateChange: ((NotchState) -> Void)?
     @ObservationIgnored var onOpenSettings: ((SettingsPage?) -> Void)?
 
-    @ObservationIgnored private var alerts = AlertQueue()
-    @ObservationIgnored private var peekTask: Task<Void, Never>?
     @ObservationIgnored private var hoverTask: Task<Void, Never>?
     @ObservationIgnored private var waitingForPointerExit = false
-    @ObservationIgnored private var holdingPeek = false
     @ObservationIgnored private var pointer: NSPoint?
     @ObservationIgnored private var buttonHeld = false
-    @ObservationIgnored private var missedDuringFocus: [NotchAlert] = []
-    @ObservationIgnored private var missedReason = HoldReason.focus
-    @ObservationIgnored private var focusWatch: Task<Void, Never>?
-    @ObservationIgnored private var finishedCITask: Task<Void, Never>?
-    private var finishedCI: LiveCI?
 
     init(
         list: PRListModel,
         actions: ActionsModel,
+        peeks: PeekPresenter,
+        liveCI: LiveCIModel,
         runs: RunStore,
         accounts: AccountStore,
-        settings: AppSettings,
         system: any SystemActions,
         geometry: NotchGeometry,
         clock: any Clock<Duration> = ContinuousClock()
     ) {
         self.list = list
         self.actions = actions
+        self.peeks = peeks
+        liveCIModel = liveCI
         self.runs = runs
         self.accounts = accounts
-        self.settings = settings
         self.system = system
         self.geometry = geometry
         self.clock = clock
+        peeks.host = self
     }
 
     var layout: NotchLayout { NotchLayout(geometry: geometry, closedWings: liveCI?.wingWidth ?? 0) }
 
-    var liveCI: LiveCI? {
-        guard settings.showsLiveCI else { return nil }
-        if var finishedCI {
-            finishedCI.label = settings.liveCILabel
-            return finishedCI
-        }
-        let logins = accounts.accounts.map(\.login).filter { !settings.mutedAccounts.contains($0) }
-        let prs = list.store.runningCI(for: logins)
-        let prKeys = Set(prs.map { "\($0.repo.lowercased())#\($0.number)" })
-        let ownRuns = logins.flatMap { login in
-            runs.runs(for: login).filter { $0.state == .running && $0.isStarted(by: login) }
-        }
-        .filter { run in run.pullRequest.map { !prKeys.contains("\(run.repo.lowercased())#\($0)") } ?? true }
-        let candidates = prs.map { (LiveCI(pr: $0), $0.updatedAt) } + ownRuns.map { (LiveCI(run: $0), $0.startedAt) }
-        guard var live = candidates.max(by: { $0.1 < $1.1 })?.0 else { return nil }
-        live.othersRunning = candidates.count - 1
-        live.label = settings.liveCILabel
-        return live
-    }
+    var liveCI: LiveCI? { liveCIModel.current }
+
+    var peekAlert: NotchAlert? { peeks.alert }
 
     // MARK: - Pointer
 
@@ -96,14 +75,7 @@ final class NotchInteraction {
 
         switch state {
         case .peek:
-            if inside {
-                guard !holdingPeek else { return }
-                holdingPeek = true
-                peekTask?.cancel()
-            } else if holdingPeek {
-                holdingPeek = false
-                dismissPeek(after: .seconds(1.5))
-            }
+            peeks.pointerMoved(over: inside)
         case .closed:
             guard inside else { return cancelHover() }
             scheduleHover(after: .milliseconds(80)) { notch in
@@ -152,16 +124,12 @@ final class NotchInteraction {
     // MARK: - Transitions
 
     func open(viaKeyboard: Bool = false) {
-        peekTask?.cancel()
-        holdingPeek = false
-        alerts.removeAll()
-        forgetMissedAlerts()
         list.keyboardMode = viaKeyboard
         if viaKeyboard { list.selectFirstIfNeeded() }
         if viaKeyboard, area == .actions { actions.selectFirstIfNeeded() }
         withAnimation(Motion.open) {
+            peeks.clearForOpen()
             state = .open
-            peekAlert = nil
         }
     }
 
@@ -179,8 +147,7 @@ final class NotchInteraction {
 
     func close(pointerStaysOver: Bool = false) {
         cancelHover()
-        peekTask?.cancel()
-        holdingPeek = false
+        peeks.stop()
         waitingForPointerExit = pointerStaysOver
         list.reset()
         actions.resetSelection()
@@ -196,63 +163,6 @@ final class NotchInteraction {
 
     // MARK: - Alerts
 
-    func enqueue(_ alerts: [NotchAlert]) {
-        guard state != .open, !alerts.isEmpty else { return }
-        self.alerts.append(alerts)
-        if state == .closed { showNextPeek() }
-    }
-
-    func enqueue(_ alert: NotchAlert) {
-        enqueue([alert])
-    }
-
-    func enqueue(events: [PREvent]) {
-        let shown = events.filter(settings.allows)
-        let alerts = shown.map { $0.alert(showingAccount: showsAccounts) }
-        guard let finished = shown.first(where: { $0.kind == .ciFailed }) ?? shown.first(where: { $0.kind == .ciPassed }),
-              showsFinishedCI(on: finished.pr)
-        else { return enqueue(alerts) }
-        showFinishedCI(finished.pr, then: alerts)
-    }
-
-    private func showsFinishedCI(on pr: PullRequest) -> Bool {
-        state == .closed && finishedCITask == nil && settings.showsLiveCI
-            && !settings.mutedAccounts.contains(pr.account)
-    }
-
-    func runsFinished(_ finished: [WorkflowRun]) {
-        let shown = finished.filter { !settings.mutedAccounts.contains($0.account) }
-        guard let run = shown.first(where: { $0.state == .failed }) ?? shown.first(where: { $0.state == .passed }),
-              state == .closed, finishedCITask == nil, settings.showsLiveCI
-        else { return }
-        flash(LiveCI(run: run, finished: run.state == .failed ? .failure : .success), then: [])
-    }
-
-    private func showFinishedCI(_ pr: PullRequest, then alerts: [NotchAlert]) {
-        flash(LiveCI(pr: pr, finished: pr.ci), then: alerts)
-    }
-
-    private func flash(_ live: LiveCI, then alerts: [NotchAlert]) {
-        finishedCI = live
-        let clock = clock
-        finishedCITask = Task { [weak self] in
-            try? await clock.sleep(for: .seconds(2))
-            guard let self else { return }
-            finishedCI = nil
-            finishedCITask = nil
-            enqueue(alerts)
-        }
-    }
-
-    func accountConnected(_ account: Account) {
-        enqueue(NotchAlert(
-            symbol: "person.crop.circle.badge.checkmark",
-            tint: .green,
-            headline: String(localized: "Account connected"),
-            detail: String(localized: "@\(account.login) · loading your PRs")
-        ))
-    }
-
     func previewAlert() {
         close(pointerStaysOver: true)
         let prs = list.visiblePRs.isEmpty ? [PullRequest.sample] : list.visiblePRs
@@ -264,9 +174,7 @@ final class NotchInteraction {
         let clock = clock
         Task { [weak self] in
             try? await clock.sleep(for: .milliseconds(450))
-            guard let self, state == .closed else { return }
-            alerts.append(events.map { $0.alert(showingAccount: self.showsAccounts) })
-            showNextPeek(evenInFocus: true)
+            self?.peeks.preview(events)
         }
     }
 
@@ -277,75 +185,6 @@ final class NotchInteraction {
             openInBrowser(url)
         } else {
             open()
-        }
-    }
-
-    private var showsAccounts: Bool {
-        accounts.accounts.count > 1
-    }
-
-    private func showNextPeek(evenInFocus: Bool = false) {
-        guard state == .closed, let alert = alerts.next() else { return }
-        if !evenInFocus, let reason = holdReason {
-            hold(alert, because: reason)
-            return
-        }
-        withAnimation(Motion.peek) {
-            peekAlert = alert
-            state = .peek
-        }
-        if settings.haptics { system.tapTrackpad() }
-        if let sound = settings.sound(for: alert.category) { system.play(sound: sound) }
-        dismissPeek(after: AlertQueue.displayTime(for: alert))
-    }
-
-    private var holdReason: HoldReason? {
-        if system.isInFocus { return .focus }
-        if settings.holdsAlertsInFullScreen, system.hasFullScreenApp(on: geometry.screenFrame) { return .fullScreen }
-        return nil
-    }
-
-    private func hold(_ alert: NotchAlert, because reason: HoldReason) {
-        if missedDuringFocus.isEmpty { missedReason = reason }
-        missedDuringFocus += alert.stack.isEmpty ? [alert] : alert.stack
-        guard focusWatch == nil else { return }
-        let clock = clock
-        focusWatch = Task { [weak self] in
-            while !Task.isCancelled {
-                try? await clock.sleep(for: .seconds(5))
-                guard let self, !Task.isCancelled else { return }
-                if holdReason == nil {
-                    showMissedAlerts()
-                    return
-                }
-            }
-        }
-    }
-
-    private func showMissedAlerts() {
-        focusWatch = nil
-        guard !missedDuringFocus.isEmpty else { return }
-        alerts.append([NotchAlert.summary(of: missedDuringFocus, note: missedReason.note)])
-        missedDuringFocus.removeAll()
-        if state == .closed { showNextPeek() }
-    }
-
-    private func forgetMissedAlerts() {
-        focusWatch?.cancel()
-        focusWatch = nil
-        missedDuringFocus.removeAll()
-    }
-
-    private func dismissPeek(after delay: Duration) {
-        peekTask?.cancel()
-        let clock = clock
-        peekTask = Task { [weak self] in
-            try? await clock.sleep(for: delay)
-            guard let self, !Task.isCancelled, state == .peek else { return }
-            withAnimation(Motion.close) { self.state = .closed }
-            try? await clock.sleep(for: .milliseconds(500))
-            guard !Task.isCancelled else { return }
-            showNextPeek()
         }
     }
 
@@ -422,13 +261,14 @@ final class NotchInteraction {
     }
 }
 
-enum HoldReason {
-    case focus, fullScreen
+// MARK: - PeekHost
 
-    var note: String {
-        switch self {
-        case .focus: String(localized: "While you were in Focus")
-        case .fullScreen: String(localized: "While an app was full screen")
-        }
+extension NotchInteraction: PeekHost {
+    func peekStarted() {
+        state = .peek
+    }
+
+    func peekEnded() {
+        state = .closed
     }
 }

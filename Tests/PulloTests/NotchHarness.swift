@@ -35,6 +35,7 @@ final class NotchHarness {
     var toasts: ToastCenter { app.toasts }
     var list: PRListModel { app.list }
     var actions: ActionsModel { app.actions }
+    var peeks: PeekPresenter { app.peeks }
     var notch: NotchInteraction { app.notch }
 
     init(

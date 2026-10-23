@@ -51,6 +51,8 @@ final class AccountStore {
 
     var logins: [String] { accounts.map(\.login) }
 
+    var hasMultipleAccounts: Bool { accounts.count > 1 }
+
     var importableGHUsers: [String] {
         ghUsers.filter { user in !accounts.contains { $0.login.caseInsensitiveCompare(user) == .orderedSame } }
     }
