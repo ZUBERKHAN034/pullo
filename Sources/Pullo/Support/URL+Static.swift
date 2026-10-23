@@ -8,6 +8,10 @@ extension URL {
 
     static let github = URL(static: "https://github.com")
 
+    var isWeb: Bool {
+        ["http", "https"].contains(scheme?.lowercased())
+    }
+
     static func pullRequest(repo: String, number: Int) -> URL {
         github.appending(path: "\(repo)/pull/\(number)")
     }

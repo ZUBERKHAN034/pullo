@@ -13,6 +13,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - With Increase Contrast on, dimmed text in the panel is brighter and easier to read. Section titles in Actions and the keyboard hints are a little easier to read too.
 - Time units like "5m" and "2h" now follow the app's language, and a message in Settings → Accounts is now translated.
 
+### Security
+- Links from checks only open web pages (http and https), so a check can't point Pullo at a file or another app.
+
 ## [0.10.2] - 2026-10-23
 
 ### Removed
