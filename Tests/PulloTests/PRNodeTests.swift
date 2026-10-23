@@ -96,4 +96,11 @@ struct PRNodeTests {
         #expect(checks.map(\.name) == ["Typecheck", "ci/legacy"])
         #expect(checks.first?.url?.absoluteString == "https://github.com/a/b/runs/1")
     }
+
+    @Test func checkLinksOnlyOpenWebPages() throws {
+        let custom = json.replacingOccurrences(of: "https://ci.example.com/3", with: "file:///etc/hosts")
+        let checks = try decode(custom).pullRequest(account: "me").failedChecks
+        #expect(checks.last?.name == "ci/legacy")
+        #expect(checks.last?.url == nil)
+    }
 }
