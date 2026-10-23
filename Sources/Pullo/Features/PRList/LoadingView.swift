@@ -12,6 +12,8 @@ struct LoadingView: View {
         (230, 150, true), (190, 170, false), (260, 120, true), (170, 140, false),
     ]
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 9) {
@@ -19,14 +21,19 @@ struct LoadingView: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .symbolEffect(.variableColor.iterative.reversing, options: .repeating)
-                TimelineView(.periodic(from: .now, by: 1.6)) { context in
-                    let index = Int(context.date.timeIntervalSinceReferenceDate / 1.6) % Self.messages.count
-                    Text(Self.messages[index])
-                        .font(.panel(.title, .semibold))
-                        .foregroundStyle(.textStrong)
-                        .id(index)
-                        .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top)).combined(with: .opacity))
-                        .animation(Motion.navigate, value: index)
+                Group {
+                    if reduceMotion {
+                        message(Self.messages[0])
+                    } else {
+                        TimelineView(.periodic(from: .now, by: 1.6)) { context in
+                            let index = Int(context.date.timeIntervalSinceReferenceDate / 1.6) % Self.messages.count
+                            message(Self.messages[index])
+                                .id(index)
+                                .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top))
+                                    .combined(with: .opacity))
+                                .animation(Motion.navigate, value: index)
+                        }
+                    }
                 }
                 .frame(height: 18)
                 .clipped()
@@ -42,6 +49,12 @@ struct LoadingView: View {
             .shimmering()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    private func message(_ text: String) -> some View {
+        Text(text)
+            .font(.panel(.title, .semibold))
+            .foregroundStyle(.textStrong)
     }
 }
 

@@ -5,6 +5,7 @@ struct PRList: View {
     let sections: [PRSection]
     @Environment(ReadTracker.self) private var tracker
     @State private var appeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -34,10 +35,10 @@ struct PRList: View {
                             }
                         }
                         .opacity(appeared ? 1 : 0)
-                        .offset(y: appeared ? 0 : 8)
-                        .blur(radius: appeared ? 0 : 3)
+                        .offset(y: appeared || reduceMotion ? 0 : 8)
+                        .blur(radius: appeared || reduceMotion ? 0 : 3)
                         .animation(
-                            Motion.reveal.delay(0.06 + Double(min(index, 8)) * 0.03),
+                            reduceMotion ? Motion.fade : Motion.reveal.delay(0.06 + Double(min(index, 8)) * 0.03),
                             value: appeared
                         )
                     }

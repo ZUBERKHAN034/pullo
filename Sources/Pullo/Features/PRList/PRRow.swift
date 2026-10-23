@@ -32,7 +32,7 @@ struct PRRow: View {
             if showingChecks {
                 FailedChecksList(pr: pr)
                     .padding(.leading, 28)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.fadeSlide(from: .top))
             }
         }
         .padding(.horizontal, 10)
@@ -58,6 +58,18 @@ struct PRRow: View {
         .accessibilityActions {
             if isUnread { Button("Mark as read") { list.markRead(pr) } }
             Button("Copy branch") { list.copyBranch(pr) }
+            if pr.ci == .failure {
+                Button(showingChecks ? String(localized: "Hide failed checks") : String(localized: "Show failed checks")) {
+                    withAnimation(Motion.navigate) { showingChecks.toggle() }
+                }
+            }
+            if showingChecks {
+                ForEach(pr.failedChecks.filter { $0.url != nil }) { check in
+                    Button(String(localized: "Open the \(check.name) log")) {
+                        if let url = check.url { notch.openInBrowser(url) }
+                    }
+                }
+            }
         }
     }
 

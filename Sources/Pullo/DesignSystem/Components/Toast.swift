@@ -5,6 +5,11 @@ struct Toast: View {
     let message: String
 
     var body: some View {
+        content.announcing(message)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         let text = Text(message)
             .font(.panel(.body, .semibold))
             .lineLimit(1)
