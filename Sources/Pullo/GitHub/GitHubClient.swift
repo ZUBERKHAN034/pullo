@@ -92,7 +92,8 @@ struct GitHubClient {
         }
         guard let payload = decoded.data else {
             if let failure = decoded.errors?.lazy.compactMap(\.failure).first { throw failure }
-            throw GitHubError.api(decoded.errors?.map(\.message).joined(separator: "\n") ?? "Empty response from GitHub.")
+            let message = decoded.errors?.map(\.message).joined(separator: "\n")
+            throw GitHubError.api(message ?? String(localized: "Empty response from GitHub."))
         }
         var filtered: [SavedFilter.ID: [PullRequest]] = [:]
         var filterErrors: [SavedFilter.ID: String] = [:]

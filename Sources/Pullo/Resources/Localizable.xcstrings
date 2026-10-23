@@ -5685,6 +5685,22 @@
           }
         }
       }
+    },
+    "Empty response from GitHub.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub devolvió una respuesta vacía."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub devolveu uma resposta vazia."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
