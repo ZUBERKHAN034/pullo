@@ -31,7 +31,7 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://pullo.jrdan.dev/appcast.xml</string>
+	<string>https://jordan-cod.github.io/pullo/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>tPTL1QQLZYqCxGyonRsuUV4yDUzX+TUBA7gsAegqAKI=</string>
 </dict>

@@ -59,9 +59,7 @@ Open a run to follow each step live. Re-run what failed, cancel what's stuck, or
 
 ## Private by design
 
-Pullo talks to the GitHub API straight from your Mac. It borrows the token from `gh` when it needs it and never stores it. There's no sign-up, and it only changes something on GitHub when you ask, like re-running a job.
-
-The one other thing it does is check [pullo.jrdan.dev](https://pullo.jrdan.dev) for updates once a day. That's also how we count how many Macs use Pullo: the site keeps the day, the app version and the country, and nothing else. Turn off **Check for updates automatically** in Settings → Updates and you're not counted.
+Pullo talks to the GitHub API straight from your Mac. It borrows the token from `gh` when it needs it and never stores it. There's no server and no sign-up, and it only changes something on GitHub when you ask, like re-running a job.
 
 <details>
 <summary><b>FAQ</b></summary>

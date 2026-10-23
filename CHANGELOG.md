@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Removed
+- Pullo no longer counts how many Macs check for updates. It checks GitHub for updates again, like before 0.10.1, and nothing about your Mac is kept anywhere.
+
 ## [0.10.1] - 2026-10-22
 
 ### Changed
