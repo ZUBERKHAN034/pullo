@@ -96,13 +96,17 @@ struct GitHubClient {
         }
         var filtered: [SavedFilter.ID: [PullRequest]] = [:]
         var filterErrors: [SavedFilter.ID: String] = [:]
+        func pullRequests(_ search: GQLResponse.Search?) -> [PullRequest] {
+            var seen = Set<String>()
+            return (search?.nodes ?? []).compactMap { $0.value?.pullRequest(account: account) }.filter { seen.insert($0.id).inserted }
+        }
         for (alias, filter) in aliases {
-            filtered[filter.id] = payload.filtered[alias]?.nodes.compactMap { $0.value?.pullRequest(account: account) } ?? []
+            filtered[filter.id] = pullRequests(payload.filtered[alias])
             if let error = decoded.errors?.first(where: { $0.alias == alias }) { filterErrors[filter.id] = error.message }
         }
         return Snapshot(
-            mine: payload.mine.nodes.compactMap { $0.value?.pullRequest(account: account) },
-            reviewRequests: payload.review.nodes.compactMap { $0.value?.pullRequest(account: account) },
+            mine: pullRequests(payload.mine),
+            reviewRequests: pullRequests(payload.review),
             filtered: filtered,
             filterErrors: filterErrors
         )

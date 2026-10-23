@@ -13,6 +13,13 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - A slow or broken gh no longer holds Pullo up, and Pullo stops asking it for a token on every refresh after it fails. "Check again" in Settings → Accounts asks right away.
 - After GitHub was slow once, Pullo kept asking for shorter lists until you quit it. It now goes back to the full lists after half an hour, and a slow connection on your side no longer counts.
 - Repositories your organization blocks with single sign-on no longer slow down the Actions side.
+- Removing an account while Pullo was refreshing could bring its pull requests and runs back.
+- Re-running or cancelling a run while the Actions list was refreshing now shows the new state right away instead of on the next check.
+- If Pullo can't read some of your saved tabs, for example after using an older version, it keeps the ones it can read instead of replacing them all, and keeps a copy of the rest.
+- A pull request that briefly drops out of GitHub's results no longer alerts you again about the same review request or forgets what you've already read.
+- Fixed a crash when GitHub listed the same pull request twice.
+- Pullo no longer uses more and more memory the longer it runs.
+- When gh's token is revoked, the Actions side now picks up the new one once you sign in again, like the pull request side does.
 
 ## [0.10.2] - 2026-10-23
 

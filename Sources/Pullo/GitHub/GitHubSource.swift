@@ -12,13 +12,9 @@ struct GitHubSource: PRSource {
         try await withClient(for: account) { try await $0.fetchOutcomes(ids: ids) }
     }
 
-    private func withClient<T>(for account: Account, _ request: (GitHubClient) async throws -> T) async throws -> T {
-        let client = try await GitHubClient(token: tokens.token(for: account.login), sizes: sizes)
-        do {
-            return try await request(client)
-        } catch GitHubError.unauthorized {
-            await tokens.forget(account.login)
-            throw GitHubError.unauthorized
+    private func withClient<T: Sendable>(for account: Account, _ request: @Sendable (GitHubClient) async throws -> T) async throws -> T {
+        try await tokens.withToken(for: account.login) { [sizes] token in
+            try await request(GitHubClient(token: token, sizes: sizes))
         }
     }
 }

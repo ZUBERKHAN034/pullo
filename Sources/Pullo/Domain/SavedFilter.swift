@@ -79,3 +79,15 @@ struct SavedFilter: AccountScoped, Codable, Hashable {
         return components?.url
     }
 }
+
+extension SavedFilter {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? container.decodeIfPresent(UUID.self, forKey: .id)) ?? UUID()
+        name = try container.decode(String.self, forKey: .name)
+        query = (try? container.decodeIfPresent(String.self, forKey: .query)) ?? ""
+        preset = try? container.decodeIfPresent(Preset.self, forKey: .preset)
+        account = try? container.decodeIfPresent(String.self, forKey: .account)
+        sort = try? container.decodeIfPresent(Sort.self, forKey: .sort)
+    }
+}

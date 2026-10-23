@@ -32,8 +32,9 @@ final class RunStore {
     @ObservationIgnored private var discoveredAt: [String: Date] = [:]
     @ObservationIgnored private var fetchedAt: [String: Date] = [:]
     @ObservationIgnored private var parkedUntil: [String: Date] = [:]
+    @ObservationIgnored private var forced: Set<String> = []
     @ObservationIgnored private var byRepo: [String: [WorkflowRun]] = [:]
-    @ObservationIgnored private var isRefreshing = false
+    @ObservationIgnored private let queue = RefreshQueue()
 
     init(
         accounts: AccountStore,
@@ -81,19 +82,41 @@ final class RunStore {
 
     private func refresh(manual: Bool) async {
         if manual { gate.clearForManualRefresh() }
-        guard !isRefreshing else { return }
-        isRefreshing = true
-        defer { isRefreshing = false }
-        let current = accounts.accounts
-        gate.prune(to: Set(current.map(\.login)))
-        for account in current where gate.allows(account.login, at: now()) {
-            await refresh(account)
+        await queue.run {
+            let current = accounts.accounts
+            gate.prune(to: Set(current.map(\.login)))
+            for account in current where isCurrent(account.login) && gate.allows(account.login, at: now()) {
+                await refresh(account)
+            }
+            await prune()
         }
-        let logins = Set(current.map(\.login))
+    }
+
+    private func prune() async {
+        let logins = Set(accounts.accounts.map(\.login))
         runs = runs.filter { logins.contains($0.key) }
         errors = errors.filter { logins.contains($0.key) }
+        repos = repos.filter { logins.contains($0.key) }
+        discoveredAt = discoveredAt.filter { logins.contains($0.key) }
+        let watched = Set(repos.flatMap { login, list in list.map { key($0, login) } })
+        byRepo = byRepo.filter { watched.contains($0.key) }
+        fetchedAt = fetchedAt.filter { watched.contains($0.key) }
+        forced = forced.filter { watched.contains($0) }
+        parkedUntil = parkedUntil.filter { now() < $0.value && logins.contains(Self.login(ofKey: $0.key)) }
         let known = Set(runs.values.flatMap { $0.map(\.id) })
         if jobs.keys.contains(where: { !known.contains($0) }) { jobs = jobs.filter { known.contains($0.key) } }
+        if jobErrors.keys.contains(where: { !known.contains($0) }) { jobErrors = jobErrors.filter { known.contains($0.key) } }
+        await source.retain(repos)
+    }
+
+    var cachedRepoCount: Int { byRepo.count + fetchedAt.count + parkedUntil.count }
+
+    private func isCurrent(_ login: String) -> Bool {
+        accounts.accounts.contains { $0.login == login }
+    }
+
+    private static func login(ofKey key: String) -> String {
+        String(key.prefix { $0 != "|" })
     }
 
     private func refresh(_ account: Account) async {
@@ -101,7 +124,9 @@ final class RunStore {
         var failure: Error?
         do {
             try await discoverIfDue(account)
+            guard isCurrent(login) else { return }
         } catch {
+            guard isCurrent(login) else { return }
             Logger.store.error(
                 "Finding repos for @\(login, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
             )
@@ -115,7 +140,9 @@ final class RunStore {
         let watched = repos[login] ?? []
         var succeeded = false
         for repo in watched where isDue(repo, login: login) {
-            if let error = await fetch(repo, for: account) {
+            let error = await fetch(repo, for: account)
+            guard isCurrent(login) else { return }
+            if let error {
                 if (error as? GitHubError)?.isForbidden == true { continue }
                 failure = error
                 if Self.stopsAccount(error) { break }
@@ -156,6 +183,7 @@ final class RunStore {
             return
         }
         let pushed = try await source.pushedRepos(for: account)
+        guard isCurrent(login) else { return }
         discoveredAt[login] = now()
         repos[login] = limit(pushed + fromPRs, for: login)
     }
@@ -171,6 +199,7 @@ final class RunStore {
 
     private func isDue(_ repo: String, login: String) -> Bool {
         guard !isParked(repo, login: login) else { return false }
+        if forced.contains(key(repo, login)) { return true }
         guard let last = fetchedAt[key(repo, login)] else { return true }
         let list = byRepo[key(repo, login)] ?? []
         let interval = if isPanelOpen {
@@ -190,14 +219,18 @@ final class RunStore {
     @discardableResult
     private func fetch(_ repo: String, for account: Account) async -> Error? {
         let key = key(repo, account.login)
-        defer { fetchedAt[key] = now() }
+        forced.remove(key)
+        defer { if isCurrent(account.login) { fetchedAt[key] = now() } }
         do {
             var fetched = try await source.runs(in: repo, for: account)
+            var lists: [Int: [WorkflowJob]] = [:]
             for index in fetched.indices where needsJobs(fetched[index], login: account.login) {
                 guard let list = try? await source.jobs(of: fetched[index], for: account) else { continue }
                 if fetched[index].state == .running { fetched[index].jobs = JobProgress(jobs: list) }
-                store(list, for: fetched[index].id)
+                lists[fetched[index].id] = list
             }
+            guard isCurrent(account.login) else { return nil }
+            for (run, list) in lists { store(list, for: run) }
             let previous = byRepo[key] ?? []
             byRepo[key] = fetched
             let finished = Self.finished(from: previous, to: fetched, login: account.login)
@@ -207,7 +240,7 @@ final class RunStore {
             Logger.store.error(
                 "Loading runs of \(repo, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
             )
-            if (error as? GitHubError)?.isForbidden == true {
+            if (error as? GitHubError)?.isForbidden == true, isCurrent(account.login) {
                 parkedUntil[key] = now().addingTimeInterval(Self.parkingTime)
                 repos[account.login]?.removeAll { $0.caseInsensitiveCompare(repo) == .orderedSame }
             }
@@ -220,9 +253,12 @@ final class RunStore {
     func loadJobs(of run: WorkflowRun) async {
         guard let account = account(for: run) else { return }
         do {
-            try await store(source.jobs(of: run, for: account), for: run.id)
+            let list = try await source.jobs(of: run, for: account)
+            guard isCurrent(account.login) else { return }
+            store(list, for: run.id)
             jobErrors[run.id] = nil
         } catch {
+            guard isCurrent(account.login) else { return }
             Logger.store
                 .error(
                     "Loading jobs of run \(run.id, privacy: .public) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
@@ -244,7 +280,7 @@ final class RunStore {
     }
 
     private func refetch(_ run: WorkflowRun) async {
-        fetchedAt[key(run.repo, run.account)] = nil
+        forced.insert(key(run.repo, run.account))
         await refresh()
     }
 

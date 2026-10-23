@@ -1,6 +1,6 @@
 import Foundation
 
-enum Fetched<Value> {
+enum Fetched<Value: Sendable>: Sendable {
     case fresh(Value, etag: String?)
     case notModified
 }
