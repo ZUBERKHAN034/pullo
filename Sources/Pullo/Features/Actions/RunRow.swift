@@ -3,6 +3,7 @@ import SwiftUI
 struct RunRow: View {
     @Environment(ActionsModel.self) private var actions
     let run: WorkflowRun
+    var selected = false
 
     @State private var hovering = false
 
@@ -38,16 +39,21 @@ struct RunRow: View {
         .padding(.vertical, 7)
         .background(
             RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .fill(hovering ? Color.surfaceSubtle : .clear)
+                .fill(hovering || selected ? Color.surfaceSubtle : .clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .strokeBorder(selected ? Color.surfaceStrong : .clear, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
+        .animation(Motion.hover, value: selected)
         .onTapGesture { actions.open(run) }
         .onDrag { run.dragItem }
         .hint(run.title)
         .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction { actions.open(run) }
     }
 
@@ -87,9 +93,9 @@ struct RunRow: View {
     static func duration(_ interval: TimeInterval) -> String {
         let seconds = max(0, Int(interval))
         switch seconds {
-        case ..<60: return "\(seconds)s"
-        case ..<3600: return "\(seconds / 60)m \(seconds % 60)s"
-        default: return "\(seconds / 3600)h \(seconds % 3600 / 60)m"
+        case ..<60: return String(localized: "\(seconds)s")
+        case ..<3600: return String(localized: "\(seconds / 60)m \(seconds % 60)s")
+        default: return String(localized: "\(seconds / 3600)h \(seconds % 3600 / 60)m")
         }
     }
 }

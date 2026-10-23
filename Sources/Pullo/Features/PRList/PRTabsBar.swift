@@ -54,6 +54,16 @@ struct PRTabsBar: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(list.title(of: tab))
+        .accessibilityValue(countDescription(for: tab))
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private func countDescription(for tab: PRTab) -> String {
+        guard list.isLoaded else { return "" }
+        let total = list.prs(in: tab).count
+        let unread = unreadCount(in: tab)
+        return unread > 0 ? String(localized: "\(total) PRs, \(unread) unread") : String(localized: "\(total) PRs")
     }
 
     private func count(for tab: PRTab, selected: Bool) -> some View {

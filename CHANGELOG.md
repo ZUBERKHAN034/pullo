@@ -4,6 +4,10 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Added
+- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
+- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
+
 ### Changed
 - Pullo uses less battery and network. It stops checking GitHub while your Mac is asleep, its screen is off or locked, or it's offline, and checks once as soon as you're back. With the panel closed, the Actions side only keeps a close eye on runs you started.
 
@@ -13,6 +17,12 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - A slow or broken gh no longer holds Pullo up, and Pullo stops asking it for a token on every refresh after it fails. "Check again" in Settings → Accounts asks right away.
 - After GitHub was slow once, Pullo kept asking for shorter lists until you quit it. It now goes back to the full lists after half an hour, and a slow connection on your side no longer counts.
 - Repositories your organization blocks with single sign-on no longer slow down the Actions side.
+- With Reduce Motion on, the panel fades instead of bouncing, and the loading screen and lists no longer slide, blur or shimmer.
+- With Increase Contrast on, dimmed text in the panel is brighter and easier to read. Section titles in Actions and the keyboard hints are a little easier to read too.
+- Time units like "5m" and "2h" now follow the app's language, and a message in Settings → Accounts is now translated.
+
+### Security
+- Links from checks only open web pages (http and https), so a check can't point Pullo at a file or another app.
 
 ## [0.10.2] - 2026-10-23
 

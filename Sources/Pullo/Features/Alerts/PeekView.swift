@@ -45,6 +45,11 @@ struct PeekView: View {
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { onTap() }
+        .announcing(spoken)
+    }
+
+    private var spoken: String {
+        [alert.headline, alert.detail].filter { !$0.isEmpty }.joined(separator: ", ")
     }
 
     private var stackedLines: some View {

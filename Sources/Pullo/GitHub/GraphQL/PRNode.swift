@@ -100,7 +100,7 @@ struct PRNode: Decodable {
             guard let outcome = context.conclusion ?? context.state, failedConclusions.contains(outcome) else { return nil }
             return FailedCheck(
                 name: context.name ?? context.context ?? "Check",
-                url: context.detailsUrl ?? context.targetUrl
+                url: [context.detailsUrl, context.targetUrl].compactMap(\.self).first(where: \.isWeb)
             )
         }
 
