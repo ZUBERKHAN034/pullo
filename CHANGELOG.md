@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-10-23
+
 ### Removed
 - Pullo no longer counts how many Macs check for updates. It checks GitHub for updates again, like before 0.10.1, and nothing about your Mac is kept anywhere.
 
@@ -250,7 +252,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.10.1...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/jordan-cod/pullo/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/jordan-cod/pullo/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/jordan-cod/pullo/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/jordan-cod/pullo/compare/v0.8.1...v0.9.0
