@@ -17,28 +17,24 @@ final class ActionsModel {
     private(set) var running: Command?
 
     let store: RunStore
-    private let list: PRListModel
     private let accounts: AccountStore
+    private let toasts: ToastCenter
 
-    init(store: RunStore, list: PRListModel, accounts: AccountStore) {
+    init(store: RunStore, accounts: AccountStore, toasts: ToastCenter) {
         self.store = store
-        self.list = list
         self.accounts = accounts
+        self.toasts = toasts
     }
 
     var tabs: [RunTab] { accounts.runTabs }
 
     var tab: RunTab? { tabs.first { $0.id == chosenTabID } ?? tabs.first }
 
-    var isLoaded: Bool { list.logins.contains { store.isLoaded($0) } }
-
-    func problem(worthShowingAt now: Date? = nil) -> (login: String, problem: RefreshProblem)? {
-        RefreshProblem.first(in: store.errors, for: list.logins, worthShowingAt: now)
-    }
+    var isLoaded: Bool { accounts.logins.contains { store.isLoaded($0) } }
 
     var allRuns: [WorkflowRun] {
         var seen = Set<Int>()
-        return list.logins.flatMap(store.runs(for:)).filter { seen.insert($0.id).inserted }
+        return accounts.logins.flatMap(store.runs(for:)).filter { seen.insert($0.id).inserted }
     }
 
     func runs(in tab: RunTab?) -> [WorkflowRun] {
@@ -139,16 +135,16 @@ final class ActionsModel {
             switch command {
             case .rerunFailedJobs:
                 try await store.rerunFailedJobs(of: run)
-                list.showToast(String(localized: "Re-running the failed jobs"))
+                toasts.show(String(localized: "Re-running the failed jobs"))
             case .cancel:
                 try await store.cancel(run)
-                list.showToast(String(localized: "Cancelling the run"))
+                toasts.show(String(localized: "Cancelling the run"))
             }
         } catch {
             Logger.store.error("Run command failed: \(error.localizedDescription, privacy: .private(mask: .hash))")
             switch command {
-            case .rerunFailedJobs: list.showToast(String(localized: "Couldn't re-run the jobs"))
-            case .cancel: list.showToast(String(localized: "Couldn't cancel the run"))
+            case .rerunFailedJobs: toasts.show(String(localized: "Couldn't re-run the jobs"))
+            case .cancel: toasts.show(String(localized: "Couldn't cancel the run"))
             }
         }
     }

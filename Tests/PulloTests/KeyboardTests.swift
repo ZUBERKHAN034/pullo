@@ -35,9 +35,9 @@ extension NotchBehavior {
             _ = h.notch.perform(.moveDown)
             #expect(h.notch.perform(.copyBranch))
             #expect(h.system.copied == ["fix/two"])
-            #expect(h.list.toast == "Copied branch: fix/two")
+            #expect(h.toasts.message == "Copied branch: fix/two")
             await h.clock.advance(by: .milliseconds(1800))
-            #expect(h.list.toast == nil)
+            #expect(h.toasts.message == nil)
         }
 
         @Test func commandsOnASelectionNeedOne() async {

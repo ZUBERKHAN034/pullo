@@ -13,7 +13,11 @@ final class RunStore {
     static let closedIdleInterval: TimeInterval = 300
     static let parkingTime: TimeInterval = 3 * 60 * 60
 
-    private(set) var runs: [String: [WorkflowRun]] = [:]
+    private(set) var runs: [String: [WorkflowRun]] = [:] {
+        didSet { revision &+= 1 }
+    }
+
+    private(set) var revision = 0
     private(set) var errors: [String: RefreshProblem] = [:]
     private(set) var jobs: [Int: [WorkflowJob]] = [:]
     private(set) var jobErrors: [Int: String] = [:]

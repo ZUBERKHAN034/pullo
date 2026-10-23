@@ -26,8 +26,6 @@ struct WorkflowRun: Identifiable, Equatable {
 
     var repoName: String { repo.split(separator: "/").last.map(String.init) ?? repo }
 
-    var isDeploy: Bool { workflow.localizedCaseInsensitiveContains("deploy") }
-
     func isStarted(by login: String) -> Bool {
         actor?.caseInsensitiveCompare(login) == .orderedSame || triggeringActor?.caseInsensitiveCompare(login) == .orderedSame
     }

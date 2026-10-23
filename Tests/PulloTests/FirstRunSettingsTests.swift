@@ -66,7 +66,7 @@ extension NotchBehavior {
         @Test func alertsShowOverFullScreenAppsUnlessAskedToHold() async {
             let h = await NotchHarness()
             h.system.fullScreen = true
-            h.notch.enqueue(h.alert())
+            h.peeks.enqueue(h.alert())
             #expect(h.notch.state == .peek)
         }
 
@@ -74,8 +74,8 @@ extension NotchBehavior {
             let h = await NotchHarness()
             h.settings.holdsAlertsInFullScreen = true
             h.system.fullScreen = true
-            h.notch.enqueue(h.alert("first"))
-            h.notch.enqueue(h.alert("second"))
+            h.peeks.enqueue(h.alert("first"))
+            h.peeks.enqueue(h.alert("second"))
             #expect(h.notch.state == .closed)
             await h.clock.advance(by: .seconds(30))
             #expect(h.notch.state == .closed)

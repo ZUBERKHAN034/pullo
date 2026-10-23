@@ -94,7 +94,7 @@ extension NotchBehavior {
             let h = await NotchHarness(runSource: source)
             await h.runs.refresh()
             await source.set([.make(id: 1, workflow: "Deploy", state: .failed)], in: "acme/api")
-            h.now += 10
+            h.now += RunStore.closedActiveInterval
             await h.runs.refresh()
             #expect(h.notch.liveCI?.finished == .failure)
             #expect(h.notch.liveCI?.name == "Deploy")
@@ -105,7 +105,7 @@ extension NotchBehavior {
         @Test func showsTheResultBeforeTheAlert() async {
             let h = await NotchHarness()
             let pr = PullRequest.make(ci: .failure, checks: CheckProgress(done: 5, total: 5))
-            h.notch.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
+            h.peeks.enqueue(events: [PREvent(kind: .ciFailed, pr: pr, actor: nil)])
             #expect(h.notch.liveCI?.finished == .failure)
             #expect(h.notch.state == .closed)
             await h.clock.advance(by: .seconds(2))
@@ -115,9 +115,30 @@ extension NotchBehavior {
 
         @Test func otherAlertsDoNotWait() async {
             let h = await NotchHarness()
-            h.notch.enqueue(events: [PREvent(kind: .approved, pr: .make(), actor: "octocat")])
+            h.peeks.enqueue(events: [PREvent(kind: .approved, pr: .make(), actor: "octocat")])
             #expect(h.notch.liveCI == nil)
             #expect(h.notch.state == .peek)
+        }
+
+        @Test func followsTheStoresAfterARefresh() async {
+            let source = ChangingSource()
+            let h = await NotchHarness(source: source)
+            #expect(h.notch.liveCI == nil)
+            await source.set("me", Snapshot(mine: [Self.running("PR_1", minutesAgo: 1)], reviewRequests: []))
+            await h.store.refresh()
+            #expect(h.notch.liveCI?.id == "PR_1")
+            await source.set("me", Snapshot(mine: [], reviewRequests: []))
+            await h.store.refresh()
+            #expect(h.notch.liveCI == nil)
+        }
+
+        @Test func turningLiveCIOffHidesItRightAway() async {
+            let h = await NotchHarness(mine: [Self.running("PR_1", minutesAgo: 1)])
+            #expect(h.notch.liveCI != nil)
+            h.settings.showsLiveCI = false
+            #expect(h.notch.liveCI == nil)
+            h.settings.showsLiveCI = true
+            #expect(h.notch.liveCI?.id == "PR_1")
         }
     }
 }

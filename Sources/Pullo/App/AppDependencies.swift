@@ -8,35 +8,70 @@ final class AppDependencies {
     let settings: AppSettings
     let tracker: ReadTracker
     let store: PRStore
-    let list: PRListModel
-    let notch: NotchInteraction
     let runs: RunStore
+    let toasts: ToastCenter
+    let list: PRListModel
     let actions: ActionsModel
+    let peeks: PeekPresenter
+    let notch: NotchInteraction
     let updater: Updater?
-    let system: any SystemActions = LiveSystemActions()
+    let system: any SystemActions
     let activity = ActivityMonitor()
 
-    init(demo: DemoMode?) {
-        self.demo = demo
-        let defaults = demo?.defaults ?? .standard
+    convenience init(demo: DemoMode?) {
         let cli = GHCLI()
         let tokens = TokenProvider(cli: cli)
-        accounts = AccountStore(defaults: defaults, cli: cli, tokens: tokens)
+        let prSource: any PRSource = demo?.source ?? GitHubSource(tokens: tokens)
+        let runSource: any RunSource = demo == nil ? GitHubRunSource(tokens: tokens) : NoRuns()
+        self.init(
+            defaults: demo?.defaults ?? .standard,
+            cli: cli,
+            tokens: tokens,
+            prSource: prSource,
+            runSource: runSource,
+            system: LiveSystemActions(),
+            updater: demo == nil ? Updater() : nil,
+            demo: demo
+        )
+    }
+
+    init(
+        defaults: UserDefaults,
+        cli: any GitHubCLI,
+        tokens: TokenProvider,
+        session: URLSession = .shared,
+        prSource: any PRSource,
+        runSource: any RunSource,
+        system: any SystemActions,
+        geometry: NotchGeometry? = nil,
+        clock: any Clock<Duration> = ContinuousClock(),
+        now: @escaping () -> Date = Date.init,
+        updater: Updater? = nil,
+        demo: DemoMode? = nil
+    ) {
+        self.demo = demo
+        self.system = system
+        self.updater = updater
+        accounts = AccountStore(defaults: defaults, cli: cli, tokens: tokens, session: session, clock: clock)
         settings = AppSettings(defaults: defaults)
         tracker = ReadTracker(defaults: defaults)
-        store = PRStore(accounts: accounts, tracker: tracker, source: demo?.source ?? GitHubSource(tokens: tokens))
-        list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system)
-        runs = RunStore(accounts: accounts, prs: store, source: demo == nil ? GitHubRunSource(tokens: tokens) : NoRuns())
-        actions = ActionsModel(store: runs, list: list, accounts: accounts)
+        store = PRStore(accounts: accounts, tracker: tracker, source: prSource, clock: clock, now: now)
+        runs = RunStore(accounts: accounts, prs: store, source: runSource, clock: clock, now: now)
+        toasts = ToastCenter(clock: clock)
+        list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system, toasts: toasts)
+        actions = ActionsModel(store: runs, accounts: accounts, toasts: toasts)
+        peeks = PeekPresenter(accounts: accounts, settings: settings, system: system, clock: clock)
         notch = NotchInteraction(
             list: list,
+            actions: actions,
+            peeks: peeks,
+            liveCI: LiveCIModel(prs: store, runs: runs, accounts: accounts, settings: settings, peeks: peeks),
             runs: runs,
             accounts: accounts,
-            settings: settings,
             system: system,
-            geometry: settings.display.screen().map { NotchGeometry(screen: $0) } ?? .placeholder
+            geometry: geometry ?? settings.display.screen().map { NotchGeometry(screen: $0) } ?? .placeholder,
+            clock: clock
         )
-        updater = demo == nil ? Updater() : nil
         connect()
     }
 
@@ -49,6 +84,7 @@ final class AppDependencies {
             .environment(tracker)
             .environment(settings)
             .environment(actions)
+            .environment(toasts)
             .environment(\.system, system)
     }
 
@@ -59,19 +95,20 @@ final class AppDependencies {
         runs.start()
     }
 
+    func refreshAll() async {
+        await store.refresh()
+        await runs.refresh()
+    }
+
     private func connect() {
         runs.setPanelOpen(notch.state == .open)
-        store.onEvents = { [weak self] events in self?.notch.enqueue(events: events) }
-        runs.onRunsFinished = { [weak self] finished in self?.notch.runsFinished(finished) }
-        notch.actions = actions
+        store.onEvents = { [weak self] events in self?.peeks.enqueue(events: events) }
+        runs.onRunsFinished = { [weak self] finished in self?.peeks.runsFinished(finished) }
         accounts.onAccountAdded = { [weak self] account in
             guard let self else { return }
-            notch.accountConnected(account)
+            peeks.accountConnected(account)
             system.requestFocusAccess()
-            Task {
-                await self.store.refresh()
-                await self.runs.refresh()
-            }
+            Task { await self.refreshAll() }
         }
         accounts.onTabsChanged = { [weak self] in
             guard let self else { return }
@@ -81,10 +118,7 @@ final class AppDependencies {
             guard let self else { return }
             tracker.forget(account: account.login)
             settings.mutedAccounts.remove(account.login)
-            Task {
-                await self.store.refresh()
-                await self.runs.refresh()
-            }
+            Task { await self.refreshAll() }
         }
     }
 }

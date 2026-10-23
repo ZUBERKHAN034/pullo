@@ -2525,22 +2525,6 @@
         }
       }
     },
-    "No account is logged into gh. Run `gh auth login` in Terminal.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay ninguna cuenta con sesión en gh. Ejecuta `gh auth login` en la Terminal."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma conta está logada no gh. Rode `gh auth login` no Terminal."
-          }
-        }
-      }
-    },
     "No accounts yet.": {
       "localizations": {
         "es": {
@@ -4144,22 +4128,6 @@
         }
       }
     },
-    "To add another account, run `gh auth login` and check again.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Para añadir otra cuenta, ejecuta `gh auth login` y vuelve a comprobar."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Para adicionar outra conta, rode `gh auth login` e verifique de novo."
-          }
-        }
-      }
-    },
     "To review": {
       "localizations": {
         "es": {
@@ -5714,6 +5682,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enquanto um app estava em tela cheia"
+          }
+        }
+      }
+    },
+    "Empty response from GitHub.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub devolvió una respuesta vacía."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub devolveu uma resposta vazia."
           }
         }
       }

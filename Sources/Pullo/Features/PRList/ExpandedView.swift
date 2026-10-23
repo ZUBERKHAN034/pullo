@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ExpandedView: View {
-    @Environment(PRListModel.self) private var list
+    @Environment(ToastCenter.self) private var toasts
     @Environment(NotchInteraction.self) private var notch
     @Environment(AccountStore.self) private var accounts
 
@@ -24,7 +24,7 @@ struct ExpandedView: View {
         .padding(.bottom, 14)
         .frame(width: size.width, height: size.height - notch.geometry.notchSize.height, alignment: .top)
         .overlay(alignment: .bottom) {
-            if let message = list.toast {
+            if let message = toasts.message {
                 Toast(message: message)
                     .padding(.bottom, 14)
                     .transition(.fadeSlide(from: .bottom))

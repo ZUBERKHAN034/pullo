@@ -91,8 +91,27 @@ jobs:
             ${{ runner.temp }}/packages
           key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
 
+      - name: Build without warnings
+        run: swift build -Xswiftc -warnings-as-errors
+
       - name: Test
-        run: swift test
+        run: swift test --enable-code-coverage
+
+      - name: Coverage
+        run: |
+          CODECOV_DIR=$(dirname "$(swift test --show-codecov-path)")
+          BUNDLE=$(find "$(swift build --show-bin-path)" -maxdepth 1 -name '*.xctest' | head -n 1)
+          BINARY="$BUNDLE/Contents/MacOS/$(basename "$BUNDLE" .xctest)"
+          xcrun llvm-cov report "$BINARY" \
+            -instr-profile "$CODECOV_DIR/default.profdata" \
+            -ignore-filename-regex '(\.build|Tests)/' \
+            | tee "$RUNNER_TEMP/coverage.txt"
+          {
+            echo "### Coverage"
+            echo '```'
+            tail -n 1 "$RUNNER_TEMP/coverage.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # Contributors' forks have no signing identity, so CI only proves the app target builds.
       - name: Build the app

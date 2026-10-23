@@ -4,6 +4,7 @@ struct PRBrowser: View {
     @Environment(PRListModel.self) private var list
     @Environment(NotchInteraction.self) private var notch
     @Environment(PRStore.self) private var store
+    @Environment(AccountStore.self) private var accounts
 
     var body: some View {
         VStack(spacing: 10) {
@@ -16,8 +17,8 @@ struct PRBrowser: View {
                         .transition(.opacity)
                 }
             }
-            if list.isLoaded, let (login, problem) = list.problem(worthShowingAt: .now) {
-                ErrorBanner(problem: problem, account: list.showsAccounts ? login : nil, updated: store.updatedAt[login]) {
+            if list.isLoaded, let (login, problem) = accounts.problem(in: store.errors, worthShowingAt: .now) {
+                ErrorBanner(problem: problem, account: accounts.hasMultipleAccounts ? login : nil, updated: store.updatedAt[login]) {
                     if problem.opensAccounts {
                         notch.onOpenSettings?(.accounts)
                     } else {
@@ -34,7 +35,7 @@ struct PRBrowser: View {
 
     @ViewBuilder
     private var content: some View {
-        if !list.isLoaded, let (_, problem) = list.problem() {
+        if !list.isLoaded, let (_, problem) = accounts.problem(in: store.errors) {
             ProblemMessage(problem: problem) { await store.refresh() }
         } else if !list.isLoaded {
             LoadingView()

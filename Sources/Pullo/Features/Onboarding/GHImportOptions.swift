@@ -4,7 +4,7 @@ struct GHImportOptions: View {
     static let terminalURL = URL(fileURLWithPath: "/System/Applications/Utilities/Terminal.app")
 
     @Environment(AccountStore.self) private var accounts
-    @Environment(PRListModel.self) private var list
+    @Environment(ToastCenter.self) private var toasts
     @Environment(\.system) private var system
 
     var body: some View {
@@ -66,7 +66,7 @@ struct GHImportOptions: View {
 
     private func copy(_ command: String) {
         system.copy(command)
-        list.showToast(String(localized: "Copied: \(command)"))
+        toasts.show(String(localized: "Copied: \(command)"))
     }
 
     private func recover(from failure: ImportFailure) {

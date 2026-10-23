@@ -5,7 +5,11 @@ import OSLog
 @MainActor
 @Observable
 final class PRStore {
-    private(set) var snapshots: [String: Snapshot] = [:]
+    private(set) var snapshots: [String: Snapshot] = [:] {
+        didSet { revision &+= 1 }
+    }
+
+    private(set) var revision = 0
     private(set) var lastUpdated: Date?
     private(set) var errors: [String: RefreshProblem] = [:]
     private(set) var updatedAt: [String: Date] = [:]

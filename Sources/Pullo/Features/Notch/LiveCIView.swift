@@ -20,7 +20,7 @@ struct LiveCIView: View {
         HStack(spacing: 4) {
             indicator
             if live.showsNumberBeside {
-                label(live.numberText)
+                label(live.name)
             }
         }
     }

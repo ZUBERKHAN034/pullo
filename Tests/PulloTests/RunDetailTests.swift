@@ -7,6 +7,7 @@ extension NotchBehavior {
     struct RunDetailTests {
         private func harness(_ source: StubRunSource) async -> NotchHarness {
             let h = await NotchHarness(runSource: source)
+            h.notch.open()
             await h.runs.refresh()
             return h
         }
@@ -58,7 +59,7 @@ extension NotchBehavior {
             await h.actions.perform(.rerunFailedJobs)
             #expect(await source.commands == ["rerun 7"])
             #expect(await source.runRequests.count == 2)
-            #expect(h.list.toast == "Re-running the failed jobs")
+            #expect(h.toasts.message == "Re-running the failed jobs")
             #expect(h.actions.running == nil)
         }
 
@@ -69,7 +70,7 @@ extension NotchBehavior {
             h.actions.open(run)
             await h.actions.perform(.cancel)
             #expect(await source.commands == ["cancel 7"])
-            #expect(h.list.toast == "Cancelling the run")
+            #expect(h.toasts.message == "Cancelling the run")
         }
 
         @Test func saysSoWhenGitHubRefuses() async {
@@ -79,7 +80,7 @@ extension NotchBehavior {
             let h = await harness(source)
             h.actions.open(run)
             await h.actions.perform(.cancel)
-            #expect(h.list.toast == "Couldn't cancel the run")
+            #expect(h.toasts.message == "Couldn't cancel the run")
         }
     }
 }
