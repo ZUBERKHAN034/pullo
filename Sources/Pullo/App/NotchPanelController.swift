@@ -32,8 +32,16 @@ final class NotchPanelController {
         installEventMonitors()
     }
 
+    func reopen() {
+        notch.reopen()
+        panel.makeKeyAndOrderFront(nil)
+    }
+
     private func stateChanged(to state: NotchState) {
         updateMouseCapture()
+        if state == .open, !panel.isKeyWindow, NSEvent.pressedMouseButtons == 0 {
+            panel.makeKeyAndOrderFront(nil)
+        }
         if state == .closed, panel.isKeyWindow {
             DispatchQueue.main.async { [panel] in
                 panel.orderOut(nil)

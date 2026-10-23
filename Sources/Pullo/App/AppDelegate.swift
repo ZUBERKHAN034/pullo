@@ -24,6 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         app.store.start()
         app.runs.start()
+        app.accounts.watchForGHLogins()
         if app.accounts.accounts.isEmpty { greetFirstLaunch() } else { app.system.requestFocusAccess() }
         panel.startListening()
         NSWorkspace.shared.notificationCenter.addObserver(
@@ -33,6 +34,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.refreshAfterWake() }
         }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        guard app.demo == nil else { return true }
+        panel?.reopen()
+        return false
     }
 
     private func refreshAfterWake() {
@@ -50,7 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 symbol: "hand.wave.fill",
                 tint: .blue,
                 headline: String(localized: "Welcome to Pullo"),
-                detail: String(localized: "Hover here to connect GitHub")
+                detail: String(localized: "Hover here or press \(Shortcut.togglePanel.symbols) to connect GitHub")
             ))
         }
     }

@@ -4,6 +4,20 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Added
+- On a Mac without a notch, Pullo now shows a small tab at the top of the screen, so you can find it and hover it. CI progress shows on it too.
+- Opening Pullo again from Finder or Spotlight opens the panel.
+- While you set up, copy the `gh auth login` command or open Terminal right from the panel. Pullo adds your account as soon as you log in.
+- ⌘, in the panel opens Settings.
+
+### Changed
+- The panel stays open while you set up your first account, even when you switch to Terminal. "Not now" closes it.
+- When the panel opens under the pointer, the arrow keys, Return and Esc work right away.
+- The welcome alert mentions the ⌥⌘P shortcut.
+
+### Fixed
+- When adding an account fails, Pullo says what went wrong in plain words and offers a way to fix it.
+
 ## [0.10.2] - 2026-10-23
 
 ### Removed

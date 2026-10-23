@@ -4,6 +4,7 @@ import SwiftUI
 struct AccountsPage: View {
     @Environment(NotchInteraction.self) private var notch
     @Environment(AccountStore.self) private var accounts
+    @Environment(\.system) private var system
     @State private var removing: Account?
 
     var body: some View {
@@ -50,7 +51,11 @@ struct AccountsPage: View {
                     }
                 }
                 if let failure = accounts.importFailure {
-                    Text(failure.message).font(.caption).foregroundStyle(.orange)
+                    LabeledContent {
+                        Button(failure.recoveryTitle) { recover(from: failure) }
+                    } label: {
+                        Text(failure.message).font(.caption).foregroundStyle(.orange)
+                    }
                 }
                 LabeledContent("Logged in with gh just now?") {
                     Button("Check again") { accounts.reloadGHUsers() }
@@ -66,6 +71,13 @@ struct AccountsPage: View {
             Button("Remove", role: .destructive) { accounts.remove(account) }
         } message: { _ in
             Text("Its PRs leave the notch. You can add it back from the GitHub CLI any time.")
+        }
+    }
+
+    private func recover(from failure: ImportFailure) {
+        switch failure.recovery {
+        case .copy(let command): system.copy(command)
+        case .retry: Task { await accounts.importFromGH(failure.user) }
         }
     }
 }
