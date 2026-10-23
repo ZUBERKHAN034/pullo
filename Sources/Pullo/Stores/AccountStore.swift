@@ -53,6 +53,10 @@ final class AccountStore {
 
     var hasMultipleAccounts: Bool { accounts.count > 1 }
 
+    func problem(in errors: [String: RefreshProblem], worthShowingAt now: Date? = nil) -> (login: String, problem: RefreshProblem)? {
+        RefreshProblem.first(in: errors, for: logins, worthShowingAt: now)
+    }
+
     var importableGHUsers: [String] {
         ghUsers.filter { user in !accounts.contains { $0.login.caseInsensitiveCompare(user) == .orderedSame } }
     }
@@ -62,7 +66,7 @@ final class AccountStore {
         accounts.removeAll { $0.id == account.id }
         persist()
         let keptTabs = tabs.filter { $0.account != account.login }
-        setTabs(keptTabs.isEmpty ? SavedFilter.defaults : keptTabs)
+        storeTabs(keptTabs.isEmpty ? SavedFilter.defaults : keptTabs)
         let keptRunTabs = runTabs.filter { $0.account != account.login }
         setRunTabs(keptRunTabs.isEmpty ? RunTab.defaults : keptRunTabs)
         onAccountRemoved?(account)
@@ -73,10 +77,15 @@ final class AccountStore {
     }
 
     func setTabs(_ tabs: [SavedFilter]) {
-        guard self.tabs != tabs else { return }
+        if storeTabs(tabs) { onTabsChanged?() }
+    }
+
+    @discardableResult
+    private func storeTabs(_ tabs: [SavedFilter]) -> Bool {
+        guard self.tabs != tabs else { return false }
         self.tabs = tabs
         save(tabs, for: .tabs)
-        onTabsChanged?()
+        return true
     }
 
     func setRunTabs(_ tabs: [RunTab]) {

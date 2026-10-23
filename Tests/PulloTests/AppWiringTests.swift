@@ -53,5 +53,17 @@ extension NotchBehavior {
             #expect(h.runs.isLoaded("ana"))
             #expect(h.system.focusRequests == 1)
         }
+
+        @Test func removingAnAccountRefreshesThePRsOnce() async throws {
+            let source = ChangingSource()
+            let h = await NotchHarness(accounts: ["me", "work"], source: source)
+            let workAPI = SavedFilter(name: "API", query: "repo:acme/api", account: "work")
+            h.accounts.setTabs(h.accounts.tabs + [workAPI])
+            await eventually { await source.requests.count == 4 }
+            try h.accounts.remove(#require(h.accounts.accounts.last))
+            await eventually { await source.requests.count > 4 }
+            await h.clock.settle()
+            #expect(await source.requests.count == 5)
+        }
     }
 }

@@ -32,10 +32,6 @@ final class ActionsModel {
 
     var isLoaded: Bool { accounts.logins.contains { store.isLoaded($0) } }
 
-    func problem(worthShowingAt now: Date? = nil) -> (login: String, problem: RefreshProblem)? {
-        RefreshProblem.first(in: store.errors, for: accounts.logins, worthShowingAt: now)
-    }
-
     var allRuns: [WorkflowRun] {
         var seen = Set<Int>()
         return accounts.logins.flatMap(store.runs(for:)).filter { seen.insert($0.id).inserted }

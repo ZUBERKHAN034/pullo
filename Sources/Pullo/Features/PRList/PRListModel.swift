@@ -32,12 +32,6 @@ final class PRListModel {
 
     var isLoaded: Bool { logins.contains { store.snapshots[$0] != nil } }
 
-    var showsAccounts: Bool { logins.count > 1 }
-
-    func problem(worthShowingAt now: Date? = nil) -> (login: String, problem: RefreshProblem)? {
-        RefreshProblem.first(in: store.errors, for: logins, worthShowingAt: now)
-    }
-
     var filters: [SavedFilter] { accounts.tabs }
 
     var tabs: [PRTab] {

@@ -95,6 +95,11 @@ final class AppDependencies {
         runs.start()
     }
 
+    func refreshAll() async {
+        await store.refresh()
+        await runs.refresh()
+    }
+
     private func connect() {
         runs.setPanelOpen(notch.state == .open)
         store.onEvents = { [weak self] events in self?.peeks.enqueue(events: events) }
@@ -103,10 +108,7 @@ final class AppDependencies {
             guard let self else { return }
             peeks.accountConnected(account)
             system.requestFocusAccess()
-            Task {
-                await self.store.refresh()
-                await self.runs.refresh()
-            }
+            Task { await self.refreshAll() }
         }
         accounts.onTabsChanged = { [weak self] in
             guard let self else { return }
@@ -116,10 +118,7 @@ final class AppDependencies {
             guard let self else { return }
             tracker.forget(account: account.login)
             settings.mutedAccounts.remove(account.login)
-            Task {
-                await self.store.refresh()
-                await self.runs.refresh()
-            }
+            Task { await self.refreshAll() }
         }
     }
 }

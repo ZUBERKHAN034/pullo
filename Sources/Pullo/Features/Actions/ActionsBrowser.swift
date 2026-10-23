@@ -3,6 +3,7 @@ import SwiftUI
 struct ActionsBrowser: View {
     @Environment(ActionsModel.self) private var actions
     @Environment(PRListModel.self) private var list
+    @Environment(AccountStore.self) private var accounts
     @Environment(NotchInteraction.self) private var notch
     @Namespace private var selection
 
@@ -39,8 +40,8 @@ struct ActionsBrowser: View {
                     notch.onOpenSettings?(.tabs)
                 }
             }
-            if actions.isLoaded, let (login, problem) = actions.problem(worthShowingAt: .now) {
-                ErrorBanner(problem: problem, account: list.showsAccounts ? login : nil, updated: nil) {
+            if actions.isLoaded, let (login, problem) = accounts.problem(in: actions.store.errors, worthShowingAt: .now) {
+                ErrorBanner(problem: problem, account: accounts.hasMultipleAccounts ? login : nil, updated: nil) {
                     if problem.opensAccounts {
                         notch.onOpenSettings?(.accounts)
                     } else {
@@ -54,7 +55,7 @@ struct ActionsBrowser: View {
 
     @ViewBuilder
     private var content: some View {
-        if !actions.isLoaded, let (_, problem) = actions.problem() {
+        if !actions.isLoaded, let (_, problem) = accounts.problem(in: actions.store.errors) {
             ProblemMessage(problem: problem) { await actions.store.refresh() }
         } else if !actions.isLoaded {
             MessageView(
