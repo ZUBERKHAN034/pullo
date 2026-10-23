@@ -27,7 +27,7 @@ struct PRBrowser: View {
             }
             content
             if list.keyboardMode {
-                KeyboardHints(searching: list.isSearching)
+                KeyboardHints(context: .pullRequests(searching: list.isSearching))
             }
         }
     }

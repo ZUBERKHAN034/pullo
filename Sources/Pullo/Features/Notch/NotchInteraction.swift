@@ -151,6 +151,7 @@ final class NotchInteraction {
         forgetMissedAlerts()
         list.keyboardMode = viaKeyboard
         if viaKeyboard { list.selectFirstIfNeeded() }
+        if viaKeyboard, area == .actions { actions?.selectFirstIfNeeded() }
         withAnimation(Motion.open) {
             state = .open
             peekAlert = nil
@@ -167,6 +168,7 @@ final class NotchInteraction {
         holdingPeek = false
         waitingForPointerExit = pointerStaysOver
         list.reset()
+        actions?.resetSelection()
         withAnimation(Motion.close) { state = .closed }
     }
 
@@ -174,6 +176,7 @@ final class NotchInteraction {
         guard area != self.area else { return }
         if list.isSearching { list.stopSearch() }
         withAnimation(Motion.navigate) { self.area = area }
+        if area == .actions, list.keyboardMode { actions?.selectFirstIfNeeded() }
     }
 
     // MARK: - Alerts
@@ -349,7 +352,7 @@ final class NotchInteraction {
     }
 
     func perform(_ command: KeyCommand) -> Bool {
-        if area == .actions, !command.worksEverywhere { return false }
+        if area == .actions, !command.worksEverywhere { return performInActions(command) }
         switch command {
         case .quit: system.quit()
         case .search: list.startSearch()
@@ -372,5 +375,25 @@ final class NotchInteraction {
             }
         }
         return true
+    }
+
+    private func performInActions(_ command: KeyCommand) -> Bool {
+        guard let actions else { return false }
+        if let run = actions.openedRun {
+            guard command == .open else { return false }
+            openInBrowser(run.url)
+            return true
+        }
+        switch command {
+        case .moveUp: return actions.moveSelection(by: -1)
+        case .moveDown: return actions.moveSelection(by: 1)
+        case .switchTab: return actions.selectTab(by: 1)
+        case .previousTab: return actions.selectTab(by: -1)
+        case .open:
+            guard let run = actions.selectedRun else { return false }
+            actions.open(run)
+            return true
+        default: return false
+        }
     }
 }

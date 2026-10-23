@@ -5,7 +5,7 @@ struct Chip: View {
 
     var body: some View {
         Text(verbatim: text)
-            .font(.panel(.micro, .semibold))
+            .font(.panel(.caption, .semibold))
             .foregroundStyle(.textSecondary)
             .padding(.horizontal, 6)
             .padding(.vertical, 1)

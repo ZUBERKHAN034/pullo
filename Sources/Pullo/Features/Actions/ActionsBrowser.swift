@@ -7,12 +7,20 @@ struct ActionsBrowser: View {
     @Namespace private var selection
 
     var body: some View {
-        if let run = actions.openedRun {
-            RunDetail(run: run)
-                .transition(.opacity.combined(with: .move(edge: .trailing)))
-        } else {
-            browser
-                .transition(.opacity.combined(with: .move(edge: .leading)))
+        VStack(spacing: 10) {
+            ZStack(alignment: .top) {
+                if let run = actions.openedRun {
+                    RunDetail(run: run)
+                        .transition(.fadeSlide(from: .trailing))
+                } else {
+                    browser
+                        .transition(.fadeSlide(from: .leading))
+                }
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+            if list.keyboardMode {
+                KeyboardHints(context: actions.openedRun == nil ? .runs : .run)
+            }
         }
     }
 
@@ -58,13 +66,19 @@ struct ActionsBrowser: View {
             MessageView(symbol: "bolt.horizontal.circle", title: String(localized: "No runs here"), detail: emptyDetail)
                 .id(actions.tab?.id)
         } else {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 2) {
-                    section(String(localized: "Running"), actions.active)
-                    section(String(localized: "Recent"), actions.recent)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 2) {
+                        section(String(localized: "Running"), actions.active)
+                        section(String(localized: "Recent"), actions.recent)
+                    }
+                }
+                .scrollIndicators(.never)
+                .onChange(of: actions.selectedRunID) { _, id in
+                    guard let id else { return }
+                    withAnimation(Motion.navigate) { proxy.scrollTo(id, anchor: .center) }
                 }
             }
-            .scrollIndicators(.never)
             .id(actions.tab?.id)
         }
     }
@@ -74,10 +88,10 @@ struct ActionsBrowser: View {
         if !runs.isEmpty {
             Text(title.uppercased())
                 .font(.panel(.caption, .bold))
-                .foregroundStyle(.textMuted)
+                .foregroundStyle(.textTertiary)
                 .padding(.horizontal, 10)
                 .padding(.top, 4)
-            ForEach(runs) { RunRow(run: $0) }
+            ForEach(runs) { RunRow(run: $0, selected: actions.selectedRunID == $0.id).id($0.id) }
         }
     }
 
