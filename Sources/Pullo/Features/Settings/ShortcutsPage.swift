@@ -21,6 +21,7 @@ struct ShortcutsPage: View {
                 row("Mark as read", "R")
                 row("Go to a tab", "⌘1 – ⌘9")
                 row("Clear the search, or close", "esc")
+                row("Open Settings", "⌘,")
                 row("Quit Pullo", "⌘Q")
             }
         }

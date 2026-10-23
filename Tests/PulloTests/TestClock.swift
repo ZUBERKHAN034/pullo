@@ -20,6 +20,7 @@ final class TestClock: Clock, @unchecked Sendable {
     private var sleepers: [Sleeper] = []
 
     var now: Instant { lock.withLock { current } }
+    var hasSleepers: Bool { lock.withLock { !sleepers.isEmpty } }
     var minimumResolution: Duration { .zero }
 
     func sleep(until deadline: Instant, tolerance: Duration?) async throws {

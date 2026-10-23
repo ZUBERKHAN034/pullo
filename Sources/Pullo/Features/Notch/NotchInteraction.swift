@@ -60,7 +60,7 @@ final class NotchInteraction {
     var layout: NotchLayout { NotchLayout(geometry: geometry, closedWings: liveCI?.wingWidth ?? 0) }
 
     var liveCI: LiveCI? {
-        guard geometry.hasNotch, settings.showsLiveCI else { return nil }
+        guard settings.showsLiveCI else { return nil }
         if var finishedCI {
             finishedCI.label = settings.liveCILabel
             return finishedCI
@@ -111,7 +111,7 @@ final class NotchInteraction {
                 if inside { list.keyboardMode = false }
                 return
             }
-            guard !inside, !buttonHeld else { return cancelHover() }
+            guard !inside, !buttonHeld, !holdsOpenForSetup else { return cancelHover() }
             scheduleHover(after: .milliseconds(200)) { notch in
                 if !notch.isPointerOver(.open), !notch.buttonHeld { notch.close() }
             }
@@ -119,7 +119,11 @@ final class NotchInteraction {
     }
 
     func mouseDown(at point: NSPoint) {
-        if state == .open, !layout.hitRect(for: .open).contains(point) { close() }
+        if state == .open, !holdsOpenForSetup, !layout.hitRect(for: .open).contains(point) { close() }
+    }
+
+    var holdsOpenForSetup: Bool {
+        accounts.accounts.isEmpty
     }
 
     private func scheduleHover(after delay: Duration, _ action: @escaping (NotchInteraction) -> Void) {
@@ -162,6 +166,14 @@ final class NotchInteraction {
         if state == .open { close() } else { open(viaKeyboard: true) }
     }
 
+    func reopen() {
+        if state == .open {
+            list.keyboardMode = true
+        } else {
+            open(viaKeyboard: true)
+        }
+    }
+
     func close(pointerStaysOver: Bool = false) {
         cancelHover()
         peekTask?.cancel()
@@ -201,14 +213,14 @@ final class NotchInteraction {
     }
 
     private func showsFinishedCI(on pr: PullRequest) -> Bool {
-        state == .closed && finishedCITask == nil && geometry.hasNotch && settings.showsLiveCI
+        state == .closed && finishedCITask == nil && settings.showsLiveCI
             && !settings.mutedAccounts.contains(pr.account)
     }
 
     func runsFinished(_ finished: [WorkflowRun]) {
         let shown = finished.filter { !settings.mutedAccounts.contains($0.account) }
         guard let run = shown.first(where: { $0.state == .failed }) ?? shown.first(where: { $0.state == .passed }),
-              state == .closed, finishedCITask == nil, geometry.hasNotch, settings.showsLiveCI
+              state == .closed, finishedCITask == nil, settings.showsLiveCI
         else { return }
         flash(LiveCI(run: run, finished: run.state == .failed ? .failure : .success), then: [])
     }
@@ -355,12 +367,14 @@ final class NotchInteraction {
         if area == .actions, !command.worksEverywhere { return performInActions(command) }
         switch command {
         case .quit: system.quit()
+        case .settings: onOpenSettings?(nil)
         case .search: list.startSearch()
         case .close:
             if area == .actions, actions?.back() == true { break }
             if list.isSearching { list.stopSearch() } else { close() }
-        case .moveUp: list.moveSelection(by: -1)
-        case .moveDown: list.moveSelection(by: 1)
+        case .moveUp, .moveDown:
+            list.keyboardMode = true
+            list.moveSelection(by: command == .moveUp ? -1 : 1)
         case .switchTab: list.selectTab(by: 1)
         case .previousTab: list.selectTab(by: -1)
         case .selectTab(let number):
@@ -385,8 +399,9 @@ final class NotchInteraction {
             return true
         }
         switch command {
-        case .moveUp: return actions.moveSelection(by: -1)
-        case .moveDown: return actions.moveSelection(by: 1)
+        case .moveUp, .moveDown:
+            list.keyboardMode = true
+            return actions.moveSelection(by: command == .moveUp ? -1 : 1)
         case .switchTab: return actions.selectTab(by: 1)
         case .previousTab: return actions.selectTab(by: -1)
         case .open:

@@ -5301,6 +5301,278 @@
           }
         }
       }
+    },
+    "Hover here or press %@ to connect GitHub": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasa el cursor aquí o pulsa %@ para conectar GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passe o mouse aqui ou aperte %@ para conectar o GitHub"
+          }
+        }
+      }
+    },
+    "Open Terminal": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Terminal"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Terminal"
+          }
+        }
+      }
+    },
+    "Pullo adds your account as soon as you log in.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pullo añade tu cuenta en cuanto inicies sesión."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Pullo adiciona sua conta assim que você fizer login."
+          }
+        }
+      }
+    },
+    "Install GitHub CLI and log in. Run this in Terminal:": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instala GitHub CLI e inicia sesión. Ejecuta esto en la Terminal:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instale o GitHub CLI e faça login. Rode isto no Terminal:"
+          }
+        }
+      }
+    },
+    "No account is logged into gh. Run this in Terminal:": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna cuenta con sesión en gh. Ejecuta esto en la Terminal:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma conta está logada no gh. Rode isto no Terminal:"
+          }
+        }
+      }
+    },
+    "To add another account, run this in Terminal:": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para añadir otra cuenta, ejecuta esto en la Terminal:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para adicionar outra conta, rode isto no Terminal:"
+          }
+        }
+      }
+    },
+    "Copied: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiado: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiado: %@"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar"
+          }
+        }
+      }
+    },
+    "Copy command": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar comando"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar comando"
+          }
+        }
+      }
+    },
+    "Not now": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ahora no"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agora não"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes"
+          }
+        }
+      }
+    },
+    "gh isn't logged into @%@ anymore. Log in again in Terminal, then add it.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gh ya no tiene sesión en @%@. Vuelve a iniciar sesión en la Terminal y luego añádela."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O gh não está mais logado em @%@. Faça login de novo no Terminal e depois adicione."
+          }
+        }
+      }
+    },
+    "gh took too long to answer for @%@.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gh tardó demasiado en responder por @%@."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O gh demorou demais para responder por @%@."
+          }
+        }
+      }
+    },
+    "GitHub rejected the gh login for @%@. Log in again in Terminal, then add it.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub rechazó la sesión de gh de @%@. Vuelve a iniciar sesión en la Terminal y luego añádela."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub recusou o login do gh de @%@. Faça login de novo no Terminal e depois adicione."
+          }
+        }
+      }
+    },
+    "Couldn't reach GitHub. Check your internet connection.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo conectar con GitHub. Revisa tu conexión a internet."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível acessar o GitHub. Confira sua conexão com a internet."
+          }
+        }
+      }
+    },
+    "GitHub isn't answering right now. Try again in a moment.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub no responde ahora mismo. Vuelve a intentarlo en un momento."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O GitHub não está respondendo agora. Tente de novo daqui a pouco."
+          }
+        }
+      }
+    },
+    "Couldn't add @%@: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo añadir @%1$@: %2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível adicionar @%1$@: %2$@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

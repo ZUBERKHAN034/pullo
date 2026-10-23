@@ -1,14 +1,14 @@
 import Carbon.HIToolbox
 
 enum KeyCommand: Equatable {
-    case quit, search, close
+    case quit, settings, search, close
     case moveUp, moveDown, open
     case switchTab, previousTab, selectTab(Int), copyBranch, markRead
     case show(PanelArea)
 
     var worksEverywhere: Bool {
         switch self {
-        case .quit, .close, .selectTab, .show: true
+        case .quit, .settings, .close, .selectTab, .show: true
         default: false
         }
     }
@@ -22,6 +22,7 @@ enum KeyCommand: Equatable {
             }
             switch characters {
             case "q": self = .quit
+            case ",": self = .settings
             case "f": self = .search
             default:
                 guard !searching, let number = Int(characters), (1...9).contains(number) else { return nil }

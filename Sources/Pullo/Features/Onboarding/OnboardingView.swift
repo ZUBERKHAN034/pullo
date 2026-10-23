@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(AccountStore.self) private var accounts
+    @Environment(NotchInteraction.self) private var notch
 
     var body: some View {
         VStack(spacing: 14) {
@@ -24,6 +25,10 @@ struct OnboardingView: View {
                     .foregroundStyle(.textTertiary)
             }
             GHImportOptions()
+            Button("Not now") { notch.close(pointerStaysOver: true) }
+                .buttonStyle(.plain)
+                .font(.panel(.small, .medium))
+                .foregroundStyle(.textTertiary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

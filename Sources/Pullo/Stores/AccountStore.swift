@@ -20,11 +20,24 @@ final class AccountStore {
     private let defaults: UserDefaults
     private let cli: any GitHubCLI
     private let tokens: TokenProvider
+    private let session: URLSession
+    private let clock: any Clock<Duration>
+    @ObservationIgnored private var knownGHUsers: Set<String>?
+    @ObservationIgnored private var watchTicks = 0
+    @ObservationIgnored private var loginWatch: Task<Void, Never>?
 
-    init(defaults: UserDefaults, cli: any GitHubCLI, tokens: TokenProvider) {
+    init(
+        defaults: UserDefaults,
+        cli: any GitHubCLI,
+        tokens: TokenProvider,
+        session: URLSession = .shared,
+        clock: any Clock<Duration> = ContinuousClock()
+    ) {
         self.defaults = defaults
         self.cli = cli
         self.tokens = tokens
+        self.session = session
+        self.clock = clock
         if let data = defaults.data(for: .accounts) {
             do {
                 accounts = try JSONDecoder().decode([Account].self, from: data)
@@ -69,18 +82,50 @@ final class AccountStore {
     }
 
     func reloadGHUsers(recheck: Bool = false) {
-        let cli = cli
-        let tokens = tokens
-        Task { [weak self] in
-            if recheck {
-                await cli.recheck()
-                await tokens.clearFailures()
-            }
-            let installed = await cli.isInstalled()
-            let users = await cli.users()
-            self?.ghInstalled = installed
-            self?.ghUsers = users
+        Task { [weak self] in await self?.loadGHUsers(recheck: recheck) }
+    }
+
+    @discardableResult
+    func loadGHUsers(recheck: Bool = false) async -> [String] {
+        if recheck {
+            await cli.recheck()
+            await tokens.clearFailures()
         }
+        let installed = await cli.isInstalled()
+        let users = await cli.users()
+        ghInstalled = installed
+        ghUsers = users
+        return users
+    }
+
+    func watchForGHLogins(every interval: Duration = .seconds(3)) {
+        guard loginWatch == nil else { return }
+        let clock = clock
+        loginWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.checkForNewLogins()
+                try? await clock.sleep(for: interval)
+                if self == nil { return }
+            }
+        }
+    }
+
+    private func checkForNewLogins() async {
+        guard accounts.isEmpty else {
+            knownGHUsers = nil
+            return
+        }
+        guard importing == nil else { return }
+        watchTicks += 1
+        let users = await loadGHUsers(recheck: !ghInstalled && watchTicks.isMultiple(of: 10))
+        if let known = knownGHUsers {
+            let added = users.filter { !known.contains($0.lowercased()) && importableGHUsers.contains($0) }
+            if !added.isEmpty { await tokens.clearFailures() }
+            for user in added {
+                await importFromGH(user)
+            }
+        }
+        knownGHUsers = Set(users.map { $0.lowercased() })
     }
 
     func importFromGH(_ user: String) async {
@@ -89,14 +134,14 @@ final class AccountStore {
         defer { importing = nil }
         do {
             let token = try await cli.token(for: user)
-            let profile = try await GitHubClient(token: token).fetchUser()
+            let profile = try await GitHubClient(token: token, session: session).fetchUser()
             await tokens.remember(token, for: profile.login)
             upsert(Account(login: profile.login, avatarURL: profile.avatarURL))
         } catch {
             Logger.github.error(
                 "Adding @\(user, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
             )
-            importFailure = ImportFailure(user: user, reason: error.localizedDescription)
+            importFailure = ImportFailure(user: user, error: error)
         }
     }
 

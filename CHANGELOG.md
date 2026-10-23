@@ -5,13 +5,21 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 ## [Unreleased]
 
 ### Added
-- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
-- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
+- On a Mac without a notch, Pullo now shows a small tab at the top of the screen, so you can find it and hover it. CI progress shows on it too.
+- Opening Pullo again from Finder or Spotlight opens the panel.
+- While you set up, copy the `gh auth login` command or open Terminal right from the panel. Pullo adds your account as soon as you log in.
+- ⌘, in the panel opens Settings.
 
 ### Changed
+- The panel stays open while you set up your first account, even when you switch to Terminal. "Not now" closes it.
+- When the panel opens under the pointer, the arrow keys, Return and Esc work right away.
+- The welcome alert mentions the ⌥⌘P shortcut.
 - Pullo uses less battery and network. It stops checking GitHub while your Mac is asleep, its screen is off or locked, or it's offline, and checks once as soon as you're back. With the panel closed, the Actions side only keeps a close eye on runs you started.
 
 ### Fixed
+- When adding an account fails, Pullo says what went wrong in plain words and offers a way to fix it.
+- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
+- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
 - When GitHub's request limit is reached, Pullo waits until it resets instead of asking again every minute. When GitHub keeps failing, it waits a bit longer each time, up to five minutes, and when your sign-in is rejected it stops asking until you try again.
 - Pullo now finds gh installed with MacPorts, Nix, mise or anywhere on your shell's PATH, and reads gh's settings from `XDG_CONFIG_HOME` when you use it.
 - A slow or broken gh no longer holds Pullo up, and Pullo stops asking it for a token on every refresh after it fails. "Check again" in Settings → Accounts asks right away.
