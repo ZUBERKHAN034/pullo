@@ -7,7 +7,6 @@ final class PRListModel {
     private var chosenTab: PRTab?
     private(set) var selectedPRID: String?
     var keyboardMode = false
-    private(set) var toast: String?
     private(set) var isSearching = false
     var searchQuery = "" {
         didSet { if isSearching { selectedPRID = visiblePRs.first?.id } }
@@ -19,24 +18,17 @@ final class PRListModel {
     private let accounts: AccountStore
     private let tracker: ReadTracker
     private let system: any SystemActions
-    private let clock: any Clock<Duration>
-    @ObservationIgnored private var toastTask: Task<Void, Never>?
+    private let toasts: ToastCenter
 
-    init(
-        store: PRStore,
-        accounts: AccountStore,
-        tracker: ReadTracker,
-        system: any SystemActions,
-        clock: any Clock<Duration> = ContinuousClock()
-    ) {
+    init(store: PRStore, accounts: AccountStore, tracker: ReadTracker, system: any SystemActions, toasts: ToastCenter) {
         self.store = store
         self.accounts = accounts
         self.tracker = tracker
         self.system = system
-        self.clock = clock
+        self.toasts = toasts
     }
 
-    var logins: [String] { accounts.accounts.map(\.login) }
+    var logins: [String] { accounts.logins }
 
     var isLoaded: Bool { logins.contains { store.snapshots[$0] != nil } }
 
@@ -185,23 +177,12 @@ final class PRListModel {
 
     func markAllRead() {
         tracker.markRead(visiblePRs)
-        showToast(String(localized: "All marked as read"))
+        toasts.show(String(localized: "All marked as read"))
     }
 
     func copyBranch(_ pr: PullRequest) {
         system.copy(pr.branch)
-        showToast(String(localized: "Copied branch: \(pr.branch)"))
-    }
-
-    func showToast(_ message: String) {
-        toastTask?.cancel()
-        withAnimation(Motion.navigate) { toast = message }
-        let clock = clock
-        toastTask = Task { [weak self] in
-            try? await clock.sleep(for: .seconds(1.8))
-            guard !Task.isCancelled else { return }
-            withAnimation(Motion.fade) { self?.toast = nil }
-        }
+        toasts.show(String(localized: "Copied branch: \(pr.branch)"))
     }
 
     private func resetSelection() {

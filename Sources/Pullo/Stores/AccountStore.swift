@@ -49,6 +49,8 @@ final class AccountStore {
         reloadGHUsers()
     }
 
+    var logins: [String] { accounts.map(\.login) }
+
     var importableGHUsers: [String] {
         ghUsers.filter { user in !accounts.contains { $0.login.caseInsensitiveCompare(user) == .orderedSame } }
     }

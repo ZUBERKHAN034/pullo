@@ -22,53 +22,53 @@ private struct StubSource: PRSource {
 final class NotchHarness {
     let clock = TestClock()
     let system = SpySystem()
-    let accounts: AccountStore
-    let settings: AppSettings
-    let tracker: ReadTracker
-    let store: PRStore
-    let list: PRListModel
-    let notch: NotchInteraction
-    let runs: RunStore
-    let actions: ActionsModel
+    let app: AppDependencies
     var now = Date(timeIntervalSince1970: 1_000_000)
     private let scratch = ScratchDefaults()
     var defaults: UserDefaults { scratch.defaults }
+
+    var accounts: AccountStore { app.accounts }
+    var settings: AppSettings { app.settings }
+    var tracker: ReadTracker { app.tracker }
+    var store: PRStore { app.store }
+    var runs: RunStore { app.runs }
+    var toasts: ToastCenter { app.toasts }
+    var list: PRListModel { app.list }
+    var actions: ActionsModel { app.actions }
+    var notch: NotchInteraction { app.notch }
 
     init(
         accounts logins: [String] = ["me"],
         mine: [PullRequest] = [],
         review: [PullRequest] = [],
-        runSource: RunSource = NoRuns()
+        source: (any PRSource)? = nil,
+        runSource: RunSource = NoRuns(),
+        cli: any GitHubCLI = FakeCLI(),
+        session: URLSession = .shared
     ) async {
         let defaults = scratch.defaults
         defaults.set(try? JSONEncoder().encode(logins.map { Account(login: $0, avatarURL: nil) }), for: .accounts)
-        accounts = AccountStore(defaults: defaults)
-        settings = AppSettings(defaults: defaults)
-        tracker = ReadTracker(defaults: defaults)
         let snapshots = Dictionary(uniqueKeysWithValues: logins.map { login in
             (login, Snapshot(mine: mine.filter { $0.account == login }, reviewRequests: review.filter { $0.account == login }))
         })
-        store = PRStore(accounts: accounts, tracker: tracker, source: StubSource(snapshots: snapshots))
-        list = PRListModel(store: store, accounts: accounts, tracker: tracker, system: system, clock: clock)
         var clockNow: () -> Date = { Date() }
-        runs = RunStore(accounts: accounts, prs: store, source: runSource) { clockNow() }
-        actions = ActionsModel(store: runs, list: list, accounts: accounts)
-        notch = NotchInteraction(
-            list: list,
-            runs: runs,
-            accounts: accounts,
-            settings: settings,
+        app = AppDependencies(
+            defaults: defaults,
+            cli: cli,
+            tokens: TokenProvider(cli: cli),
+            session: session,
+            prSource: source ?? StubSource(snapshots: snapshots),
+            runSource: runSource,
             system: system,
             geometry: NotchGeometry(
                 screenFrame: NSRect(x: 0, y: 0, width: 1512, height: 982),
                 notchSize: CGSize(width: 185, height: 32),
                 hasNotch: true
             ),
-            clock: clock
+            clock: clock,
+            now: { clockNow() }
         )
-        clockNow = { [unowned self] in now }
-        runs.onRunsFinished = { [unowned notch] in notch.runsFinished($0) }
-        notch.actions = actions
+        clockNow = { [weak self] in self?.now ?? Date() }
         await store.refresh()
     }
 

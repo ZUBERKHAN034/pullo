@@ -94,7 +94,7 @@ extension NotchBehavior {
             let h = await NotchHarness(runSource: source)
             await h.runs.refresh()
             await source.set([.make(id: 1, workflow: "Deploy", state: .failed)], in: "acme/api")
-            h.now += 10
+            h.now += RunStore.closedActiveInterval
             await h.runs.refresh()
             #expect(h.notch.liveCI?.finished == .failure)
             #expect(h.notch.liveCI?.name == "Deploy")

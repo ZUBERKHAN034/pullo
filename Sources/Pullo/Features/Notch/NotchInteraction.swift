@@ -17,6 +17,7 @@ final class NotchInteraction {
     var geometry: NotchGeometry
 
     let list: PRListModel
+    private let actions: ActionsModel
     private let runs: RunStore
     private let accounts: AccountStore
     private let settings: AppSettings
@@ -25,7 +26,6 @@ final class NotchInteraction {
 
     @ObservationIgnored var onStateChange: ((NotchState) -> Void)?
     @ObservationIgnored var onOpenSettings: ((SettingsPage?) -> Void)?
-    @ObservationIgnored var actions: ActionsModel?
 
     @ObservationIgnored private var alerts = AlertQueue()
     @ObservationIgnored private var peekTask: Task<Void, Never>?
@@ -42,6 +42,7 @@ final class NotchInteraction {
 
     init(
         list: PRListModel,
+        actions: ActionsModel,
         runs: RunStore,
         accounts: AccountStore,
         settings: AppSettings,
@@ -50,6 +51,7 @@ final class NotchInteraction {
         clock: any Clock<Duration> = ContinuousClock()
     ) {
         self.list = list
+        self.actions = actions
         self.runs = runs
         self.accounts = accounts
         self.settings = settings
@@ -156,7 +158,7 @@ final class NotchInteraction {
         forgetMissedAlerts()
         list.keyboardMode = viaKeyboard
         if viaKeyboard { list.selectFirstIfNeeded() }
-        if viaKeyboard, area == .actions { actions?.selectFirstIfNeeded() }
+        if viaKeyboard, area == .actions { actions.selectFirstIfNeeded() }
         withAnimation(Motion.open) {
             state = .open
             peekAlert = nil
@@ -181,7 +183,7 @@ final class NotchInteraction {
         holdingPeek = false
         waitingForPointerExit = pointerStaysOver
         list.reset()
-        actions?.resetSelection()
+        actions.resetSelection()
         withAnimation(Motion.close) { state = .closed }
     }
 
@@ -189,7 +191,7 @@ final class NotchInteraction {
         guard area != self.area else { return }
         if list.isSearching { list.stopSearch() }
         withAnimation(Motion.navigate) { self.area = area }
-        if area == .actions, list.keyboardMode { actions?.selectFirstIfNeeded() }
+        if area == .actions, list.keyboardMode { actions.selectFirstIfNeeded() }
     }
 
     // MARK: - Alerts
@@ -378,7 +380,7 @@ final class NotchInteraction {
         case .settings: onOpenSettings?(nil)
         case .search: list.startSearch()
         case .close:
-            if area == .actions, actions?.back() == true { break }
+            if area == .actions, actions.back() { break }
             if list.isSearching { list.stopSearch() } else { close() }
         case .moveUp, .moveDown:
             list.keyboardMode = true
@@ -386,7 +388,7 @@ final class NotchInteraction {
         case .switchTab: list.selectTab(by: 1)
         case .previousTab: list.selectTab(by: -1)
         case .selectTab(let number):
-            return area == .actions ? actions?.selectTab(number: number) ?? false : list.selectTab(number: number)
+            return area == .actions ? actions.selectTab(number: number) : list.selectTab(number: number)
         case .show(let area): show(area)
         case .open, .copyBranch, .markRead:
             guard let pr = list.selectedPR else { return false }
@@ -400,7 +402,6 @@ final class NotchInteraction {
     }
 
     private func performInActions(_ command: KeyCommand) -> Bool {
-        guard let actions else { return false }
         if let run = actions.openedRun {
             guard command == .open else { return false }
             openInBrowser(run.url)

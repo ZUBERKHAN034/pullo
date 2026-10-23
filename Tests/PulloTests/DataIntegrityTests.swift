@@ -145,7 +145,7 @@ extension NotchBehavior {
             #expect(h.runs.runs(for: "me").first?.state == .running)
 
             await source.hold.close()
-            h.now += 10
+            h.now += RunStore.closedActiveInterval
             let first = Task { await h.runs.refresh() }
             await source.hold.waitForArrivals(2)
             await source.set([.make(id: 1, state: .cancelled)], in: "acme/api")

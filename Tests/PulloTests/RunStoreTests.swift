@@ -35,6 +35,7 @@ extension NotchBehavior {
                 "acme/quiet": [.make(id: 2, repo: "acme/quiet")],
             ])
             let h = await NotchHarness(runSource: source)
+            h.notch.open()
             await h.runs.refresh()
             h.now += 10
             await h.runs.refresh()
@@ -88,6 +89,7 @@ extension NotchBehavior {
         @Test func stopsAskingForAnAccountsReposOnceOffline() async {
             let source = StubRunSource(pushed: ["acme/a", "acme/b", "acme/c"])
             let h = await NotchHarness(runSource: source)
+            h.notch.open()
             await h.runs.refresh()
             await source.failRuns(with: .offline)
             h.now += 60
@@ -140,8 +142,9 @@ extension NotchBehavior {
 
         @Test func openingThePanelFollowsItsState() async {
             let h = await NotchHarness()
-            #expect(h.runs.isPanelOpen)
+            #expect(!h.runs.isPanelOpen)
             h.notch.open()
+            #expect(h.runs.isPanelOpen)
             h.notch.close()
             #expect(!h.runs.isPanelOpen)
             h.notch.open()
