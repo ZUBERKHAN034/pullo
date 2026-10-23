@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-10-23
+
 ### Changed
 - Each Settings page has its own colored icon in the sidebar, like System Settings.
 
@@ -296,7 +298,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.0...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/jordan-cod/pullo/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jordan-cod/pullo/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/jordan-cod/pullo/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/jordan-cod/pullo/compare/v0.10.0...v0.10.1
