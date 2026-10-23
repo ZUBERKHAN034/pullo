@@ -95,6 +95,8 @@ actor StubRunSource: RunSource {
         if failsCommands { throw GitHubError.http(403) }
         commands.append("cancel \(run.id)")
     }
+
+    func retain(_ repos: [String: [String]]) async {}
 }
 
 extension WorkflowJob {

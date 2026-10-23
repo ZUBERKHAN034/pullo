@@ -7,11 +7,16 @@ import OSLog
 final class ReadTracker {
     private(set) var baselines: [String: ReadBaseline] = [:]
 
+    static let forgetAfter: TimeInterval = 14 * 24 * 60 * 60
+    static let seenGranularity: TimeInterval = 24 * 60 * 60
+
     private var knownAccounts: Set<String> = []
     private let defaults: UserDefaults
+    private let now: () -> Date
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, now: @escaping () -> Date = Date.init) {
         self.defaults = defaults
+        self.now = now
         if let data = defaults.data(for: .readBaselines) {
             do {
                 baselines = try JSONDecoder().decode([String: ReadBaseline].self, from: data)
@@ -24,10 +29,20 @@ final class ReadTracker {
 
     func sync(account: String, prs: [PullRequest]) {
         let firstSync = !knownAccounts.contains(account)
-        var updated = baselines.filter { !$0.key.hasPrefix("\(account)|") }
+        let now = now()
+        let present = Set(prs.map(Self.key))
+        var updated = baselines.filter { key, base in
+            guard key.hasPrefix("\(account)|"), !present.contains(key) else { return true }
+            return base.lastSeen.map { now.timeIntervalSince($0) < Self.forgetAfter } ?? true
+        }
+        for (key, base) in updated where key.hasPrefix("\(account)|") && base.lastSeen == nil {
+            updated[key]?.lastSeen = now
+        }
         for pr in prs {
             let key = Self.key(pr)
-            updated[key] = baselines[key] ?? ReadBaseline(pr, isNew: !firstSync && pr.author != account)
+            var base = baselines[key] ?? ReadBaseline(pr, isNew: !firstSync && pr.author != account)
+            if base.lastSeen.map({ now.timeIntervalSince($0) >= Self.seenGranularity }) ?? true { base.lastSeen = now }
+            updated[key] = base
         }
         let newAccount = knownAccounts.insert(account).inserted
         guard updated != baselines || newAccount else { return }
@@ -74,7 +89,11 @@ final class ReadTracker {
 
     func markRead(_ prs: [PullRequest]) {
         var updated = baselines
-        for pr in prs { updated[Self.key(pr)] = ReadBaseline(pr) }
+        for pr in prs {
+            var base = ReadBaseline(pr)
+            base.lastSeen = baselines[Self.key(pr)]?.lastSeen
+            updated[Self.key(pr)] = base
+        }
         guard updated != baselines else { return }
         baselines = updated
         save()

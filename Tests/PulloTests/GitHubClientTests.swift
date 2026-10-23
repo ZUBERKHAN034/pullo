@@ -162,6 +162,12 @@ struct GitHubClientTests {
         #expect(client.sizes.usesLight(account))
     }
 
+    @Test func aPRListedTwiceIsKeptOnce() async throws {
+        let (client, _) = client(body: #"{ "data": { "mine": { "nodes": [\#(prNode), \#(prNode)] }, "review": { "nodes": [] } } }"#)
+        let snapshot = try await client.fetchSnapshot(account: "me")
+        #expect(snapshot.mine.map(\.id) == ["PR_1"])
+    }
+
     @Test func partialDataIsKeptWhenAnOrgBlocksTheToken() async throws {
         let body = """
         { "data": { "mine": { "nodes": [\(prNode), {}] }, "review": { "nodes": [] } },
