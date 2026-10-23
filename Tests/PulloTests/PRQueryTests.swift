@@ -23,10 +23,10 @@ struct PRQueryTests {
     }
 
     @Test func keepsWhatTheFieldsCantShow() {
-        let query = PRQuery(parsing: "label:bug label:api -author:@me team-review-requested:acme/web")
+        let query = PRQuery(parsing: "label:bug label:api -author:@me involves:@me")
         #expect(query.label == "bug")
-        #expect(query.extra == "label:api -author:@me team-review-requested:acme/web")
-        #expect(query.text == "label:bug label:api -author:@me team-review-requested:acme/web")
+        #expect(query.extra == "label:api -author:@me involves:@me")
+        #expect(query.text == "label:bug label:api -author:@me involves:@me")
     }
 
     @Test func buildsTheSearchFromTheFields() {
@@ -54,5 +54,29 @@ struct PRQueryTests {
         #expect(PRQuery(parsing: "author:@me is:open").text == "author:@me")
         #expect(PRQuery(parsing: "is:merged").state == .merged)
         #expect(PRQuery(parsing: "is:draft").state == .drafts)
+    }
+
+    @Test func readsTeamReviewRequests() {
+        let query = PRQuery(parsing: "team-review-requested:acme/backend team-review-requested:acme/web")
+        #expect(query.review == .requestedFromTeams)
+        #expect(query.teams == ["acme/backend", "acme/web"])
+        #expect(query.text == "team-review-requested:acme/backend team-review-requested:acme/web")
+        #expect(PRQuery(parsing: "user-review-requested:@me").review == .requestedFromMeOnly)
+    }
+
+    @Test func aTeamReviewTabNeedsATeam() {
+        var query = PRQuery()
+        query.review = .requestedFromTeams
+        #expect(!query.isComplete)
+        #expect(query.text.isEmpty)
+        query.teams = ["acme/backend"]
+        #expect(query.isComplete)
+        #expect(query.text == "team-review-requested:acme/backend")
+    }
+
+    @Test func otherReviewsKeepTeamsInTheSearch() {
+        let query = PRQuery(parsing: "review:approved team-review-requested:acme/web")
+        #expect(query.review == .approved)
+        #expect(query.extra == "team-review-requested:acme/web")
     }
 }

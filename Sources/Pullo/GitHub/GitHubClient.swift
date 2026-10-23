@@ -142,6 +142,16 @@ struct GitHubClient {
         return GitHubUser(login: payload.login, avatarURL: payload.avatar_url)
     }
 
+    func fetchTeams() async throws -> [String] {
+        struct Team: Decodable {
+            struct Organization: Decodable { let login: String }
+            let slug: String
+            let organization: Organization
+        }
+        let data = try await send(request(for: URL(static: "https://api.github.com/user/teams?per_page=100")))
+        return try JSONDecoder().decode([Team].self, from: data).map { "\($0.organization.login)/\($0.slug)" }
+    }
+
     func request(for url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("bearer \(token)", forHTTPHeaderField: "Authorization")

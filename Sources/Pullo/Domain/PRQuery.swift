@@ -14,12 +14,14 @@ struct PRQuery: Equatable {
     }
 
     enum Review: String, CaseIterable {
-        case any, requestedFromMe, reviewedByMe, required, approved, changesRequested
+        case any, requestedFromMe, requestedFromMeOnly, requestedFromTeams, reviewedByMe, required, approved, changesRequested
 
         var title: String {
             switch self {
             case .any: String(localized: "Any")
-            case .requestedFromMe: String(localized: "Requested from me")
+            case .requestedFromMe: String(localized: "Requested from me or my teams")
+            case .requestedFromMeOnly: String(localized: "Requested from me only")
+            case .requestedFromTeams: String(localized: "Requested from a team")
             case .reviewedByMe: String(localized: "Reviewed by me")
             case .required: String(localized: "Waiting for review")
             case .approved: String(localized: "Approved")
@@ -31,6 +33,8 @@ struct PRQuery: Equatable {
             switch self {
             case .any: nil
             case .requestedFromMe: "review-requested:@me"
+            case .requestedFromMeOnly: "user-review-requested:@me"
+            case .requestedFromTeams: nil
             case .reviewedByMe: "reviewed-by:@me"
             case .required: "review:required"
             case .approved: "review:approved"
@@ -88,6 +92,7 @@ struct PRQuery: Equatable {
     var author: Author = .anyone
     var user = ""
     var review: Review = .any
+    var teams: [String] = []
     var repo = ""
     var label = ""
     var checks: Checks = .any
@@ -115,6 +120,9 @@ struct PRQuery: Equatable {
             if !login.isEmpty { parts.append("author:\(login)") }
         }
         if let token = review.token { parts.append(token) }
+        if review == .requestedFromTeams {
+            parts += teams.map(\.trimmed).filter { !$0.isEmpty }.map { "team-review-requested:\($0)" }
+        }
         if !repo.trimmed.isEmpty { parts.append("repo:\(repo.trimmed)") }
         if !label.trimmed.isEmpty { parts.append("label:\(Self.quoted(label.trimmed))") }
         if let token = checks.token { parts.append(token) }
@@ -124,7 +132,8 @@ struct PRQuery: Equatable {
     }
 
     var isComplete: Bool {
-        author != .user || !user.trimmed.trimmingPrefix("@").isEmpty
+        (author != .user || !user.trimmed.trimmingPrefix("@").isEmpty)
+            && (review != .requestedFromTeams || teams.contains { !$0.trimmed.isEmpty })
     }
 
     private mutating func read(_ token: String, taken: inout Set<String>) -> Bool {
@@ -139,7 +148,12 @@ struct PRQuery: Equatable {
             field = "author"
             guard !taken.contains(field) else { return false }
             if lowered == "@me" { author = .me } else { author = .user; user = value }
-        case ("review-requested", "@me"), ("reviewed-by", "@me"), ("review", _):
+        case ("team-review-requested", _):
+            guard !value.isEmpty, review == .requestedFromTeams || !taken.contains("review") else { return false }
+            field = "review"
+            review = .requestedFromTeams
+            teams.append(value)
+        case ("review-requested", "@me"), ("user-review-requested", "@me"), ("reviewed-by", "@me"), ("review", _):
             let match = Review.allCases.first { $0.token?.lowercased() == "\(key):\(lowered)" }
             guard let match else { return false }
             field = "review"
