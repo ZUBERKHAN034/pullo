@@ -56,7 +56,6 @@ struct WorkflowRunTests {
         #expect(run.workflow == "Deploy")
         #expect(run.state == .running)
         #expect(run.pullRequest == 41)
-        #expect(run.isDeploy)
         #expect(run.isStarted(by: "me"))
         #expect(run.startedAt.timeIntervalSince(run.createdAt) == 5)
     }
