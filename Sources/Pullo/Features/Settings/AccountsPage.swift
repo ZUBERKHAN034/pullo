@@ -58,7 +58,7 @@ struct AccountsPage: View {
                     }
                 }
                 LabeledContent("Logged in with gh just now?") {
-                    Button("Check again") { accounts.reloadGHUsers() }
+                    Button("Check again") { accounts.reloadGHUsers(recheck: true) }
                 }
             }
         }

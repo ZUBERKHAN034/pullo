@@ -23,6 +23,7 @@ struct ErrorBanner: View {
         }
         .buttonStyle(.plain)
         .hint(problem.detail)
+        .accessibilityHint(problem.detail)
     }
 
     private var message: String {

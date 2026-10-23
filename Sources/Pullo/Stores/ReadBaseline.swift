@@ -8,6 +8,7 @@ struct ReadBaseline: Codable, Equatable {
     var ci: CIState?
     var review: ReviewDecision?
     var isNew = false
+    var lastSeen: Date?
 
     init(_ pr: PullRequest, isNew: Bool = false) {
         commentIDs = Set(pr.othersCommentIDs)

@@ -23,6 +23,7 @@ final class AccountStore {
     private let session: URLSession
     private let clock: any Clock<Duration>
     @ObservationIgnored private var knownGHUsers: Set<String>?
+    @ObservationIgnored private var watchTicks = 0
     @ObservationIgnored private var loginWatch: Task<Void, Never>?
 
     init(
@@ -80,14 +81,18 @@ final class AccountStore {
         save(tabs, for: .runTabs)
     }
 
-    func reloadGHUsers() {
-        Task { [weak self] in await self?.loadGHUsers() }
+    func reloadGHUsers(recheck: Bool = false) {
+        Task { [weak self] in await self?.loadGHUsers(recheck: recheck) }
     }
 
     @discardableResult
-    func loadGHUsers() async -> [String] {
-        let cli = cli
-        let (installed, users) = await Task.detached { (cli.isInstalled, cli.users()) }.value
+    func loadGHUsers(recheck: Bool = false) async -> [String] {
+        if recheck {
+            await cli.recheck()
+            await tokens.clearFailures()
+        }
+        let installed = await cli.isInstalled()
+        let users = await cli.users()
         ghInstalled = installed
         ghUsers = users
         return users
@@ -111,9 +116,12 @@ final class AccountStore {
             return
         }
         guard importing == nil else { return }
-        let users = await loadGHUsers()
+        watchTicks += 1
+        let users = await loadGHUsers(recheck: !ghInstalled && watchTicks.isMultiple(of: 10))
         if let known = knownGHUsers {
-            for user in users where !known.contains(user.lowercased()) && importableGHUsers.contains(user) {
+            let added = users.filter { !known.contains($0.lowercased()) && importableGHUsers.contains($0) }
+            if !added.isEmpty { await tokens.clearFailures() }
+            for user in added {
                 await importFromGH(user)
             }
         }
@@ -125,13 +133,14 @@ final class AccountStore {
         importFailure = nil
         defer { importing = nil }
         do {
-            let cli = cli
-            let token = try await Task.detached { try cli.token(for: user) }.value
+            let token = try await cli.token(for: user)
             let profile = try await GitHubClient(token: token, session: session).fetchUser()
             await tokens.remember(token, for: profile.login)
             upsert(Account(login: profile.login, avatarURL: profile.avatarURL))
         } catch {
-            Logger.github.error("Adding @\(user, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            Logger.github.error(
+                "Adding @\(user, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
+            )
             importFailure = ImportFailure(user: user, error: error)
         }
     }
@@ -149,18 +158,31 @@ final class AccountStore {
     private func loadTabs() {
         let decoder = JSONDecoder()
         let legacy = defaults.data(for: .accounts).flatMap { try? decoder.decode([LegacyAccount].self, from: $0) } ?? []
-        if let data = defaults.data(for: .tabs), let saved = try? decoder.decode([SavedFilter].self, from: data) {
-            tabs = saved
+        if defaults.object(for: .tabs) != nil {
+            let saved: [SavedFilter] = loadList(.tabs, keepingUnreadableIn: .unreadableTabs)
+            if !saved.isEmpty { tabs = saved }
         } else if !legacy.isEmpty {
             tabs = SavedFilter.merging(legacy.map { ($0.login, $0.filters ?? SavedFilter.defaults) })
             save(tabs, for: .tabs)
         }
-        if let data = defaults.data(for: .runTabs), let saved = try? decoder.decode([RunTab].self, from: data) {
-            runTabs = saved
+        if defaults.object(for: .runTabs) != nil {
+            let saved: [RunTab] = loadList(.runTabs, keepingUnreadableIn: .unreadableRunTabs)
+            if !saved.isEmpty { runTabs = saved }
         } else if !legacy.isEmpty {
             runTabs = RunTab.merging(legacy.map { ($0.login, $0.runTabs ?? RunTab.defaults) })
             save(runTabs, for: .runTabs)
         }
+    }
+
+    private func loadList<Element: Decodable>(_ key: DefaultsKey, keepingUnreadableIn backup: DefaultsKey) -> [Element] {
+        let stored = defaults.object(for: key)
+        let decoded = (stored as? Data).flatMap { try? JSONDecoder().decode([Lenient<Element>].self, from: $0) }
+        let kept = decoded?.compactMap(\.value) ?? []
+        if decoded == nil || kept.count != decoded?.count {
+            Logger.store.error("Some saved \(key.rawValue, privacy: .public) are unreadable; keeping a copy")
+            defaults.set(stored, for: backup)
+        }
+        return kept
     }
 
     private func save(_ value: some Encodable, for key: DefaultsKey) {

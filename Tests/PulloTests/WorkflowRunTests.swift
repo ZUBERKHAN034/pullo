@@ -132,6 +132,20 @@ struct WorkflowRunTests {
           { "type": "PushEvent", "repo": { "name": "acme/api" } },
           { "type": "PushEvent", "repo": { "name": "acme/web" } } ]
         """)
-        #expect(try await client.fetchPushedRepos(login: "me") == ["acme/web", "acme/api"])
+        guard case .fresh(let repos, _) = try await client.fetchPushedRepos(login: "me", etag: nil) else {
+            Issue.record("Expected fresh repos")
+            return
+        }
+        #expect(repos == ["acme/web", "acme/api"])
+    }
+
+    @Test func asksForPushesWithTheLastETag() async throws {
+        let (client, token) = client(status: 304, body: "")
+        let result = try await client.fetchPushedRepos(login: "me", etag: "\"abc\"")
+        guard case .notModified = result else {
+            Issue.record("Expected not modified")
+            return
+        }
+        #expect(StubURLProtocol.lastRequest(token: token)?.value(forHTTPHeaderField: "If-None-Match") == "\"abc\"")
     }
 }

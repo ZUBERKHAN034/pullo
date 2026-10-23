@@ -16,6 +16,7 @@ protocol SystemActions {
 
 struct LiveSystemActions: SystemActions {
     func open(_ url: URL) {
+        guard url.isWeb else { return }
         NSWorkspace.shared.open(url)
     }
 

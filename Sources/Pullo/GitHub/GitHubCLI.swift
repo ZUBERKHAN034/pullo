@@ -1,7 +1,12 @@
 import Foundation
 
 protocol GitHubCLI: Sendable {
-    var isInstalled: Bool { get }
-    func users() -> [String]
-    func token(for user: String) throws -> String
+    func isInstalled() async -> Bool
+    func users() async -> [String]
+    func token(for user: String) async throws -> String
+    func recheck() async
+}
+
+extension GitHubCLI {
+    func recheck() async {}
 }

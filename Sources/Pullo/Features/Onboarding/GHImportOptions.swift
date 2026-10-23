@@ -15,7 +15,7 @@ struct GHImportOptions: View {
                 CommandBox(command: command) { copy(command) }
                 HStack(spacing: 8) {
                     PillButton(title: String(localized: "Open Terminal"), symbol: "terminal") { system.open(Self.terminalURL) }
-                    PillButton(title: String(localized: "Check again"), symbol: "arrow.clockwise") { accounts.reloadGHUsers() }
+                    PillButton(title: String(localized: "Check again"), symbol: "arrow.clockwise") { accounts.reloadGHUsers(recheck: true) }
                 }
                 if accounts.accounts.isEmpty, accounts.ghInstalled {
                     HStack(spacing: 6) {

@@ -17,9 +17,30 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - The panel stays open while you set up your first account, even when you switch to Terminal. "Not now" closes it.
 - When the panel opens under the pointer, the arrow keys, Return and Esc work right away.
 - The welcome alert mentions the ⌥⌘P shortcut.
+- Pullo uses less battery and network. It stops checking GitHub while your Mac is asleep, its screen is off or locked, or it's offline, and checks once as soon as you're back. With the panel closed, the Actions side only keeps a close eye on runs you started.
 
 ### Fixed
 - When adding an account fails, Pullo says what went wrong in plain words and offers a way to fix it.
+- The Actions list works from the keyboard: ↑↓ pick a run, ↩ opens it, ↩ again opens it on GitHub and esc goes back.
+- VoiceOver reads alerts and confirmations out loud as they appear, tells which pull request tab is selected and how many PRs it has, and can show a PR's failed checks.
+- When GitHub's request limit is reached, Pullo waits until it resets instead of asking again every minute. When GitHub keeps failing, it waits a bit longer each time, up to five minutes, and when your sign-in is rejected it stops asking until you try again.
+- Pullo now finds gh installed with MacPorts, Nix, mise or anywhere on your shell's PATH, and reads gh's settings from `XDG_CONFIG_HOME` when you use it.
+- A slow or broken gh no longer holds Pullo up, and Pullo stops asking it for a token on every refresh after it fails. "Check again" in Settings → Accounts asks right away.
+- After GitHub was slow once, Pullo kept asking for shorter lists until you quit it. It now goes back to the full lists after half an hour, and a slow connection on your side no longer counts.
+- Repositories your organization blocks with single sign-on no longer slow down the Actions side.
+- Removing an account while Pullo was refreshing could bring its pull requests and runs back.
+- Re-running or cancelling a run while the Actions list was refreshing now shows the new state right away instead of on the next check.
+- If Pullo can't read some of your saved tabs, for example after using an older version, it keeps the ones it can read instead of replacing them all, and keeps a copy of the rest.
+- A pull request that briefly drops out of GitHub's results no longer alerts you again about the same review request or forgets what you've already read.
+- Fixed a crash when GitHub listed the same pull request twice.
+- Pullo no longer uses more and more memory the longer it runs.
+- When gh's token is revoked, the Actions side now picks up the new one once you sign in again, like the pull request side does.
+- With Reduce Motion on, the panel fades instead of bouncing, and the loading screen and lists no longer slide, blur or shimmer.
+- With Increase Contrast on, dimmed text in the panel is brighter and easier to read. Section titles in Actions and the keyboard hints are a little easier to read too.
+- Time units like "5m" and "2h" now follow the app's language, and a message in Settings → Accounts is now translated.
+
+### Security
+- Links from checks only open web pages (http and https), so a check can't point Pullo at a file or another app.
 
 ## [0.10.2] - 2026-10-23
 

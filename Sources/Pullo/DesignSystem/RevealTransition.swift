@@ -14,7 +14,8 @@ struct RevealModifier: ViewModifier {
 
 extension AnyTransition {
     static func reveal(delay: Double) -> AnyTransition {
-        .asymmetric(
+        guard !Motion.reduced else { return AnyTransition.opacity.animation(Motion.fade) }
+        return .asymmetric(
             insertion: .modifier(active: RevealModifier(progress: 0), identity: RevealModifier(progress: 1))
                 .animation(Motion.reveal.delay(delay)),
             removal: .modifier(active: RevealModifier(progress: 0), identity: RevealModifier(progress: 1))

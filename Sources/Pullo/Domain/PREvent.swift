@@ -14,7 +14,7 @@ struct PREvent: Equatable {
 extension PREvent {
     static func diff(old: Snapshot, new: Snapshot) -> [PREvent] {
         var events: [PREvent] = []
-        let oldMine = Dictionary(uniqueKeysWithValues: old.mine.map { ($0.id, $0) })
+        let oldMine = Dictionary(old.mine.map { ($0.id, $0) }) { first, _ in first }
 
         for pr in new.mine {
             guard let before = oldMine[pr.id] else { continue }

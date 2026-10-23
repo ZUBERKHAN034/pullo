@@ -5,21 +5,24 @@ struct GHCLI: GitHubCLI {
     var host = "github.com"
     var timeout: Duration = .seconds(10)
 
-    var isInstalled: Bool { Self.executable != nil }
+    var locator = GHLocator.shared
 
-    private static var executable: String? {
-        ["/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh"]
-            .first(where: FileManager.default.isExecutableFile(atPath:))
+    func isInstalled() async -> Bool {
+        await locator.location().executable != nil
     }
 
-    func users() -> [String] {
-        let configDir = ProcessInfo.processInfo.environment["GH_CONFIG_DIR"] ?? NSHomeDirectory() + "/.config/gh"
-        guard isInstalled else { return [] }
+    func recheck() async {
+        await locator.reset()
+    }
+
+    func users() async -> [String] {
+        let location = await locator.location()
+        guard location.executable != nil else { return [] }
         let hosts: String
         do {
-            hosts = try String(contentsOfFile: configDir + "/hosts.yml", encoding: .utf8)
+            hosts = try String(contentsOfFile: location.configDirectory + "/hosts.yml", encoding: .utf8)
         } catch {
-            Logger.github.notice("Reading gh's hosts.yml failed: \(error.localizedDescription, privacy: .public)")
+            Logger.github.notice("Reading gh's hosts.yml failed: \(error.localizedDescription, privacy: .private(mask: .hash))")
             return []
         }
         return Self.users(inHostsFile: hosts, host: host)
@@ -55,25 +58,25 @@ struct GHCLI: GitHubCLI {
         return users
     }
 
-    func token(for user: String) throws -> String {
-        guard let executable = Self.executable else { throw GitHubError.noToken }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: executable)
-        process.arguments = ["auth", "token", "--hostname", host, "--user", user]
-        let output = Pipe()
-        process.standardOutput = output
-        process.standardError = Pipe()
-        let exited = DispatchSemaphore(value: 0)
-        process.terminationHandler = { _ in exited.signal() }
-        try process.run()
-        if exited.wait(timeout: .now() + .milliseconds(Int(timeout / .milliseconds(1)))) == .timedOut {
-            process.terminate()
+    func token(for user: String) async throws -> String {
+        let location = await locator.location()
+        guard let executable = location.executable else { throw GitHubError.noToken }
+        let output: ProcessRunner.Output
+        do {
+            output = try await ProcessRunner.run(
+                executable,
+                ["auth", "token", "--hostname", host, "--user", user],
+                environment: location.environment,
+                timeout: timeout
+            )
+        } catch is ProcessRunner.TimedOut {
             throw GitHubError.ghTimedOut
+        } catch {
+            Logger.github.error("Running gh failed: \(error.localizedDescription, privacy: .private(mask: .hash))")
+            throw GitHubError.noToken
         }
-        let data = output.fileHandleForReading.readDataToEndOfFile()
-
-        let token = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
-        guard process.terminationStatus == 0, !token.isEmpty else { throw GitHubError.noToken }
+        let token = String(decoding: output.stdout, as: UTF8.self).trimmed
+        guard output.status == 0, !token.isEmpty else { throw GitHubError.noToken }
         return token
     }
 }
