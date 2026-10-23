@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.11.2] - 2026-10-23
+
 ### Fixed
 - A tab whose search had no author, repository or organization showed pull requests from all of GitHub. The tab editor now asks for one, and such tabs show what to fix instead of strangers' PRs.
 
@@ -301,7 +303,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.1...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.2...HEAD
+[0.11.2]: https://github.com/jordan-cod/pullo/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jordan-cod/pullo/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jordan-cod/pullo/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/jordan-cod/pullo/compare/v0.10.1...v0.10.2
