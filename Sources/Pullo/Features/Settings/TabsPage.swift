@@ -4,6 +4,7 @@ import SwiftUI
 struct TabsPage: View {
     @Environment(AccountStore.self) private var accounts
     @State private var editing: SavedFilter?
+    @State private var editingTeamReviews = false
     @State private var editingRunTab: RunTab?
 
     var body: some View {
@@ -12,7 +13,7 @@ struct TabsPage: View {
             runTabsSection
         }
         .sheet(item: $editing) { filter in
-            TabEditor(filter: filter) { saved in
+            TabEditor(filter: filter, startsWithTeamReviews: editingTeamReviews) { saved in
                 var filters = accounts.tabs
                 if let index = filters.firstIndex(where: { $0.id == saved.id }) {
                     filters[index] = saved
@@ -33,6 +34,11 @@ struct TabsPage: View {
                 accounts.setRunTabs(tabs)
             }
         }
+    }
+
+    private func edit(_ filter: SavedFilter, teamReviews: Bool = false) {
+        editingTeamReviews = teamReviews
+        editing = filter
     }
 
     private func scoped(_ text: String, to account: String?) -> String {
@@ -105,7 +111,7 @@ struct TabsPage: View {
             ForEach(filters) { filter in
                 LabeledContent {
                     HStack(spacing: 6) {
-                        Button("Edit…") { editing = filter }
+                        Button("Edit…") { edit(filter) }
                         Button {
                             accounts.setTabs(filters.filter { $0.id != filter.id })
                         } label: {
@@ -135,10 +141,11 @@ struct TabsPage: View {
             }
             HStack {
                 Menu("Add tab") {
-                    Button("Blank…") { editing = SavedFilter(name: "", query: "author:@me") }
+                    Button("Blank…") { edit(SavedFilter(name: "", query: "author:@me")) }
                     Section("Examples") {
+                        Button("Team reviews") { edit(SavedFilter(name: String(localized: "Team reviews"), query: ""), teamReviews: true) }
                         ForEach(SavedFilter.examples, id: \.query) { example in
-                            Button(example.name) { editing = example }
+                            Button(example.name) { edit(example) }
                         }
                     }
                 }
@@ -164,13 +171,16 @@ private struct TabEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.system) private var system
     @Environment(PRListModel.self) private var list
+    @Environment(AccountStore.self) private var accounts
     @State private var filter: SavedFilter
     @State private var fields: PRQuery
     @State private var showsQuery: Bool
+    @State private var myTeams: [String]?
     let onSave: (SavedFilter) -> Void
 
-    init(filter: SavedFilter, onSave: @escaping (SavedFilter) -> Void) {
-        let fields = PRQuery(parsing: filter.query)
+    init(filter: SavedFilter, startsWithTeamReviews: Bool = false, onSave: @escaping (SavedFilter) -> Void) {
+        var fields = PRQuery(parsing: filter.query)
+        if startsWithTeamReviews { fields.review = .requestedFromTeams }
         _filter = State(initialValue: filter)
         _fields = State(initialValue: fields)
         _showsQuery = State(initialValue: !fields.extra.isEmpty)
@@ -199,6 +209,47 @@ private struct TabEditor: View {
         var known = Set<String>()
         return (list.tabs + [.mine, .review]).flatMap(list.prs(in:)).map(\.repo)
             .filter { known.insert($0.lowercased()).inserted }.sorted()
+    }
+
+    private var review: Binding<PRQuery.Review> {
+        Binding {
+            fields.review
+        } set: {
+            fields.review = $0
+            if $0 == .requestedFromTeams, fields.teams.isEmpty { fields.teams = myTeams ?? [] }
+            filter.query = fields.text
+        }
+    }
+
+    private var team: Binding<String> {
+        Binding {
+            fields.teams.count == 1 ? fields.teams[0] : ""
+        } set: {
+            fields.teams = $0.isEmpty ? (myTeams ?? []) : [$0]
+            filter.query = fields.text
+        }
+    }
+
+    private var teamChoices: [String] {
+        let picked = fields.teams.count == 1 ? fields.teams : []
+        return (myTeams ?? []) + picked.filter { !(myTeams ?? []).contains($0) }
+    }
+
+    private func useTeamReviews() {
+        if filter.name.allSatisfy(\.isWhitespace) { filter.name = String(localized: "Team reviews") }
+        fields = PRQuery()
+        fields.review = .requestedFromTeams
+        fields.teams = myTeams ?? []
+        filter.query = fields.text
+    }
+
+    private func loadTeams() async {
+        let logins = filter.account.map { [$0] } ?? accounts.accounts.map(\.login)
+        myTeams = await accounts.teams(of: logins)
+        if fields.review == .requestedFromTeams, fields.teams.isEmpty {
+            fields.teams = myTeams ?? []
+            filter.query = fields.text
+        }
     }
 
     private func use(_ example: SavedFilter) {
@@ -246,8 +297,20 @@ private struct TabEditor: View {
                             .accessibilityLabel(String(localized: "Pick a repository"))
                         }
                     }
-                    Picker("Review", selection: field(\.review)) {
+                    Picker("Review", selection: review) {
                         ForEach(PRQuery.Review.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    if fields.review == .requestedFromTeams {
+                        if myTeams == nil {
+                            LabeledContent("Team") { ProgressView().controlSize(.small) }
+                        } else if teamChoices.isEmpty {
+                            TextField("Team", text: team, prompt: Text(verbatim: "acme/backend"))
+                        } else {
+                            Picker("Team", selection: team) {
+                                Text("All my teams").tag("")
+                                ForEach(teamChoices, id: \.self) { Text(verbatim: $0).tag($0) }
+                            }
+                        }
                     }
                     Picker("Checks", selection: field(\.checks)) {
                         ForEach(PRQuery.Checks.allCases, id: \.self) { Text($0.title).tag($0) }
@@ -261,6 +324,7 @@ private struct TabEditor: View {
                         Text("Show pull requests where")
                         Spacer()
                         Menu("Examples") {
+                            Button("Team reviews") { useTeamReviews() }
                             ForEach(SavedFilter.examples, id: \.query) { example in
                                 Button(example.name) { use(example) }
                             }
@@ -310,6 +374,7 @@ private struct TabEditor: View {
             .padding([.horizontal, .bottom], 20)
         }
         .frame(width: 480)
+        .task(id: filter.account) { await loadTeams() }
     }
 }
 

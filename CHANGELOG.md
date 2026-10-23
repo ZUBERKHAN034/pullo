@@ -5,6 +5,7 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 ## [Unreleased]
 
 ### Added
+- A "Team reviews" example tab, and a Review option for pull requests requested from one of your teams, picked from the teams GitHub says you're on. The Review menu also tells "me or my teams" apart from "me only".
 - On a Mac without a notch, Pullo now shows a small tab at the top of the screen, so you can find it and hover it. CI progress shows on it too.
 - Opening Pullo again from Finder or Spotlight opens the panel.
 - While you set up, copy the `gh auth login` command or open Terminal right from the panel. Pullo adds your account as soon as you log in.

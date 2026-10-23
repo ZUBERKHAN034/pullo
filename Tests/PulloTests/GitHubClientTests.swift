@@ -40,6 +40,15 @@ struct GitHubClientTests {
         #expect(user.avatarURL?.host() == "avatars.githubusercontent.com")
     }
 
+    @Test func readsYourTeams() async throws {
+        let (client, token) = client(body: """
+        [ { "slug": "backend", "organization": { "login": "acme" } },
+          { "slug": "web", "organization": { "login": "acme" } } ]
+        """)
+        #expect(try await client.fetchTeams() == ["acme/backend", "acme/web"])
+        #expect(StubURLProtocol.lastRequest(token: token)?.url?.path() == "/user/teams")
+    }
+
     @Test func rejectedTokensAreUnauthorized() async {
         let (client, _) = client(status: 401, body: #"{ "message": "Bad credentials" }"#)
         await #expect(throws: GitHubError.unauthorized) { try await client.fetchUser() }

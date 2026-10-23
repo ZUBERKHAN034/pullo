@@ -4982,22 +4982,6 @@
         }
       }
     },
-    "Requested from me": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solicitada a mí"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pedida pra mim"
-          }
-        }
-      }
-    },
     "Review": {
       "localizations": {
         "es": {
@@ -5698,6 +5682,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "O GitHub devolveu uma resposta vazia."
+          }
+        }
+      }
+    },
+    "Requested from me or my teams": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitado a mí o a mis equipos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedido a mim ou aos meus times"
+          }
+        }
+      }
+    },
+    "Requested from me only": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitado solo a mí"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedido só a mim"
+          }
+        }
+      }
+    },
+    "Requested from a team": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitado a un equipo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedido a um time"
+          }
+        }
+      }
+    },
+    "Team": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time"
+          }
+        }
+      }
+    },
+    "All my teams": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos mis equipos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos os meus times"
+          }
+        }
+      }
+    },
+    "Team reviews": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisiones de equipos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reviews dos times"
           }
         }
       }

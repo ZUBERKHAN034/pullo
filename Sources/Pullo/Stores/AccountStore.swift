@@ -141,6 +141,18 @@ final class AccountStore {
         knownGHUsers = Set(users.map { $0.lowercased() })
     }
 
+    func teams(of logins: [String]) async -> [String] {
+        var found = Set<String>()
+        for login in logins {
+            let session = session
+            let teams = try? await tokens.withToken(for: login) { token in
+                try await GitHubClient(token: token, session: session).fetchTeams()
+            }
+            found.formUnion(teams ?? [])
+        }
+        return found.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    }
+
     func importFromGH(_ user: String) async {
         importing = user
         importFailure = nil
