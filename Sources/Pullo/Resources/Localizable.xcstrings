@@ -5781,6 +5781,22 @@
           }
         }
       }
+    },
+    "This search would cover all of GitHub. Add an author, repository or organization.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta búsqueda abarcaría todo GitHub. Añade un autor, un repositorio o una organización."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essa busca cobriria o GitHub inteiro. Adicione um autor, repositório ou organização."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

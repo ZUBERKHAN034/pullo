@@ -347,18 +347,24 @@ private struct TabEditor: View {
                             .lineLimit(2...4)
                     }
                 } footer: {
-                    HStack {
-                        Text("Anything the fields can't show stays in the search.")
-                        Spacer()
-                        Link(
-                            "Search syntax",
-                            destination: URL(
-                                static: "https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests"
+                    VStack(alignment: .leading, spacing: 6) {
+                        if !filter.query.allSatisfy(\.isWhitespace), !filter.isScoped {
+                            Label(SavedFilter.unscopedMessage, systemImage: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                        }
+                        HStack {
+                            Text("Anything the fields can't show stays in the search.")
+                            Spacer()
+                            Link(
+                                "Search syntax",
+                                destination: URL(
+                                    static: "https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests"
+                                )
                             )
-                        )
-                        Button("Preview on GitHub") { filter.webURL.map(system.open) }
-                            .buttonStyle(.link)
-                            .disabled(filter.query.allSatisfy(\.isWhitespace))
+                            Button("Preview on GitHub") { filter.webURL.map(system.open) }
+                                .buttonStyle(.link)
+                                .disabled(filter.query.allSatisfy(\.isWhitespace))
+                        }
                     }
                     .font(.caption)
                 }
@@ -374,7 +380,7 @@ private struct TabEditor: View {
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(!filter.isComplete || !fields.isComplete)
+                .disabled(!filter.isComplete || !fields.isComplete || !filter.isScoped)
             }
             .padding([.horizontal, .bottom], 20)
         }

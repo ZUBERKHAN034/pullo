@@ -212,6 +212,20 @@ struct GitHubClientTests {
         #expect((sent["query"] as? String)?.contains("f1: search(query: $f1") == true)
     }
 
+    @Test func aTabWithoutAScopeIsNeverSearched() async throws {
+        let merged = SavedFilter(name: "Merged", query: "is:merged")
+        let body = #"{ "data": { "mine": { "nodes": [] }, "review": { "nodes": [] } } }"#
+        let (client, token) = client(body: body)
+        let snapshot = try await client.fetchSnapshot(account: "me", filters: [merged])
+        #expect(snapshot.filtered[merged.id]?.isEmpty == true)
+        #expect(snapshot.filterErrors[merged.id] == SavedFilter.unscopedMessage)
+
+        let request = try #require(StubURLProtocol.lastRequest(token: token))
+        let sent = try #require(try JSONSerialization.jsonObject(with: sentBody(of: request)) as? [String: Any])
+        let variables = try #require(sent["variables"] as? [String: String])
+        #expect(variables["f0"] == nil)
+    }
+
     private func sentBody(of request: URLRequest) -> Data {
         if let body = request.httpBody { return body }
         guard let stream = request.httpBodyStream else { return Data() }

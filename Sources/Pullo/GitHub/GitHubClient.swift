@@ -70,7 +70,8 @@ struct GitHubClient {
         size: QuerySize,
         retriesOverload: Bool
     ) async throws -> Snapshot {
-        let filters = filters.filter { $0.isComplete && !$0.usesBuiltInSearch }
+        let unscoped = filters.filter { $0.isComplete && !$0.isScoped }
+        let filters = filters.filter { $0.isComplete && $0.isScoped && !$0.usesBuiltInSearch }
         let aliases = Dictionary(uniqueKeysWithValues: filters.enumerated().map { ("f\($0.offset)", $0.element) })
         var request = request(for: URL(static: "https://api.github.com/graphql"))
         request.httpMethod = "POST"
@@ -97,6 +98,10 @@ struct GitHubClient {
         }
         var filtered: [SavedFilter.ID: [PullRequest]] = [:]
         var filterErrors: [SavedFilter.ID: String] = [:]
+        for filter in unscoped {
+            filtered[filter.id] = []
+            filterErrors[filter.id] = SavedFilter.unscopedMessage
+        }
         func pullRequests(_ search: GQLResponse.Search?) -> [PullRequest] {
             var seen = Set<String>()
             return (search?.nodes ?? []).compactMap { $0.value?.pullRequest(account: account) }.filter { seen.insert($0.id).inserted }

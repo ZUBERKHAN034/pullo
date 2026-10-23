@@ -51,9 +51,20 @@ struct SavedFilterTests {
         #expect(!SavedFilter(name: "Mine", query: "author:@me").usesBuiltInSearch)
     }
 
+    @Test func aSearchNeedsSomethingThatNarrowsIt() {
+        #expect(!SavedFilter(name: "Merged", query: "is:merged").isScoped)
+        #expect(!SavedFilter(name: "Bugs", query: "label:bug status:failure").isScoped)
+        #expect(!SavedFilter(name: "Not mine", query: "-author:@me").isScoped)
+        #expect(!SavedFilter(name: "Empty", query: "repo: is:merged").isScoped)
+        #expect(SavedFilter(name: "Merged", query: "author:@me is:merged").isScoped)
+        #expect(SavedFilter(name: "Org", query: "org:acme is:merged").isScoped)
+        #expect(SavedFilter(name: "Repo", query: "label:bug REPO:acme/api").isScoped)
+        #expect(SavedFilter(name: "Team", query: "team-review-requested:acme/web").isScoped)
+    }
+
     @Test func examplesAreReadyToSave() {
         let examples = SavedFilter.examples
-        #expect(examples.allSatisfy { $0.isComplete })
+        #expect(examples.allSatisfy { $0.isComplete && $0.isScoped })
         #expect(examples.allSatisfy { $0.preset == nil })
         #expect(Set(examples.map(\.query)).count == examples.count)
     }
