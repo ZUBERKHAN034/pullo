@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Changed
+- Each Settings page has its own colored icon in the sidebar, like System Settings.
+
 ## [0.11.0] - 2026-10-23
 
 ### Added

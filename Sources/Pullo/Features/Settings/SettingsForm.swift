@@ -9,7 +9,16 @@ struct SettingsForm: View {
     var body: some View {
         NavigationSplitView {
             List(pages, selection: $navigation.page) { page in
-                Label(page.title, systemImage: page.symbol)
+                Label {
+                    Text(page.title)
+                } icon: {
+                    Image(systemName: page.symbol)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 22, height: 22)
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(page.tint.gradient))
+                }
+                .padding(.vertical, 2)
             }
             .navigationSplitViewColumnWidth(min: 170, ideal: 180, max: 200)
             .toolbar(removing: .sidebarToggle)

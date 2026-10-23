@@ -21,14 +21,25 @@ enum SettingsPage: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .general: "gearshape"
-        case .appearance: "paintbrush"
-        case .alerts: "bell.badge"
-        case .accounts: "person.2"
-        case .tabs: "rectangle.stack"
-        case .shortcuts: "keyboard"
-        case .updates: "arrow.down.circle"
-        case .about: "info.circle"
+        case .general: "gearshape.fill"
+        case .appearance: "paintbrush.fill"
+        case .alerts: "bell.badge.fill"
+        case .accounts: "person.2.fill"
+        case .tabs: "rectangle.stack.fill"
+        case .shortcuts: "keyboard.fill"
+        case .updates: "arrow.down.circle.fill"
+        case .about: "info.circle.fill"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .general, .shortcuts, .about: .gray
+        case .appearance: .blue
+        case .alerts: .red
+        case .accounts: .indigo
+        case .tabs: .orange
+        case .updates: .green
         }
     }
 }
