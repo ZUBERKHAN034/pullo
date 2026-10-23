@@ -68,10 +68,16 @@ final class AccountStore {
         save(tabs, for: .runTabs)
     }
 
-    func reloadGHUsers() {
+    func reloadGHUsers(recheck: Bool = false) {
         let cli = cli
+        let tokens = tokens
         Task { [weak self] in
-            let (installed, users) = await Task.detached { (cli.isInstalled, cli.users()) }.value
+            if recheck {
+                await cli.recheck()
+                await tokens.clearFailures()
+            }
+            let installed = await cli.isInstalled()
+            let users = await cli.users()
             self?.ghInstalled = installed
             self?.ghUsers = users
         }
@@ -82,13 +88,14 @@ final class AccountStore {
         importFailure = nil
         defer { importing = nil }
         do {
-            let cli = cli
-            let token = try await Task.detached { try cli.token(for: user) }.value
+            let token = try await cli.token(for: user)
             let profile = try await GitHubClient(token: token).fetchUser()
             await tokens.remember(token, for: profile.login)
             upsert(Account(login: profile.login, avatarURL: profile.avatarURL))
         } catch {
-            Logger.github.error("Adding @\(user, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            Logger.github.error(
+                "Adding @\(user, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
+            )
             importFailure = ImportFailure(user: user, reason: error.localizedDescription)
         }
     }

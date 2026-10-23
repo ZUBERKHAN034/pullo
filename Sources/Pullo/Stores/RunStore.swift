@@ -9,6 +9,9 @@ final class RunStore {
     static let activeInterval: TimeInterval = 10
     static let idleInterval: TimeInterval = 60
     static let discoveryInterval: TimeInterval = 300
+    static let closedActiveInterval: TimeInterval = 30
+    static let closedIdleInterval: TimeInterval = 300
+    static let parkingTime: TimeInterval = 3 * 60 * 60
 
     private(set) var runs: [String: [WorkflowRun]] = [:]
     private(set) var errors: [String: RefreshProblem] = [:]
@@ -22,18 +25,36 @@ final class RunStore {
     private let prs: PRStore
     private let source: RunSource
     private let now: () -> Date
+    @ObservationIgnored let poller: Poller
+    @ObservationIgnored private(set) var gate: PollGate
+    @ObservationIgnored private(set) var isPanelOpen = true
     @ObservationIgnored private var repos: [String: [String]] = [:]
     @ObservationIgnored private var discoveredAt: [String: Date] = [:]
     @ObservationIgnored private var fetchedAt: [String: Date] = [:]
+    @ObservationIgnored private var parkedUntil: [String: Date] = [:]
     @ObservationIgnored private var byRepo: [String: [WorkflowRun]] = [:]
-    @ObservationIgnored private var pollTask: Task<Void, Never>?
     @ObservationIgnored private var isRefreshing = false
 
-    init(accounts: AccountStore, prs: PRStore, source: RunSource, now: @escaping () -> Date = Date.init) {
+    init(
+        accounts: AccountStore,
+        prs: PRStore,
+        source: RunSource,
+        clock: any Clock<Duration> = ContinuousClock(),
+        gate: PollGate = PollGate(),
+        now: @escaping () -> Date = Date.init
+    ) {
         self.accounts = accounts
         self.prs = prs
         self.source = source
         self.now = now
+        self.gate = gate
+        poller = Poller(clock: clock)
+        poller.tick = { [weak self] in
+            guard let self else { return .seconds(Self.activeInterval) }
+            await refresh(manual: false)
+            return .seconds(isPanelOpen ? Self.activeInterval : Self.closedActiveInterval)
+        }
+        poller.onResume = { [weak self] in self?.gate.clearBackoff() }
     }
 
     func isLoaded(_ login: String?) -> Bool {
@@ -45,21 +66,27 @@ final class RunStore {
     }
 
     func start() {
-        pollTask?.cancel()
-        pollTask = Task { [weak self] in
-            while !Task.isCancelled {
-                await self?.refresh()
-                try? await Task.sleep(for: .seconds(Self.activeInterval))
-            }
-        }
+        poller.start()
+    }
+
+    func setPanelOpen(_ open: Bool) {
+        guard isPanelOpen != open else { return }
+        isPanelOpen = open
+        if open { poller.pollNow() }
     }
 
     func refresh() async {
+        await refresh(manual: true)
+    }
+
+    private func refresh(manual: Bool) async {
+        if manual { gate.clearForManualRefresh() }
         guard !isRefreshing else { return }
         isRefreshing = true
         defer { isRefreshing = false }
         let current = accounts.accounts
-        for account in current {
+        gate.prune(to: Set(current.map(\.login)))
+        for account in current where gate.allows(account.login, at: now()) {
             await refresh(account)
         }
         let logins = Set(current.map(\.login))
@@ -75,10 +102,13 @@ final class RunStore {
         do {
             try await discoverIfDue(account)
         } catch {
-            Logger.store.error("Finding repos for @\(login, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            Logger.store.error(
+                "Finding repos for @\(login, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
+            )
             failure = error
-            if runs[login] == nil {
+            if runs[login] == nil || Self.stopsAccount(error) {
                 errors[login] = RefreshProblem(error, at: now(), after: errors[login])
+                gate.failed(login, with: error, at: now())
                 return
             }
         }
@@ -86,7 +116,9 @@ final class RunStore {
         var succeeded = false
         for repo in watched where isDue(repo, login: login) {
             if let error = await fetch(repo, for: account) {
+                if (error as? GitHubError)?.isForbidden == true { continue }
                 failure = error
+                if Self.stopsAccount(error) { break }
             } else {
                 succeeded = true
             }
@@ -95,8 +127,17 @@ final class RunStore {
         publish(watched, for: login)
         if succeeded {
             errors[login] = nil
+            gate.succeeded(login)
         } else if let failure {
             errors[login] = RefreshProblem(failure, at: now(), after: errors[login])
+            gate.failed(login, with: failure, at: now())
+        }
+    }
+
+    private static func stopsAccount(_ error: Error) -> Bool {
+        switch error as? GitHubError {
+        case .offline?, .rateLimited?, .unauthorized?, .noToken?, .ghTimedOut?: true
+        default: false
         }
     }
 
@@ -111,23 +152,39 @@ final class RunStore {
         if let last = discoveredAt[login], now().timeIntervalSince(last) < Self.discoveryInterval {
             let known = repos[login] ?? []
             let missing = fromPRs.filter { !known.contains($0) }
-            if !missing.isEmpty { repos[login] = Self.limit(known + missing) }
+            if !missing.isEmpty { repos[login] = limit(known + missing, for: login) }
             return
         }
         let pushed = try await source.pushedRepos(for: account)
         discoveredAt[login] = now()
-        repos[login] = Self.limit(pushed + fromPRs)
+        repos[login] = limit(pushed + fromPRs, for: login)
     }
 
-    private static func limit(_ repos: [String]) -> [String] {
+    private func limit(_ repos: [String], for login: String) -> [String] {
         var seen = Set<String>()
-        return Array(repos.filter { seen.insert($0.lowercased()).inserted }.prefix(maxRepos))
+        return Array(repos.filter { !isParked($0, login: login) && seen.insert($0.lowercased()).inserted }.prefix(Self.maxRepos))
+    }
+
+    private func isParked(_ repo: String, login: String) -> Bool {
+        parkedUntil[key(repo, login)].map { now() < $0 } ?? false
     }
 
     private func isDue(_ repo: String, login: String) -> Bool {
+        guard !isParked(repo, login: login) else { return false }
         guard let last = fetchedAt[key(repo, login)] else { return true }
-        let active = byRepo[key(repo, login)]?.contains { $0.state.isActive } ?? false
-        return now().timeIntervalSince(last) >= (active ? Self.activeInterval : Self.idleInterval)
+        let list = byRepo[key(repo, login)] ?? []
+        let interval = if isPanelOpen {
+            list.contains { $0.state.isActive } ? Self.activeInterval : Self.idleInterval
+        } else {
+            list.contains { $0.state.isActive && $0.isStarted(by: login) } ? Self.closedActiveInterval : Self.closedIdleInterval
+        }
+        return now().timeIntervalSince(last) >= interval
+    }
+
+    private func needsJobs(_ run: WorkflowRun, login: String) -> Bool {
+        if run.id == watchedRun { return true }
+        guard run.state == .running else { return false }
+        return isPanelOpen || run.isStarted(by: login)
     }
 
     @discardableResult
@@ -136,7 +193,7 @@ final class RunStore {
         defer { fetchedAt[key] = now() }
         do {
             var fetched = try await source.runs(in: repo, for: account)
-            for index in fetched.indices where fetched[index].state == .running || fetched[index].id == watchedRun {
+            for index in fetched.indices where needsJobs(fetched[index], login: account.login) {
                 guard let list = try? await source.jobs(of: fetched[index], for: account) else { continue }
                 if fetched[index].state == .running { fetched[index].jobs = JobProgress(jobs: list) }
                 store(list, for: fetched[index].id)
@@ -147,7 +204,13 @@ final class RunStore {
             if !finished.isEmpty { onRunsFinished?(finished) }
             return nil
         } catch {
-            Logger.store.error("Loading runs of \(repo, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            Logger.store.error(
+                "Loading runs of \(repo, privacy: .private(mask: .hash)) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
+            )
+            if (error as? GitHubError)?.isForbidden == true {
+                parkedUntil[key] = now().addingTimeInterval(Self.parkingTime)
+                repos[account.login]?.removeAll { $0.caseInsensitiveCompare(repo) == .orderedSame }
+            }
             return error
         }
     }
@@ -160,7 +223,10 @@ final class RunStore {
             try await store(source.jobs(of: run, for: account), for: run.id)
             jobErrors[run.id] = nil
         } catch {
-            Logger.store.error("Loading jobs of run \(run.id) failed: \(error.localizedDescription, privacy: .public)")
+            Logger.store
+                .error(
+                    "Loading jobs of run \(run.id, privacy: .public) failed: \(error.localizedDescription, privacy: .private(mask: .hash))"
+                )
             jobErrors[run.id] = error.localizedDescription
         }
     }

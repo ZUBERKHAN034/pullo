@@ -29,7 +29,7 @@ struct GQLResponse: Decodable {
 
         var failure: GitHubError? {
             if type == "RATE_LIMITED" { return .rateLimited(until: nil) }
-            if message.localizedCaseInsensitiveContains("timeout") { return .timedOut }
+            if message.localizedCaseInsensitiveContains("timeout") { return .queryTimedOut }
             return nil
         }
     }

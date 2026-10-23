@@ -22,25 +22,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        app.store.start()
-        app.runs.start()
+        app.startPolling()
         if app.accounts.accounts.isEmpty { greetFirstLaunch() } else { app.system.requestFocusAccess() }
         panel.startListening()
-        NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.didWakeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.refreshAfterWake() }
-        }
-    }
-
-    private func refreshAfterWake() {
-        Task { [app] in
-            try? await Task.sleep(for: .seconds(3))
-            await app.store.refresh()
-            await app.runs.refresh()
-        }
     }
 
     private func greetFirstLaunch() {

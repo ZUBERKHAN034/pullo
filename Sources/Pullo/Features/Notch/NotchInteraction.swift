@@ -6,7 +6,10 @@ import SwiftUI
 @Observable
 final class NotchInteraction {
     private(set) var state: NotchState = .closed {
-        didSet { onStateChange?(state) }
+        didSet {
+            runs.setPanelOpen(state == .open)
+            onStateChange?(state)
+        }
     }
 
     private(set) var peekAlert: NotchAlert?

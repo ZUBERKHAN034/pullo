@@ -74,10 +74,10 @@ struct FakeCLI: GitHubCLI {
     var logins: [String] = []
     var tokens: [String: String] = [:]
 
-    var isInstalled: Bool { installed }
-    func users() -> [String] { logins }
+    func isInstalled() async -> Bool { installed }
+    func users() async -> [String] { logins }
 
-    func token(for user: String) throws -> String {
+    func token(for user: String) async throws -> String {
         guard let token = tokens[user] else { throw GitHubError.noToken }
         return token
     }

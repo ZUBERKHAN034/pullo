@@ -6,10 +6,12 @@ enum GitHubError: LocalizedError, Equatable {
     case unauthorized
     case offline
     case timedOut
+    case queryTimedOut
     case server(Int)
     case rateLimited(until: Date?)
     case http(Int)
     case api(String)
+    case forbidden(String)
 
     var errorDescription: String? {
         switch self {
@@ -17,7 +19,7 @@ enum GitHubError: LocalizedError, Equatable {
         case .ghTimedOut: String(localized: "gh took too long to answer. Check that `gh auth status` works in Terminal.")
         case .unauthorized: String(localized: "GitHub rejected the gh token. Run `gh auth refresh`.")
         case .offline: String(localized: "Your Mac isn't connected to the internet.")
-        case .timedOut: String(localized: "GitHub took too long to answer.")
+        case .timedOut, .queryTimedOut: String(localized: "GitHub took too long to answer.")
         case .server(let status): String(localized: "GitHub is having trouble right now (error \(status)).")
         case .rateLimited(let until):
             if let until {
@@ -28,22 +30,26 @@ enum GitHubError: LocalizedError, Equatable {
                 String(localized: "GitHub's request limit for this account was reached. Pullo tries again in a few minutes.")
             }
         case .http(let status): String(localized: "GitHub returned error \(status).")
-        case .api(let message): message
+        case .api(let message), .forbidden(let message): message
         }
     }
 
     var isTransient: Bool {
         switch self {
-        case .offline, .timedOut, .server: true
+        case .timedOut, .server: true
         default: false
         }
     }
 
     var isOverloaded: Bool {
         switch self {
-        case .timedOut, .server: true
+        case .queryTimedOut, .server: true
         default: false
         }
+    }
+
+    var isForbidden: Bool {
+        if case .forbidden = self { true } else { false }
     }
 
     init?(_ error: URLError) {

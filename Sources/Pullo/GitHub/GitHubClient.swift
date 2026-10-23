@@ -1,10 +1,10 @@
 import Foundation
-import os
 import OSLog
 
 struct GitHubClient {
     let token: String
-    var session: URLSession = .shared
+    var session: URLSession = .github
+    var sizes = QuerySizes()
     var retryDelays: [Duration] = [.seconds(1), .seconds(3)]
 
     struct QuerySize: Equatable {
@@ -14,12 +14,6 @@ struct GitHubClient {
 
         static let full = QuerySize(prs: 40, checks: 30, activity: 20)
         static let light = QuerySize(prs: 15, checks: 15, activity: 10)
-    }
-
-    private static let lightAccounts = OSAllocatedUnfairLock(initialState: Set<String>())
-
-    static func usesLightQuery(_ account: String) -> Bool {
-        lightAccounts.withLock { $0.contains(account) }
     }
 
     static func query(filterCount: Int, size: QuerySize = .full) -> String {
@@ -55,22 +49,27 @@ struct GitHubClient {
     }
 
     func fetchSnapshot(account: String, filters: [SavedFilter] = []) async throws -> Snapshot {
-        if Self.usesLightQuery(account) {
-            return try await fetchSnapshot(account: account, filters: filters, size: .light, retrying: true)
+        if sizes.usesLight(account) {
+            return try await fetchSnapshot(account: account, filters: filters, size: .light, retriesOverload: true)
         }
         do {
-            return try await fetchSnapshot(account: account, filters: filters, size: .full, retrying: false)
+            return try await fetchSnapshot(account: account, filters: filters, size: .full, retriesOverload: false)
         } catch let error as GitHubError where error.isOverloaded {
             Logger.github
                 .notice(
-                    "The full query for @\(account, privacy: .public) failed (\(error.localizedDescription, privacy: .public)); using the light one from now on"
+                    "The full query for @\(account, privacy: .private(mask: .hash)) failed (\(String(describing: error), privacy: .public)); using the light one for a while"
                 )
-            Self.lightAccounts.withLock { _ = $0.insert(account) }
-            return try await fetchSnapshot(account: account, filters: filters, size: .light, retrying: true)
+            sizes.downgrade(account)
+            return try await fetchSnapshot(account: account, filters: filters, size: .light, retriesOverload: true)
         }
     }
 
-    private func fetchSnapshot(account: String, filters: [SavedFilter], size: QuerySize, retrying: Bool) async throws -> Snapshot {
+    private func fetchSnapshot(
+        account: String,
+        filters: [SavedFilter],
+        size: QuerySize,
+        retriesOverload: Bool
+    ) async throws -> Snapshot {
         let filters = filters.filter { $0.isComplete && !$0.usesBuiltInSearch }
         let aliases = Dictionary(uniqueKeysWithValues: filters.enumerated().map { ("f\($0.offset)", $0.element) })
         var request = request(for: URL(static: "https://api.github.com/graphql"))
@@ -84,12 +83,12 @@ struct GitHubClient {
             ].merging(aliases.mapValues(\.searchQuery)) { $1 },
         ])
 
-        let data = try await perform(request, retrying: retrying).data
+        let data = try await perform(request, retriesOverload: retriesOverload).data
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(GQLResponse.self, from: data)
         if let errors = decoded.errors, !errors.isEmpty {
-            Logger.github.error("GitHub reported errors: \(errors.map(\.message).joined(separator: " | "), privacy: .public)")
+            Logger.github.error("GitHub reported errors: \(errors.map(\.message).joined(separator: " | "), privacy: .private(mask: .hash))")
         }
         guard let payload = decoded.data else {
             if let failure = decoded.errors?.lazy.compactMap(\.failure).first { throw failure }
@@ -161,17 +160,18 @@ struct GitHubClient {
     private func perform(
         _ request: URLRequest,
         allowing allowed: Set<Int> = [],
-        retrying: Bool = true
+        retriesOverload: Bool = true
     ) async throws -> (data: Data, response: HTTPURLResponse) {
-        let delays = retrying && Self.canRetry(request) ? retryDelays : []
+        let delays = Self.canRetry(request) ? retryDelays : []
         var attempt = 0
         while true {
             do {
                 return try await performOnce(request, allowing: allowed)
-            } catch let error as GitHubError where error.isTransient && attempt < delays.count {
+            } catch let error as GitHubError
+                where error.isTransient && (retriesOverload || !error.isOverloaded) && attempt < delays.count {
                 Logger.github
                     .notice(
-                        "\(request.url?.path() ?? "", privacy: .public) failed (\(error.localizedDescription, privacy: .public)); trying again"
+                        "\(request.url?.path() ?? "", privacy: .private(mask: .hash)) failed (\(String(describing: error), privacy: .public)); trying again"
                     )
                 try await Task.sleep(for: delays[attempt])
                 attempt += 1
@@ -190,21 +190,23 @@ struct GitHubClient {
         do {
             (data, response) = try await session.data(for: request)
         } catch let error as URLError {
-            Logger.github.error("\(request.url?.path() ?? "", privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+            Logger.github.error(
+                "\(request.url?.path() ?? "", privacy: .private(mask: .hash)) failed: URLError \(error.code.rawValue, privacy: .public)"
+            )
             throw GitHubError(error) ?? error
         }
         let http = response as? HTTPURLResponse
         let status = http?.statusCode ?? 0
         if allowed.contains(status), let http { return (data, http) }
         if !(200..<300).contains(status) {
-            Logger.github.error("\(request.url?.path() ?? "", privacy: .public) returned \(status)")
+            Logger.github.error("\(request.url?.path() ?? "", privacy: .private(mask: .hash)) returned \(status, privacy: .public)")
         }
         if status == 401 { throw GitHubError.unauthorized }
         if status == 403 || status == 429, let http, let limit = Self.rateLimit(http, data) { throw limit }
         if (500..<600).contains(status) { throw GitHubError.server(status) }
         guard (200..<300).contains(status), let http else {
             if let failure = try? JSONDecoder().decode(Failure.self, from: data) {
-                throw GitHubError.api(failure.message)
+                throw status == 403 ? GitHubError.forbidden(failure.message) : GitHubError.api(failure.message)
             }
             throw GitHubError.http(status)
         }

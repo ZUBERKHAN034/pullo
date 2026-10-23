@@ -9,13 +9,21 @@ actor GitHubRunSource: RunSource {
     private let tokens: TokenProvider
     private var runCache: [String: Cached<[WorkflowRun]>] = [:]
     private var jobCache: [String: Cached<[WorkflowJob]>] = [:]
+    private var pushedCache: [String: Cached<[String]>] = [:]
 
     init(tokens: TokenProvider) {
         self.tokens = tokens
     }
 
     func pushedRepos(for account: Account) async throws -> [String] {
-        try await client(for: account).fetchPushedRepos(login: account.login)
+        let cached = pushedCache[account.login]
+        switch try await client(for: account).fetchPushedRepos(login: account.login, etag: cached?.etag) {
+        case .notModified:
+            return cached?.value ?? []
+        case .fresh(let repos, let etag):
+            pushedCache[account.login] = etag.map { Cached(etag: $0, value: repos) }
+            return repos
+        }
     }
 
     func runs(in repo: String, for account: Account) async throws -> [WorkflowRun] {

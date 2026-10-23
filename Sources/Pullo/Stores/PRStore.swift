@@ -17,14 +17,30 @@ final class PRStore {
     private let tracker: ReadTracker
     private let source: PRSource
     private let now: () -> Date
-    @ObservationIgnored private var pollTask: Task<Void, Never>?
+    @ObservationIgnored let poller: Poller
+    @ObservationIgnored private(set) var gate: PollGate
     @ObservationIgnored private var refreshQueued = false
 
-    init(accounts: AccountStore, tracker: ReadTracker, source: PRSource, now: @escaping () -> Date = Date.init) {
+    init(
+        accounts: AccountStore,
+        tracker: ReadTracker,
+        source: PRSource,
+        clock: any Clock<Duration> = ContinuousClock(),
+        gate: PollGate = PollGate(),
+        now: @escaping () -> Date = Date.init
+    ) {
         self.accounts = accounts
         self.tracker = tracker
         self.source = source
         self.now = now
+        self.gate = gate
+        poller = Poller(clock: clock)
+        poller.tick = { [weak self] in
+            guard let self else { return .seconds(60) }
+            await refresh(manual: false)
+            return pollInterval
+        }
+        poller.onResume = { [weak self] in self?.gate.clearBackoff() }
     }
 
     func mine(for login: String?) -> [PullRequest] {
@@ -54,16 +70,15 @@ final class PRStore {
     }
 
     func start() {
-        pollTask?.cancel()
-        pollTask = Task { [weak self] in
-            while !Task.isCancelled {
-                await self?.refresh()
-                try? await Task.sleep(for: self?.pollInterval ?? .seconds(60))
-            }
-        }
+        poller.start()
     }
 
     func refresh() async {
+        await refresh(manual: true)
+    }
+
+    private func refresh(manual: Bool) async {
+        if manual { gate.clearForManualRefresh() }
         guard !isLoading else {
             refreshQueued = true
             return
@@ -77,7 +92,9 @@ final class PRStore {
     }
 
     private func refreshAllAccounts() async {
-        let current = accounts.accounts
+        let everyone = accounts.accounts
+        gate.prune(to: Set(everyone.map(\.login)))
+        let current = everyone.filter { gate.allows($0.login, at: now()) }
         let source = source
         let tabs = Dictionary(uniqueKeysWithValues: current.map { ($0.login, accounts.filters(for: $0.login)) })
         let results = await withTaskGroup(of: (String, Result<Snapshot, Error>).self) { group in
@@ -108,18 +125,27 @@ final class PRStore {
                 tracker.sync(account: login, prs: snapshot.mine + snapshot.reviewRequests)
                 errors[login] = nil
                 updatedAt[login] = now()
+                gate.succeeded(login)
             case .failure(let error):
-                Logger.store.error("Refreshing @\(login, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
-                errors[login] = RefreshProblem(error, at: now(), after: errors[login])
+                let problem = RefreshProblem(error, at: now(), after: errors[login])
+                Logger.store.error(
+                    "Refreshing @\(login, privacy: .private(mask: .hash)) failed (\(String(describing: problem.kind), privacy: .public)): \(error.localizedDescription, privacy: .private(mask: .hash))"
+                )
+                errors[login] = problem
+                gate.failed(login, with: error, at: now())
             }
         }
 
-        let logins = Set(current.map(\.login))
+        let logins = Set(everyone.map(\.login))
         snapshots = snapshots.filter { logins.contains($0.key) }
         errors = errors.filter { logins.contains($0.key) }
         updatedAt = updatedAt.filter { logins.contains($0.key) }
 
-        lastUpdated = snapshots.isEmpty ? nil : now()
+        if snapshots.isEmpty {
+            lastUpdated = nil
+        } else if !current.isEmpty {
+            lastUpdated = now()
+        }
 
         var seen = Set<String>()
         let unique = events.filter { seen.insert("\($0.pr.id)|\($0.kind)").inserted }
@@ -134,7 +160,7 @@ final class PRStore {
         do {
             outcomes = try await source.outcomes(of: gone.map(\.id), for: account)
         } catch {
-            Logger.store.error("Looking up merged or closed PRs failed: \(error.localizedDescription, privacy: .public)")
+            Logger.store.error("Looking up merged or closed PRs failed: \(error.localizedDescription, privacy: .private(mask: .hash))")
             outcomes = []
         }
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }

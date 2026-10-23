@@ -4,6 +4,16 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Changed
+- Pullo uses less battery and network. It stops checking GitHub while your Mac is asleep, its screen is off or locked, or it's offline, and checks once as soon as you're back. With the panel closed, the Actions side only keeps a close eye on runs you started.
+
+### Fixed
+- When GitHub's request limit is reached, Pullo waits until it resets instead of asking again every minute. When GitHub keeps failing, it waits a bit longer each time, up to five minutes, and when your sign-in is rejected it stops asking until you try again.
+- Pullo now finds gh installed with MacPorts, Nix, mise or anywhere on your shell's PATH, and reads gh's settings from `XDG_CONFIG_HOME` when you use it.
+- A slow or broken gh no longer holds Pullo up, and Pullo stops asking it for a token on every refresh after it fails. "Check again" in Settings → Accounts asks right away.
+- After GitHub was slow once, Pullo kept asking for shorter lists until you quit it. It now goes back to the full lists after half an hour, and a slow connection on your side no longer counts.
+- Repositories your organization blocks with single sign-on no longer slow down the Actions side.
+
 ## [0.10.2] - 2026-10-23
 
 ### Removed

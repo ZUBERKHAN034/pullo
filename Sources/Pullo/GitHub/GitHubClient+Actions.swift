@@ -6,7 +6,7 @@ enum Fetched<Value> {
 }
 
 extension GitHubClient {
-    func fetchPushedRepos(login: String) async throws -> [String] {
+    func fetchPushedRepos(login: String, etag: String?) async throws -> Fetched<[String]> {
         struct Event: Decodable {
             struct Repo: Decodable { let name: String }
             let type: String
@@ -14,10 +14,10 @@ extension GitHubClient {
         }
         let url = URL(static: "https://api.github.com/users").appending(path: login).appending(path: "events")
             .appending(queryItems: [URLQueryItem(name: "per_page", value: "100")])
-        let data = try await send(request(for: url))
+        guard case .fresh(let data, let etag) = try await conditionalGet(url, etag: etag) else { return .notModified }
         let events = try Self.restDecoder.decode([Event].self, from: data)
         var seen = Set<String>()
-        return events.filter { $0.type == "PushEvent" }.map(\.repo.name).filter { seen.insert($0).inserted }
+        return .fresh(events.filter { $0.type == "PushEvent" }.map(\.repo.name).filter { seen.insert($0).inserted }, etag: etag)
     }
 
     func fetchRuns(in repo: String, account: String, etag: String?) async throws -> Fetched<[WorkflowRun]> {
