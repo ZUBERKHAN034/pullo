@@ -2,9 +2,15 @@ import AppKit
 import SwiftUI
 
 struct TabsPage: View {
+    private struct Editing: Identifiable {
+        let filter: SavedFilter
+        let teamReviews: Bool
+
+        var id: UUID { filter.id }
+    }
+
     @Environment(AccountStore.self) private var accounts
-    @State private var editing: SavedFilter?
-    @State private var editingTeamReviews = false
+    @State private var editing: Editing?
     @State private var editingRunTab: RunTab?
 
     var body: some View {
@@ -12,8 +18,8 @@ struct TabsPage: View {
             tabsSection
             runTabsSection
         }
-        .sheet(item: $editing) { filter in
-            TabEditor(filter: filter, startsWithTeamReviews: editingTeamReviews) { saved in
+        .sheet(item: $editing) { editing in
+            TabEditor(filter: editing.filter, startsWithTeamReviews: editing.teamReviews) { saved in
                 var filters = accounts.tabs
                 if let index = filters.firstIndex(where: { $0.id == saved.id }) {
                     filters[index] = saved
@@ -37,8 +43,7 @@ struct TabsPage: View {
     }
 
     private func edit(_ filter: SavedFilter, teamReviews: Bool = false) {
-        editingTeamReviews = teamReviews
-        editing = filter
+        editing = Editing(filter: filter, teamReviews: teamReviews)
     }
 
     private func scoped(_ text: String, to account: String?) -> String {
