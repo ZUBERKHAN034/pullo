@@ -17,14 +17,31 @@ final class PRStore {
     private let tracker: ReadTracker
     private let source: PRSource
     private let now: () -> Date
-    @ObservationIgnored private var pollTask: Task<Void, Never>?
-    @ObservationIgnored private var refreshQueued = false
+    @ObservationIgnored let poller: Poller
+    @ObservationIgnored private(set) var gate: PollGate
+    @ObservationIgnored private let queue = RefreshQueue()
+    @ObservationIgnored private var reviewRequestsSeen: [String: Date] = [:]
 
-    init(accounts: AccountStore, tracker: ReadTracker, source: PRSource, now: @escaping () -> Date = Date.init) {
+    init(
+        accounts: AccountStore,
+        tracker: ReadTracker,
+        source: PRSource,
+        clock: any Clock<Duration> = ContinuousClock(),
+        gate: PollGate = PollGate(),
+        now: @escaping () -> Date = Date.init
+    ) {
         self.accounts = accounts
         self.tracker = tracker
         self.source = source
         self.now = now
+        self.gate = gate
+        poller = Poller(clock: clock)
+        poller.tick = { [weak self] in
+            guard let self else { return .seconds(60) }
+            await refresh(manual: false)
+            return pollInterval
+        }
+        poller.onResume = { [weak self] in self?.gate.clearBackoff() }
     }
 
     func mine(for login: String?) -> [PullRequest] {
@@ -43,6 +60,8 @@ final class PRStore {
         login.flatMap { snapshots[$0]?.filterErrors[filter] }
     }
 
+    static let reviewRequestMemory: TimeInterval = 10 * 60
+
     var pollInterval: Duration {
         snapshots.values.contains { $0.mine.contains { $0.ci == .pending } } ? .seconds(30) : .seconds(60)
     }
@@ -54,32 +73,28 @@ final class PRStore {
     }
 
     func start() {
-        pollTask?.cancel()
-        pollTask = Task { [weak self] in
-            while !Task.isCancelled {
-                await self?.refresh()
-                try? await Task.sleep(for: self?.pollInterval ?? .seconds(60))
-            }
-        }
+        poller.start()
     }
 
     func refresh() async {
-        guard !isLoading else {
-            refreshQueued = true
-            return
-        }
-        isLoading = true
-        defer { isLoading = false }
-        repeat {
-            refreshQueued = false
+        await refresh(manual: true)
+    }
+
+    private func refresh(manual: Bool) async {
+        if manual { gate.clearForManualRefresh() }
+        await queue.run {
+            isLoading = true
             await refreshAllAccounts()
-        } while refreshQueued
+            isLoading = false
+        }
     }
 
     private func refreshAllAccounts() async {
-        let current = accounts.accounts
+        let everyone = accounts.accounts
+        gate.prune(to: Set(everyone.map(\.login)))
+        let current = everyone.filter { gate.allows($0.login, at: now()) }
         let source = source
-        let tabs = Dictionary(uniqueKeysWithValues: current.map { ($0.login, accounts.filters(for: $0.login)) })
+        let tabs = Dictionary(current.map { ($0.login, accounts.filters(for: $0.login)) }) { first, _ in first }
         let results = await withTaskGroup(of: (String, Result<Snapshot, Error>).self) { group in
             for account in current {
                 let filters = tabs[account.login] ?? []
@@ -91,7 +106,7 @@ final class PRStore {
         }
 
         var events: [PREvent] = []
-        for (login, result) in results {
+        for (login, result) in results where isCurrent(login) {
             switch result {
             case .success(let fetched):
                 let snapshot = Snapshot(
@@ -100,30 +115,58 @@ final class PRStore {
                     filtered: fetched.filtered,
                     filterErrors: fetched.filterErrors
                 )
+                var found: [PREvent] = []
                 if let previous = snapshots[login] {
-                    events += PREvent.diff(old: previous, new: snapshot)
-                    events += await departures(from: previous, to: snapshot, login: login)
+                    found += PREvent.diff(old: previous, new: snapshot).filter { !wasRecentlyRequested($0, login: login) }
+                    found += await departures(from: previous, to: snapshot, login: login)
                 }
+                guard isCurrent(login) else { continue }
+                events += found
+                rememberReviewRequests(snapshot.reviewRequests, login: login)
                 snapshots[login] = snapshot
                 tracker.sync(account: login, prs: snapshot.mine + snapshot.reviewRequests)
                 errors[login] = nil
                 updatedAt[login] = now()
+                gate.succeeded(login)
             case .failure(let error):
-                Logger.store.error("Refreshing @\(login, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
-                errors[login] = RefreshProblem(error, at: now(), after: errors[login])
+                let problem = RefreshProblem(error, at: now(), after: errors[login])
+                Logger.store.error(
+                    "Refreshing @\(login, privacy: .private(mask: .hash)) failed (\(String(describing: problem.kind), privacy: .public)): \(error.localizedDescription, privacy: .private(mask: .hash))"
+                )
+                errors[login] = problem
+                gate.failed(login, with: error, at: now())
             }
         }
 
-        let logins = Set(current.map(\.login))
+        let logins = Set(accounts.accounts.map(\.login))
+        reviewRequestsSeen = reviewRequestsSeen.filter { now().timeIntervalSince($0.value) < Self.reviewRequestMemory }
         snapshots = snapshots.filter { logins.contains($0.key) }
         errors = errors.filter { logins.contains($0.key) }
         updatedAt = updatedAt.filter { logins.contains($0.key) }
 
-        lastUpdated = snapshots.isEmpty ? nil : now()
+        if snapshots.isEmpty {
+            lastUpdated = nil
+        } else if !current.isEmpty {
+            lastUpdated = now()
+        }
 
         var seen = Set<String>()
-        let unique = events.filter { seen.insert("\($0.pr.id)|\($0.kind)").inserted }
+        let unique = events.filter { logins.contains($0.pr.account) && seen.insert("\($0.pr.id)|\($0.kind)").inserted }
         if !unique.isEmpty { onEvents?(unique) }
+    }
+
+    private func isCurrent(_ login: String) -> Bool {
+        accounts.accounts.contains { $0.login == login }
+    }
+
+    private func wasRecentlyRequested(_ event: PREvent, login: String) -> Bool {
+        guard event.kind == .reviewRequested, let seen = reviewRequestsSeen["\(login)|\(event.pr.id)"] else { return false }
+        return now().timeIntervalSince(seen) < Self.reviewRequestMemory
+    }
+
+    private func rememberReviewRequests(_ prs: [PullRequest], login: String) {
+        let seenAt = now()
+        for pr in prs { reviewRequestsSeen["\(login)|\(pr.id)"] = seenAt }
     }
 
     private func departures(from old: Snapshot, to new: Snapshot, login: String) async -> [PREvent] {
@@ -134,7 +177,7 @@ final class PRStore {
         do {
             outcomes = try await source.outcomes(of: gone.map(\.id), for: account)
         } catch {
-            Logger.store.error("Looking up merged or closed PRs failed: \(error.localizedDescription, privacy: .public)")
+            Logger.store.error("Looking up merged or closed PRs failed: \(error.localizedDescription, privacy: .private(mask: .hash))")
             outcomes = []
         }
         return gone.compactMap { pr in outcomes.first { $0.id == pr.id }?.event(for: pr) }

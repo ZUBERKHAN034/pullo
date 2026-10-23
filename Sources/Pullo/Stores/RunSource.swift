@@ -6,6 +6,7 @@ protocol RunSource: Sendable {
     func jobs(of run: WorkflowRun, for account: Account) async throws -> [WorkflowJob]
     func rerunFailedJobs(of run: WorkflowRun, for account: Account) async throws
     func cancel(_ run: WorkflowRun, for account: Account) async throws
+    func retain(_ repos: [String: [String]]) async
 }
 
 struct NoRuns: RunSource {
@@ -14,4 +15,5 @@ struct NoRuns: RunSource {
     func jobs(of run: WorkflowRun, for account: Account) async throws -> [WorkflowJob] { [] }
     func rerunFailedJobs(of run: WorkflowRun, for account: Account) async throws {}
     func cancel(_ run: WorkflowRun, for account: Account) async throws {}
+    func retain(_ repos: [String: [String]]) async {}
 }

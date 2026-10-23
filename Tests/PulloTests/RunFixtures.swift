@@ -43,6 +43,7 @@ actor StubRunSource: RunSource {
     private var jobLists: [Int: [WorkflowJob]] = [:]
     private var failsCommands = false
     private var runsFailure: GitHubError?
+    private var repoFailures: [String: GitHubError] = [:]
     private(set) var commands: [String] = []
 
     init(pushed: [String] = [], runs: [String: [WorkflowRun]] = [:], failsDiscovery: Bool = false) {
@@ -55,6 +56,8 @@ actor StubRunSource: RunSource {
 
     func failRuns(with error: GitHubError?) { runsFailure = error }
 
+    func failRuns(in repo: String, with error: GitHubError?) { repoFailures[repo] = error }
+
     func pushedRepos(for account: Account) async throws -> [String] {
         if failsDiscovery { throw GitHubError.api("Not Found") }
         return pushed
@@ -63,6 +66,7 @@ actor StubRunSource: RunSource {
     func runs(in repo: String, for account: Account) async throws -> [WorkflowRun] {
         runRequests.append(repo)
         if let runsFailure { throw runsFailure }
+        if let failure = repoFailures[repo] { throw failure }
         return byRepo[repo] ?? []
     }
 
@@ -91,6 +95,8 @@ actor StubRunSource: RunSource {
         if failsCommands { throw GitHubError.http(403) }
         commands.append("cancel \(run.id)")
     }
+
+    func retain(_ repos: [String: [String]]) async {}
 }
 
 extension WorkflowJob {

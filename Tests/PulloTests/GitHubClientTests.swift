@@ -1,4 +1,5 @@
 import Foundation
+import os
 @testable import Pullo
 import Testing
 
@@ -45,8 +46,14 @@ struct GitHubClientTests {
     }
 
     @Test func restErrorsCarryGitHubsReason() async {
-        let (client, _) = client(status: 403, body: #"{ "message": "Resource not accessible by integration" }"#)
-        await #expect(throws: GitHubError.api("Resource not accessible by integration")) { try await client.fetchUser() }
+        let (client, _) = client(status: 422, body: #"{ "message": "Validation Failed" }"#)
+        await #expect(throws: GitHubError.api("Validation Failed")) { try await client.fetchUser() }
+    }
+
+    @Test func aBlockedRepoIsForbidden() async {
+        let message = "Resource protected by organization SAML enforcement. You must grant your Personal Access token access to this organization."
+        let (client, _) = client(status: 403, body: #"{ "message": "\#(message)" }"#)
+        await #expect(throws: GitHubError.forbidden(message)) { try await client.fetchUser() }
     }
 
     @Test func errorsWithoutABodyKeepTheStatus() async {
@@ -80,9 +87,37 @@ struct GitHubClientTests {
         #expect(StubURLProtocol.requestCount(token: token) == 1)
     }
 
-    @Test func noConnectionMeansOffline() async {
-        let (client, _) = client([.offline()])
+    @Test func noConnectionMeansOfflineAndIsNotTriedAgain() async {
+        let (client, token) = client([.offline()])
         await #expect(throws: GitHubError.offline) { try await client.fetchUser() }
+        #expect(StubURLProtocol.requestCount(token: token) == 1)
+    }
+
+    @Test func aSlowAnswerIsTriedAgainButDoesNotDowngradeTheQuery() async throws {
+        let account = UUID().uuidString
+        let page = StubURLProtocol.Response(status: 200, body: #"{ "data": { "mine": { "nodes": [] }, "review": { "nodes": [] } } }"#)
+        let (client, token) = client([.init(status: 0, body: "", failure: .timedOut), page])
+        _ = try await client.fetchSnapshot(account: account)
+        #expect(StubURLProtocol.requestCount(token: token) == 2)
+        #expect(StubURLProtocol.bodies(token: token).allSatisfy { $0.contains("first: 40") })
+        #expect(!client.sizes.usesLight(account))
+    }
+
+    @Test func theLightQueryIsDroppedAfterAWhile() async throws {
+        let account = UUID().uuidString
+        let clock = OSAllocatedUnfairLock(initialState: Date(timeIntervalSince1970: 1_000_000))
+        let sizes = QuerySizes { clock.withLock { $0 } }
+        let page = StubURLProtocol.Response(status: 200, body: #"{ "data": { "mine": { "nodes": [] }, "review": { "nodes": [] } } }"#)
+        var (client, token) = client([.init(status: 502, body: ""), page])
+        client.sizes = sizes
+        _ = try await client.fetchSnapshot(account: account)
+        #expect(sizes.usesLight(account))
+        clock.withLock { $0 += QuerySizes.downgradeTime - 1 }
+        #expect(sizes.usesLight(account))
+        clock.withLock { $0 += 2 }
+        #expect(!sizes.usesLight(account))
+        _ = try await client.fetchSnapshot(account: account)
+        #expect(StubURLProtocol.bodies(token: token).last?.contains("first: 40") == true)
     }
 
     @Test func aSpentRateLimitSaysWhenItResets() async {
@@ -111,7 +146,7 @@ struct GitHubClientTests {
         #expect(bodies[0].contains("first: 40"))
         #expect(bodies[1].contains("first: 15"))
         #expect(bodies[2].contains("first: 15"))
-        #expect(GitHubClient.usesLightQuery(account))
+        #expect(client.sizes.usesLight(account))
     }
 
     @Test func aGraphQLTimeoutCountsAsOverloaded() async throws {
@@ -124,7 +159,13 @@ struct GitHubClientTests {
         let (client, token) = client([timeout, page])
         _ = try await client.fetchSnapshot(account: account)
         #expect(StubURLProtocol.requestCount(token: token) == 2)
-        #expect(GitHubClient.usesLightQuery(account))
+        #expect(client.sizes.usesLight(account))
+    }
+
+    @Test func aPRListedTwiceIsKeptOnce() async throws {
+        let (client, _) = client(body: #"{ "data": { "mine": { "nodes": [\#(prNode), \#(prNode)] }, "review": { "nodes": [] } } }"#)
+        let snapshot = try await client.fetchSnapshot(account: "me")
+        #expect(snapshot.mine.map(\.id) == ["PR_1"])
     }
 
     @Test func partialDataIsKeptWhenAnOrgBlocksTheToken() async throws {

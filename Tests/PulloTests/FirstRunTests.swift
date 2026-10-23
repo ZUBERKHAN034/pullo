@@ -170,10 +170,10 @@ final class LoginCLI: GitHubCLI, @unchecked Sendable {
         set { lock.withLock { storedToken = newValue } }
     }
 
-    var isInstalled: Bool { true }
-    func users() -> [String] { logins }
+    func isInstalled() async -> Bool { true }
+    func users() async -> [String] { logins }
 
-    func token(for user: String) throws -> String {
+    func token(for user: String) async throws -> String {
         guard let token, logins.contains(user) else { throw GitHubError.noToken }
         return token
     }

@@ -14,6 +14,7 @@ final class AppDependencies {
     let actions: ActionsModel
     let updater: Updater?
     let system: any SystemActions = LiveSystemActions()
+    let activity = ActivityMonitor()
 
     init(demo: DemoMode?) {
         self.demo = demo
@@ -51,7 +52,15 @@ final class AppDependencies {
             .environment(\.system, system)
     }
 
+    func startPolling() {
+        activity.watch([store.poller, runs.poller])
+        activity.start()
+        store.start()
+        runs.start()
+    }
+
     private func connect() {
+        runs.setPanelOpen(notch.state == .open)
         store.onEvents = { [weak self] events in self?.notch.enqueue(events: events) }
         runs.onRunsFinished = { [weak self] finished in self?.notch.runsFinished(finished) }
         notch.actions = actions
