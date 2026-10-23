@@ -364,7 +364,7 @@ private struct TabEditor: View {
                 }
             }
             .formStyle(.grouped)
-            .frame(minHeight: 530)
+            .frame(minHeight: 570)
             HStack {
                 Spacer()
                 Button("Cancel", role: .cancel) { dismiss() }
