@@ -26,7 +26,7 @@ jobs:
     # The first notarization of a new account can take hours; later ones take minutes, and public repos pay nothing to wait.
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
 
@@ -53,6 +53,12 @@ jobs:
 
       - name: Test
         run: swift test
+
+      # Installed before any secret is on the runner, from pinned versions with known hashes.
+      - name: Install the disk image tool
+        run: |
+          python3 -m venv "$RUNNER_TEMP/dmgbuild"
+          "$RUNNER_TEMP/dmgbuild/bin/pip" install --quiet --require-hashes --only-binary :all: -r .github/dmg-requirements.txt
 
       - name: Import the Developer ID certificate
         env:
@@ -132,8 +138,6 @@ jobs:
       # People download the disk image; it's signed and notarized on its own so Gatekeeper accepts it before it's opened.
       - name: Disk image
         run: |
-          python3 -m venv "$RUNNER_TEMP/dmgbuild"
-          "$RUNNER_TEMP/dmgbuild/bin/pip" install --quiet dmgbuild
           DMG="$RUNNER_TEMP/Pullo.dmg"
           "$RUNNER_TEMP/dmgbuild/bin/dmgbuild" -s .github/dmg-settings.py \
             -D app="$RUNNER_TEMP/export/Pullo.app" "Pullo" "$DMG"
@@ -187,3 +191,9 @@ jobs:
           done
           echo "::error::$FEED_URL still doesn't list build $BUILD"
           exit 1
+
+      - name: Remove the signing keychain and keys
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/api_key.p8" "$RUNNER_TEMP/cert.p12"

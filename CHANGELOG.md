@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Security
+- Links from checks only open web pages (http and https), so a check can't point Pullo at a file or another app.
+
 ## [0.10.2] - 2026-10-23
 
 ### Removed
