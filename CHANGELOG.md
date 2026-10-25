@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.11.4] - 2026-10-25
+
 ### Changed
 - Pullo no longer wakes up on every mouse move: it only follows the pointer while it is over the notch, which cuts its CPU use while you move the mouse elsewhere by about 95%.
 
@@ -315,7 +317,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.3...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.4...HEAD
+[0.11.4]: https://github.com/jordan-cod/pullo/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/jordan-cod/pullo/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/jordan-cod/pullo/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jordan-cod/pullo/compare/v0.11.0...v0.11.1
