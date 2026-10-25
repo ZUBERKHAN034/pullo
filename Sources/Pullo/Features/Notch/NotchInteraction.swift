@@ -30,6 +30,7 @@ final class NotchInteraction {
     @ObservationIgnored private var hoverTask: Task<Void, Never>?
     @ObservationIgnored private var waitingForPointerExit = false
     @ObservationIgnored private var pointer: NSPoint?
+    @ObservationIgnored private var pointerLeft = false
     @ObservationIgnored private var buttonHeld = false
 
     init(
@@ -63,10 +64,11 @@ final class NotchInteraction {
 
     // MARK: - Pointer
 
-    func mouseMoved(to point: NSPoint, buttonHeld: Bool = false) {
+    func mouseMoved(to point: NSPoint, buttonHeld: Bool = false, leaving: Bool = false) {
         pointer = point
+        pointerLeft = leaving
         self.buttonHeld = buttonHeld
-        let inside = layout.hitRect(for: state).contains(point)
+        let inside = !leaving && layout.hitRect(for: state).contains(point)
 
         if waitingForPointerExit {
             if !inside { waitingForPointerExit = false }
@@ -113,7 +115,7 @@ final class NotchInteraction {
     }
 
     private func isPointerOver(_ state: NotchState) -> Bool {
-        pointer.map(layout.hitRect(for: state).contains) ?? false
+        !pointerLeft && (pointer.map(layout.hitRect(for: state).contains) ?? false)
     }
 
     private func cancelHover() {
