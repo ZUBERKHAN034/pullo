@@ -11,13 +11,13 @@
 - The workflow publishes it as a GitHub pre-release on Sparkle's `beta` channel, so only people who turned on "Get beta versions" get it. The download links keep pointing to the latest stable release.
 
 ## Update feed
-- The app reads its Sparkle feed from GitHub Pages, at `https://jordan-cod.github.io/pullo/appcast.xml`, served from the `gh-pages` branch. Version 0.10.1 reads it through `https://pullo.jrdan.dev/appcast.xml`, which the site's Worker passes through without logging anything, so that address has to keep working. Pullo doesn't count users. Versions up to 0.8.0 read the old feed at `https://jordan-cod.github.io/devnotch/appcast.xml`, a frozen copy in the `jordan-cod/jordan-cod.github.io` repo that ends at 0.8.0, which moved everyone to the new feed.
+- The app reads its Sparkle feed from GitHub Pages, at `https://jordan-cod.github.io/pullo/appcast.xml`, served from the `gh-pages` branch. Version 0.10.1 reads `https://pullo.jrdan.dev/appcast.xml`, which the site's Worker redirects to the GitHub Pages feed, so that redirect has to stay. Pullo doesn't count users. Versions up to 0.8.0 read the old feed at `https://jordan-cod.github.io/devnotch/appcast.xml`, a frozen copy in the `jordan-cod/jordan-cod.github.io` repo that ends at 0.8.0, which moved everyone to the new feed.
 - Releases are immutable, so the feed never lives only inside a release. Every release workflow starts from the published feed, adds the new version, pushes it to `gh-pages` and waits until Pages serves it.
 - A copy is still attached to each release for installs older than 0.6.1, which read it from the latest release.
 - The stable `X.Y.Z` release lists everything since the previous stable release, betas included.
 
 ## Website
-- The product page at https://pullo.jrdan.dev lives in the private repo `jordan-cod/pullo-site`, which also serves `/appcast.xml`, passed through from the GitHub Pages feed.
+- The product page at https://pullo.jrdan.dev lives in the private repo `jordan-cod/pullo-site`, which also redirects `/appcast.xml` to the GitHub Pages feed.
 
 ## Code
 - No comments in code, except `// MARK:`.
