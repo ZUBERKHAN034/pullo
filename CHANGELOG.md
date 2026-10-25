@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Changed
+- Pullo no longer wakes up on every mouse move: it only follows the pointer while it is over the notch, which cuts its CPU use while you move the mouse elsewhere by about 95%.
+
 ## [0.11.3] - 2026-10-25
 
 ### Fixed

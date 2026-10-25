@@ -9,6 +9,8 @@ final class NotchPanelController {
     private var hotKey: HotKey?
     private var registeredShortcut: ShortcutChoice?
     private var monitors: [Any] = []
+    private var pointerMonitor: Any?
+    private var tracker: PointerTracker?
 
     init(app: AppDependencies) {
         self.app = app
@@ -31,6 +33,7 @@ final class NotchPanelController {
             MainActor.assumeIsolated { self?.screensChanged() }
         }
         installEventMonitors()
+        updatePointerMonitor()
     }
 
     func reopen() {
@@ -39,16 +42,20 @@ final class NotchPanelController {
     }
 
     private func stateChanged(to state: NotchState) {
-        updateMouseCapture()
         if state == .open, !panel.isKeyWindow, NSEvent.pressedMouseButtons == 0 {
             panel.makeKeyAndOrderFront(nil)
         }
         if state == .closed, panel.isKeyWindow {
-            DispatchQueue.main.async { [panel] in
-                panel.orderOut(nil)
-                panel.orderFrontRegardless()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { [weak self] in
+                MainActor.assumeIsolated { self?.giveUpKeyFocus() }
             }
         }
+    }
+
+    private func giveUpKeyFocus() {
+        guard notch.state == .closed, panel.isKeyWindow else { return }
+        panel.orderOut(nil)
+        panel.orderFrontRegardless()
     }
 
     private func toggleFromKeyboard() {
@@ -79,6 +86,7 @@ final class NotchPanelController {
             DispatchQueue.main.async {
                 MainActor.assumeIsolated {
                     self?.registerShortcut()
+                    self?.updatePointerMonitor()
                     self?.screensChanged()
                     self?.observeSettings()
                 }
@@ -102,36 +110,40 @@ final class NotchPanelController {
         panel.setFrame(target.panelFrame, display: true)
     }
 
-    private func pointerChanged(_ event: NSEvent) {
-        let buttonHeld = event.type == .leftMouseDragged
-        followPointer(to: NSEvent.mouseLocation)
-        notch.mouseMoved(to: NSEvent.mouseLocation, buttonHeld: buttonHeld)
-        if notch.state == .open, buttonHeld { return }
-        updateMouseCapture()
+    private func pointerChanged(leaving: Bool = false) {
+        notch.mouseMoved(to: NSEvent.mouseLocation, buttonHeld: NSEvent.pressedMouseButtons & 1 != 0, leaving: leaving)
     }
 
-    private func updateMouseCapture() {
-        let state = notch.state
-        let over = notch.layout.hitRect(for: state).contains(NSEvent.mouseLocation)
-        let ignores = state == .closed || !over
-        if panel.ignoresMouseEvents != ignores { panel.ignoresMouseEvents = ignores }
+    private func updatePointerMonitor() {
+        let follows = app.settings.display == .pointer
+        guard follows != (pointerMonitor != nil) else { return }
+        if let pointerMonitor {
+            NSEvent.removeMonitor(pointerMonitor)
+            self.pointerMonitor = nil
+        } else {
+            pointerMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] _ in
+                MainActor.assumeIsolated { self?.followPointer(to: NSEvent.mouseLocation) }
+            }
+        }
     }
 
     private func installEventMonitors() {
-        let pointer: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .leftMouseUp]
-        if let global = NSEvent.addGlobalMonitorForEvents(matching: pointer.union(.leftMouseDown), handler: { [weak self] event in
+        if let view = panel.contentView {
+            tracker = PointerTracker(view: view) { [weak self] leaving in self?.pointerChanged(leaving: leaving) }
+        }
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .leftMouseUp], handler: { [weak self] event in
             MainActor.assumeIsolated {
                 if event.type == .leftMouseDown {
                     self?.notch.mouseDown(at: NSEvent.mouseLocation)
                 } else {
-                    self?.pointerChanged(event)
+                    self?.pointerChanged()
                 }
             }
         }) {
             monitors.append(global)
         }
-        if let local = NSEvent.addLocalMonitorForEvents(matching: pointer, handler: { [weak self] event in
-            MainActor.assumeIsolated { self?.pointerChanged(event) }
+        if let local = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp, handler: { [weak self] event in
+            MainActor.assumeIsolated { self?.pointerChanged() }
             return event
         }) {
             monitors.append(local)
