@@ -4,6 +4,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+## [0.11.3] - 2026-10-25
+
 ### Fixed
 - A long account name on an alert stays on one line and shortens in the middle instead of wrapping.
 - Wide alert icons, like the team review one, fit inside their circle.
@@ -307,7 +309,8 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 - An alert stays open while the pointer is over it.
 - Clicks only land on the visible part of the notch. Everywhere else they go to the app behind it.
 
-[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.2...HEAD
+[unreleased]: https://github.com/jordan-cod/pullo/compare/v0.11.3...HEAD
+[0.11.3]: https://github.com/jordan-cod/pullo/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/jordan-cod/pullo/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jordan-cod/pullo/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jordan-cod/pullo/compare/v0.10.2...v0.11.0
