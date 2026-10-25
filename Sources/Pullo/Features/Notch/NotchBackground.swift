@@ -10,13 +10,14 @@ struct NotchBackground<S: Shape>: View {
     let height: CGFloat
     var style: PanelStyle?
     var scale: CGFloat = 1
+    var glassSize: CGSize?
 
     private var currentStyle: PanelStyle { style ?? settings.panelStyle }
 
     var body: some View {
         if usesGlass, #available(macOS 26, *) {
             ZStack {
-                Color.clear.glassEffect(.regular, in: shape)
+                glass
                 if currentStyle == .glassDarkTop {
                     darkTop
                 }
@@ -24,6 +25,20 @@ struct NotchBackground<S: Shape>: View {
             }
         } else {
             Color.black
+        }
+    }
+
+    @available(macOS 26, *)
+    @ViewBuilder
+    private var glass: some View {
+        if let glassSize {
+            Color.clear
+                .glassEffect(.regular, in: Rectangle())
+                .frame(width: glassSize.width, height: glassSize.height)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .transaction { $0.animation = nil }
+        } else {
+            Color.clear.glassEffect(.regular, in: shape)
         }
     }
 
