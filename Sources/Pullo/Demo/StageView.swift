@@ -33,16 +33,7 @@ import SwiftUI
 
     private struct Wallpaper: View {
         var body: some View {
-            ZStack {
-                LinearGradient(colors: [Color(red: 0.05, green: 0.06, blue: 0.16), Color(red: 0.11, green: 0.07, blue: 0.24)],
-                               startPoint: .top, endPoint: .bottom)
-                RadialGradient(colors: [Color(red: 0.45, green: 0.25, blue: 0.95).opacity(0.75), .clear],
-                               center: UnitPoint(x: 0.18, y: 0.3), startRadius: 10, endRadius: 520)
-                RadialGradient(colors: [Color(red: 1, green: 0.45, blue: 0.3).opacity(0.55), .clear],
-                               center: UnitPoint(x: 0.85, y: 0.85), startRadius: 10, endRadius: 480)
-                RadialGradient(colors: [Color(red: 0.2, green: 0.7, blue: 0.9).opacity(0.45), .clear],
-                               center: UnitPoint(x: 0.65, y: 0.15), startRadius: 10, endRadius: 380)
-            }
+            Color(red: 0.27, green: 0.28, blue: 0.3)
         }
     }
 
@@ -87,15 +78,9 @@ import SwiftUI
 
         var body: some View {
             VStack(spacing: 16) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .fill(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    Image(systemName: "arrow.triangle.pull")
-                        .font(.system(size: 38, weight: .bold))
-                        .foregroundStyle(.white)
-                }
-                .frame(width: 88, height: 88)
-                .shadow(color: .purple.opacity(0.6), radius: 30)
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .frame(width: 104, height: 104)
                 Text(caption.title)
                     .font(.system(size: 48, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)

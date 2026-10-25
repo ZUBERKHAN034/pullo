@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/media/prs.png" width="880" alt="Pullo open under the notch, listing pull requests">
+  <img src="docs/media/demo.gif" width="840" alt="Alerts drop from the notch, then Pullo opens to list pull requests">
 </p>
 
 ## Know the moment something changes
