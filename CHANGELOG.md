@@ -4,6 +4,10 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Fixed
+- A long account name on an alert stays on one line and shortens in the middle instead of wrapping.
+- Wide alert icons, like the team review one, fit inside their circle.
+
 ## [0.11.2] - 2026-10-23
 
 ### Fixed

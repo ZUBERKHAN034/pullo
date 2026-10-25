@@ -19,6 +19,7 @@ struct PeekView: View {
                             .font(.panel(.headline, .semibold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
+                            .layoutPriority(1)
                         accountChip
                     }
                     Text(alert.detail)

@@ -27,7 +27,10 @@ struct AlertIcon: View {
             Circle().fill(.black)
             Circle().fill(alert.tint.opacity(alert.actor == nil ? 0.2 : 0.35))
             Image(systemName: alert.symbol)
-                .font(.system(size: diameter * 0.5, weight: .bold))
+                .resizable()
+                .scaledToFit()
+                .fontWeight(.bold)
+                .frame(width: diameter * 0.62, height: diameter * 0.42)
                 .foregroundStyle(alert.tint)
         }
         .frame(width: diameter, height: diameter)
