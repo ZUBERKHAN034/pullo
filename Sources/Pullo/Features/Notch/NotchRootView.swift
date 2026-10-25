@@ -5,6 +5,7 @@ struct NotchRootView: View {
     @Environment(AccountStore.self) private var accounts
     @Environment(AppSettings.self) private var settings
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @State private var lastShown: NotchState = .open
 
     var body: some View {
         let state = notch.state
@@ -23,6 +24,22 @@ struct NotchRootView: View {
         .hintLayer(within: CGSize(width: size.width + radii.top * 2, height: size.height))
         .animation(Motion.peek, value: notch.liveCI)
         .environment(\.panelGlass, settings.panelStyle.usesGlass(reduceTransparency: reduceTransparency))
+        .onChange(of: state) { _, new in
+            if new != .closed { lastShown = new }
+        }
+    }
+
+    private func background(state: NotchState, shape: NotchShape, height: CGFloat) -> some View {
+        let glassState = state == .closed ? lastShown : state
+        let glassSize = notch.layout.size(for: glassState)
+        let glassRadii = notch.layout.radii(for: glassState)
+        return NotchBackground(
+            state: state,
+            shape: shape,
+            notchWidth: notch.geometry.notchSize.width,
+            height: height,
+            glassSize: CGSize(width: glassSize.width + glassRadii.top * 2, height: glassSize.height)
+        )
     }
 
     private func panel(state: NotchState, size: CGSize, radii: (top: CGFloat, bottom: CGFloat), shape: NotchShape) -> some View {
@@ -40,7 +57,7 @@ struct NotchRootView: View {
         }
         .frame(width: size.width, height: size.height, alignment: .top)
         .padding(.horizontal, radii.top)
-        .background { NotchBackground(state: state, shape: shape, notchWidth: notch.geometry.notchSize.width, height: size.height) }
+        .background { background(state: state, shape: shape, height: size.height) }
         .clipShape(shape)
         .compositingGroup()
         .shadow(color: .black.opacity(state == .closed ? 0 : 0.55), radius: state == .open ? 26 : 14, y: 8)

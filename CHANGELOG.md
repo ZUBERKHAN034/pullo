@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Fixed
+- Opening the panel with the glass style no longer briefly takes about 300 MB of memory. The glass background stays the same size while the panel animates, so it peaks under 30 MB.
+
 ## [0.11.3] - 2026-10-25
 
 ### Fixed
