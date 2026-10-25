@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Changed
+- Pullo no longer wakes up on every mouse move: it only follows the pointer while it is over the notch, which cuts its CPU use while you move the mouse elsewhere by about 95%.
+
 ### Fixed
 - Opening the panel with the glass style no longer briefly takes about 300 MB of memory. The glass background stays the same size while the panel animates, so it peaks under 30 MB.
 

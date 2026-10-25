@@ -83,6 +83,23 @@ extension NotchBehavior {
             #expect(h.notch.state == .closed)
         }
 
+        @Test func leavingThePanelClosesItEvenNearItsEdge() async {
+            let h = await NotchHarness()
+            h.notch.open()
+            let edge = h.notch.layout.hitRect(for: .open).insetBy(dx: 2, dy: 2).origin
+            h.notch.mouseMoved(to: edge, leaving: true)
+            await h.clock.advance(by: .milliseconds(200))
+            #expect(h.notch.state == .closed)
+        }
+
+        @Test func leavingTheClosedNotchCancelsTheOpen() async {
+            let h = await NotchHarness()
+            h.notch.mouseMoved(to: h.inside(.closed))
+            h.notch.mouseMoved(to: h.inside(.closed), leaving: true)
+            await h.clock.advance(by: .milliseconds(200))
+            #expect(h.notch.state == .closed)
+        }
+
         @Test func staysOpenWhileDraggingAPROut() async {
             let h = await NotchHarness()
             h.notch.open()
