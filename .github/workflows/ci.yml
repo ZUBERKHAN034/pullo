@@ -123,9 +123,14 @@ jobs:
             -clonedSourcePackagesDirPath "$RUNNER_TEMP/packages" \
             CODE_SIGNING_ALLOWED=NO
 
+      - name: Stage the app build
+        run: |
+          mkdir -p "$RUNNER_TEMP/PulloArtifact"
+          ditto "$RUNNER_TEMP/DerivedData/Build/Products/Release/Pullo.app" "$RUNNER_TEMP/PulloArtifact/Pullo.app"
+
       - name: Save the app build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: Pullo-unsigned-macOS-app
-          path: ${{ runner.temp }}/DerivedData/Build/Products/Release/Pullo.app
+          path: ${{ runner.temp }}/PulloArtifact/*
           if-no-files-found: error
