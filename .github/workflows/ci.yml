@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -118,5 +119,13 @@ jobs:
         run: |
           xcodebuild build \
             -project Pullo.xcodeproj -scheme Pullo -configuration Release \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -clonedSourcePackagesDirPath "$RUNNER_TEMP/packages" \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Save the app build
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v4
+        with:
+          name: Pullo-unsigned-macOS-app
+          path: ${{ runner.temp }}/DerivedData/Build/Products/Release/Pullo.app
+          if-no-files-found: error

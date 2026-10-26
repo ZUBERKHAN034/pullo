@@ -3,7 +3,7 @@ import Foundation
 enum DefaultsKey: String {
     case accounts, tabs, runTabs, unreadableTabs, unreadableRunTabs
     case mutedCategories, mutedAccounts, haptics, sound, categorySounds, panelStyle, liveCI, liveCILabel
-    case display, shortcut, holdInFullScreen
+    case display, shortcut, holdInFullScreen, openOnHover
     case readBaselines, readKnownAccounts
     case betaUpdates
 }

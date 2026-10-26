@@ -18,6 +18,11 @@ struct GeneralPage: View {
                 )
             }
             Section {
+                Toggle("Open Pullo on hover", isOn: $settings.opensOnHover)
+            } footer: {
+                Text("Turn this off if another app uses the notch. You can still open Pullo with its keyboard shortcut or by clicking the notch.")
+            }
+            Section {
                 Toggle("Open at login", isOn: Binding(
                     get: { settings.launchAtLogin },
                     set: { settings.setLaunchAtLogin($0) }

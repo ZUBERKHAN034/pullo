@@ -64,7 +64,7 @@ final class NotchInteraction {
 
     // MARK: - Pointer
 
-    func mouseMoved(to point: NSPoint, buttonHeld: Bool = false, leaving: Bool = false) {
+    func mouseMoved(to point: NSPoint, buttonHeld: Bool = false, leaving: Bool = false, opensOnHover: Bool = true) {
         pointer = point
         pointerLeft = leaving
         self.buttonHeld = buttonHeld
@@ -79,7 +79,7 @@ final class NotchInteraction {
         case .peek:
             peeks.pointerMoved(over: inside)
         case .closed:
-            guard inside else { return cancelHover() }
+            guard inside, opensOnHover else { return cancelHover() }
             scheduleHover(after: .milliseconds(80)) { notch in
                 if notch.isPointerOver(notch.state) { notch.open() }
             }

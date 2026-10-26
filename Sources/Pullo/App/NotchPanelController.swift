@@ -111,7 +111,12 @@ final class NotchPanelController {
     }
 
     private func pointerChanged(leaving: Bool = false) {
-        notch.mouseMoved(to: NSEvent.mouseLocation, buttonHeld: NSEvent.pressedMouseButtons & 1 != 0, leaving: leaving)
+        notch.mouseMoved(
+            to: NSEvent.mouseLocation,
+            buttonHeld: NSEvent.pressedMouseButtons & 1 != 0,
+            leaving: leaving,
+            opensOnHover: app.settings.opensOnHover
+        )
     }
 
     private func updatePointerMonitor() {

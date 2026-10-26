@@ -4,6 +4,9 @@ All notable changes to Pullo are listed here, newest first. The format follows [
 
 ## [Unreleased]
 
+### Added
+- You can turn off opening Pullo when you hover over the notch, so it won’t compete with other notch apps.
+
 ## [0.11.4] - 2026-10-25
 
 ### Changed

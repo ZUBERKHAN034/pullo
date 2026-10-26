@@ -17,6 +17,7 @@ final class AppSettings {
     var display: DisplayChoice { didSet { save() } }
     var shortcut: ShortcutChoice { didSet { save() } }
     var holdsAlertsInFullScreen: Bool { didSet { save() } }
+    var opensOnHover: Bool { didSet { save() } }
     var shortcutUnavailable = false
     private(set) var launchAtLogin: Bool
     private(set) var launchAtLoginFailure: String?
@@ -41,6 +42,7 @@ final class AppSettings {
         display = (defaults.object(for: .display) as? String).flatMap(DisplayChoice.init(rawValue:)) ?? .builtIn
         shortcut = (defaults.object(for: .shortcut) as? String).flatMap(ShortcutChoice.init(rawValue:)) ?? .optionCommandP
         holdsAlertsInFullScreen = defaults.object(for: .holdInFullScreen) as? Bool ?? false
+        opensOnHover = defaults.object(for: .openOnHover) as? Bool ?? true
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
@@ -92,5 +94,6 @@ final class AppSettings {
         defaults.set(display.rawValue, for: .display)
         defaults.set(shortcut.rawValue, for: .shortcut)
         defaults.set(holdsAlertsInFullScreen, for: .holdInFullScreen)
+        defaults.set(opensOnHover, for: .openOnHover)
     }
 }
